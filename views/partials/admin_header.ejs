@@ -17,7 +17,7 @@
 
         <div class="dropdown">
             <button class="btn btn-light border d-flex align-items-center gap-2 py-1 px-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <img src="<%= getAvatar(adminUser ? adminUser.avatar_url : null, adminUser ? adminUser.gender : 'Male', 'admin') %>" alt="Admin" class="topbar-avatar">
+                <img src="<%= typeof getAvatar === 'function' ? getAvatar(adminUser ? adminUser.avatar_url : null, adminUser ? adminUser.gender : 'Male', 'admin') : ((adminUser && adminUser.avatar_url) || '/images/default_avatar_male.svg') %>" alt="Admin" class="topbar-avatar">
                 <div class="text-start d-none d-sm-block">
                     <span class="d-block fw-bold small text-dark lh-1"><%= adminUser ? adminUser.name : 'Administrator' %></span>
                     <small class="text-muted" style="font-size: 0.7rem;">Super Admin</small>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || 'Biometric Machine Live Monitor | Quantum Science Academy' %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .pulse-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse-ring 1.8s infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        .pulse-dot-red {
+            animation: pulse-ring-red 1.8s infinite;
+        }
+        @keyframes pulse-ring-red {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .log-code-box {
+            background-color: #0f172a;
+            color: #38bdf8;
+            font-size: 0.75rem;
+            max-height: 180px;
+            overflow-y: auto;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin: 0;
+            font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+        .config-card {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .config-code {
+            background: rgba(255,255,255,0.1);
+            color: #fde047;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="admin-body">
+
+    <div class="admin-wrapper">
+        <%- include('../../partials/admin_sidebar') %>
+
+        <div class="admin-main">
+            <%- include('../../partials/admin_header') %>
+
+            <main class="admin-content">
+                <%- include('../../partials/alerts') %>
+
+                <!-- Page Header -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1">
+                            <i class="fa-solid fa-fingerprint text-primary me-2"></i>Biometric Device Live Monitor
+                        </h4>
+                        <p class="text-muted small mb-0">FKWeb &amp; HTTP Push Protocol Receiver • Real-time Attendance Punches</p>
+                    </div>
+                    <div class="d-flex flex-wrap align-items-center gap-2 mt-3 mt-sm-0">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="btnAutoRefresh" onclick="toggleAutoRefresh()">
+                                <i class="fa-solid fa-arrows-rotate me-1" id="refreshIcon"></i>
+                                <span id="refreshLabel">Auto-Refresh (10s)</span>
+                            </button>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="location.reload()">
+                                <i class="fa-solid fa-rotate-right me-1"></i> Refresh Now
+                            </button>
+                        </div>
+                        <a href="/api/biometric/logs/raw" target="_blank" class="btn btn-outline-info btn-sm">
+                            <i class="fa-solid fa-file-lines me-1"></i> Raw Log File
+                        </a>
+                        <form action="/admin/biometric/logs/clear" method="POST" onsubmit="return confirm('Clear recent in-memory log buffer? (Disk file will remain intact)')" class="d-inline">
+                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                <i class="fa-solid fa-trash-can me-1"></i> Clear Buffer
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- KPI Status Widgets -->
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="stat-widget">
+                            <div class="stat-icon <%= isConnected ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' %>">
+                                <i class="fa-solid fa-satellite-dish"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.72rem;">Cloud Connection</small>
+                                <div class="stat-val d-flex align-items-center gap-2 fs-5 mt-1">
+                                    <% if (isConnected) { %>
+                                        <span class="pulse-dot bg-success"></span>
+                                        <span class="text-success fw-bold">ONLINE</span>
+                                    <% } else { %>
+                                        <span class="pulse-dot pulse-dot-red bg-danger"></span>
+                                        <span class="text-danger fw-bold">WAITING PING</span>
+                                    <% } %>
+                                </div>
+                                <small class="text-muted" style="font-size: 0.72rem;">
+                                    <%= deviceState.lastSeen ? 'Last: ' + new Date(deviceState.lastSeen).toLocaleTimeString() : 'No connection yet' %>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="stat-widget">
+                            <div class="stat-icon bg-info-subtle text-info">
+                                <i class="fa-solid fa-microchip"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.72rem;">Device Serial / SN</small>
+                                <div class="stat-val fs-6 mt-1 text-dark fw-bold text-truncate" style="max-width: 170px;">
+                                    <%= deviceState.lastDeviceId || 'Detecting...' %>
+                                </div>
+                                <small class="text-muted" style="font-size: 0.72rem;">
+                                    IP: <%= deviceState.lastIp || 'N/A' %>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="stat-widget">
+                            <div class="stat-icon bg-warning-subtle text-warning">
+                                <i class="fa-solid fa-network-wired"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.72rem;">Last Request Type</small>
+                                <div class="stat-val fs-6 mt-1 text-dark fw-bold">
+                                    <%= deviceState.lastRequestCode || 'Heartbeat / Push' %>
+                                </div>
+                                <small class="text-muted" style="font-size: 0.72rem;">
+                                    FKWeb / HTTP Post
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="stat-widget">
+                            <div class="stat-icon bg-primary-subtle text-primary">
+                                <i class="fa-solid fa-chart-column"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.72rem;">Total Activity</small>
+                                <div class="stat-val fs-5 mt-1 text-primary fw-bold">
+                                    <%= deviceState.totalPings %> <span class="fs-6 text-muted fw-normal">Pings</span> | <%= deviceState.totalPunches %> <span class="fs-6 text-muted fw-normal">Punches</span>
+                                </div>
+                                <small class="text-muted" style="font-size: 0.72rem;">
+                                    Since server startup
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hardware Connection Guide Banner -->
+                <div class="config-card p-3 p-md-4 mb-4 shadow-sm">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                        <div>
+                            <h6 class="fw-bold text-warning mb-1">
+                                <i class="fa-solid fa-gear me-1"></i> Biometric Machine Network Setup Information
+                            </h6>
+                            <p class="text-light small mb-0 opacity-75">
+                                Enter these settings in your biometric hardware (Menu -> Comm -> Cloud / Web Server / ADMS):
+                            </p>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2 align-items-center">
+                            <div class="small">Server Host: <span class="config-code">quantum.mybhiwani.in</span></div>
+                            <div class="small">Port: <span class="config-code">80</span></div>
+                            <div class="small">Protocol: <span class="config-code">FKWeb / ADMS</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Live Payloads Table -->
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-header bg-white py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <h6 class="fw-bold mb-0 text-dark">
+                                <i class="fa-solid fa-stream text-primary me-1"></i> Live Captured Payloads
+                            </h6>
+                            <span class="badge bg-light text-muted border">Buffer: <%= logs.length %> entries</span>
+                        </div>
+                        <% if (isConnected) { %>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                <i class="fa-solid fa-circle-dot me-1"></i> Live Stream Active
+                            </span>
+                        <% } else { %>
+                            <span class="badge bg-light text-secondary border px-2 py-1">
+                                <i class="fa-solid fa-clock me-1"></i> Awaiting Incoming Requests
+                            </span>
+                        <% } %>
+                    </div>
+                    <div class="card-body p-0">
+                        <% if (logs.length === 0) { %>
+                            <div class="text-center py-5">
+                                <i class="fa-solid fa-fingerprint text-muted opacity-25" style="font-size: 3.5rem;"></i>
+                                <h6 class="fw-bold mt-3 text-secondary">No Machine Requests Captured Yet</h6>
+                                <p class="text-muted small mx-auto mb-3" style="max-width: 500px;">
+                                    Ensure the biometric machine is turned ON, connected to Wi-Fi/LAN, and configured with cloud server host <code>quantum.mybhiwani.in</code> on port <code>80</code>.
+                                </p>
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="location.reload()">
+                                    <i class="fa-solid fa-rotate-right me-1"></i> Check Again
+                                </button>
+                            </div>
+                        <% } else { %>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 140px;">Timestamp</th>
+                                            <th style="width: 180px;">Method &amp; Path</th>
+                                            <th style="width: 140px;">Device Serial</th>
+                                            <th style="width: 130px;">Request Code</th>
+                                            <th>Payload / Data Received</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% logs.forEach((l, idx) => { %>
+                                            <tr>
+                                                <td class="text-nowrap text-muted font-monospace small">
+                                                    <%= new Date(l.timestamp).toLocaleTimeString() %>
+                                                    <div style="font-size: 0.7rem;" class="text-muted"><%= new Date(l.timestamp).toLocaleDateString() %></div>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-primary-subtle text-primary me-1"><%= l.method %></span>
+                                                    <code class="small text-dark fw-bold"><%= l.path %></code>
+                                                    <div class="small text-muted" style="font-size: 0.72rem;">IP: <%= l.ip || 'N/A' %></div>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-light text-dark border font-monospace">
+                                                        <i class="fa-solid fa-barcode text-muted me-1"></i><%= l.devId || 'QSA-BIO-01' %>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-info-subtle text-info border border-info-subtle">
+                                                        <%= l.requestCode || 'cdata' %>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <pre class="log-code-box"><%= typeof l.body === 'object' ? JSON.stringify(l.body, null, 2) : (l.body || JSON.stringify(l.query || {})) %></pre>
+                                                </td>
+                                            </tr>
+                                        <% }); %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-refresh control
+        let refreshSeconds = 10;
+        let isPaused = false;
+        const refreshLabel = document.getElementById('refreshLabel');
+        const refreshIcon = document.getElementById('refreshIcon');
+
+        const interval = setInterval(() => {
+            if (!isPaused) {
+                refreshSeconds--;
+                if (refreshSeconds <= 0) {
+                    location.reload();
+                } else {
+                    refreshLabel.innerText = `Auto-Refresh (${refreshSeconds}s)`;
+                }
+            }
+        }, 1000);
+
+        function toggleAutoRefresh() {
+            isPaused = !isPaused;
+            if (isPaused) {
+                refreshLabel.innerText = 'Auto-Refresh Paused';
+                document.getElementById('btnAutoRefresh').classList.replace('btn-outline-secondary', 'btn-warning');
+            } else {
+                refreshSeconds = 10;
+                refreshLabel.innerText = `Auto-Refresh (${refreshSeconds}s)`;
+                document.getElementById('btnAutoRefresh').classList.replace('btn-warning', 'btn-outline-secondary');
+            }
+        }
+    </script>
+</body>
+</html>

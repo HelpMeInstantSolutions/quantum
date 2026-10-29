@@ -2,7 +2,7 @@
     const pathOnly = (currentUrl || '').split('?')[0];
     const isExamsActive = pathOnly.startsWith('/admin/results');
     const isStudentsActive = pathOnly.startsWith('/admin/students') || pathOnly.startsWith('/admin/promotion');
-    const isAttendanceActive = pathOnly.startsWith('/admin/attendance');
+    const isAttendanceActive = pathOnly.startsWith('/admin/attendance') || pathOnly.startsWith('/admin/biometric');
     const isFeesActive = pathOnly.startsWith('/admin/fees') || pathOnly.startsWith('/admin/receipts') || pathOnly.startsWith('/admin/pending-fees');
 %>
 <aside class="admin-sidebar">

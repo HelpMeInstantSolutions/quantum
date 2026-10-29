@@ -5,6 +5,7 @@ const path = require('path');
 const pool = require('../config/db');
 const initBiometricSchema = require('../database/init_biometric_schema');
 const { sendAttendancePushNotification } = require('../utils/pushNotificationService');
+const { requireAdminWeb } = require('../middleware/authMiddleware');
 
 // Auto-initialize biometric & dual-session schema
 (async () => {
@@ -582,117 +583,22 @@ router.get('/api/biometric/logs/raw', (req, res) => {
 });
 
 // 4. HTML Dashboard View: GET /admin/biometric/logs
-router.get('/admin/biometric/logs', (req, res) => {
-    const isConnected = deviceState.lastSeen && (Date.now() - new Date(deviceState.lastSeen).getTime()) < 60000;
-    const html = `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Biometric Machine Live Monitor | Quantum Science Academy</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-        <meta http-equiv="refresh" content="10">
-        <style>
-            body { background: #0f172a; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif; }
-            .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; }
-            .badge-live { animation: pulse 2s infinite; }
-            @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
-            pre { background: #020617; color: #38bdf8; padding: 12px; border-radius: 8px; font-size: 12px; }
-        </style>
-    </head>
-    <body class="p-4">
-        <div class="container-fluid">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2 class="fw-bold text-white mb-1">📟 Biometric Device Live Monitor</h2>
-                    <p class="text-secondary mb-0">FKWeb &amp; HTTP Push Protocol Receiver • Auto-refreshes every 10s</p>
-                </div>
-                <div>
-                    <a href="/api/biometric/logs/raw" target="_blank" class="btn btn-outline-info btn-sm me-2">📄 View Raw biometric.log</a>
-                    <a href="/admin" class="btn btn-primary btn-sm">⬅ Admin Dashboard</a>
-                </div>
-            </div>
+router.get('/admin/biometric/logs', requireAdminWeb, (req, res) => {
+    const isConnected = !!(deviceState.lastSeen && (Date.now() - new Date(deviceState.lastSeen).getTime()) < 60000);
+    const schoolName = res.locals.school?.school_name || 'Quantum Science Academy';
+    res.render('admin/biometric/logs', {
+        title: `Biometric Machine Live Monitor | ${schoolName}`,
+        isConnected,
+        deviceState,
+        logs: inMemoryLogs
+    });
+});
 
-            <!-- Status KPI Cards -->
-            <div class="row g-3 mb-4">
-                <div class="col-md-3">
-                    <div class="card p-3">
-                        <small class="text-secondary fw-semibold">CLOUD STATUS</small>
-                        <h4 class="fw-bold mt-1 ${isConnected ? 'text-success' : 'text-danger'}">
-                            ${isConnected ? '🟢 ONLINE (CONNECTED)' : '🔴 WAITING PING'}
-                        </h4>
-                        <small class="text-muted">${deviceState.lastSeen ? 'Last seen: ' + new Date(deviceState.lastSeen).toLocaleTimeString() : 'No ping yet'}</small>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card p-3">
-                        <small class="text-secondary fw-semibold">DEVICE ID / SERIAL</small>
-                        <h4 class="fw-bold mt-1 text-info">${deviceState.lastDeviceId || 'Detecting...'}</h4>
-                        <small class="text-muted">IP: ${deviceState.lastIp || 'N/A'}</small>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card p-3">
-                        <small class="text-secondary fw-semibold">LAST REQUEST CODE</small>
-                        <h4 class="fw-bold mt-1 text-warning">${deviceState.lastRequestCode || 'None'}</h4>
-                        <small class="text-muted">Heartbeat / Push Type</small>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card p-3">
-                        <small class="text-secondary fw-semibold">ACTIVITY COUNTERS</small>
-                        <h4 class="fw-bold mt-1 text-white">📡 ${deviceState.totalPings} | 📥 ${deviceState.totalPunches}</h4>
-                        <small class="text-muted">Total Pings | Punches Received</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Live Logs Table -->
-            <div class="card p-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-bold text-white mb-0">📡 Recent Incoming Machine Payloads (${inMemoryLogs.length})</h5>
-                    <span class="badge bg-success badge-live">● Live Stream Active</span>
-                </div>
-                ${inMemoryLogs.length === 0 ? `
-                    <div class="alert alert-dark text-center py-5">
-                        <h5>No requests captured yet</h5>
-                        <p class="text-secondary mb-0">Ensure the machine is turned on, connected to Wi-Fi, and pointing to <code>http://qunatum.mybhiwani.in</code>.</p>
-                    </div>
-                ` : `
-                    <div class="table-responsive">
-                        <table class="table table-dark table-hover table-bordered align-middle">
-                            <thead class="table-secondary text-dark">
-                                <tr>
-                                    <th>Timestamp</th>
-                                    <th>Method &amp; Path</th>
-                                    <th>Device SN</th>
-                                    <th>Request Code</th>
-                                    <th>Payload (Body / Query)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${inMemoryLogs.map(l => `
-                                    <tr>
-                                        <td class="text-nowrap font-monospace text-info">${new Date(l.timestamp).toLocaleTimeString()}</td>
-                                        <td><span class="badge bg-primary">${l.method}</span> <code class="text-warning">${l.path}</code></td>
-                                        <td><strong class="text-white">${l.devId || 'Unknown'}</strong></td>
-                                        <td><span class="badge bg-secondary">${l.requestCode || 'General'}</span></td>
-                                        <td>
-                                            <pre class="mb-0">${typeof l.body === 'object' ? JSON.stringify(l.body, null, 2) : (l.body || JSON.stringify(l.query))}</pre>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                `}
-            </div>
-        </div>
-    </body>
-    </html>
-    `;
-    res.send(html);
+// Clear in-memory buffer
+router.post('/admin/biometric/logs/clear', requireAdminWeb, (req, res) => {
+    inMemoryLogs.length = 0;
+    req.session.flash_success = 'Biometric in-memory request buffer cleared successfully.';
+    res.redirect('/admin/biometric/logs');
 });
 
 module.exports = router;
