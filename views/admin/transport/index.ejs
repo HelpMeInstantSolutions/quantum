@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+    <div class="admin-wrapper">
+        <%- include('../../partials/admin_sidebar') %>
+
+        <div class="admin-main">
+            <%- include('../../partials/admin_header') %>
+
+            <main class="admin-content">
+                <%- include('../../partials/alerts') %>
+
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1">Bus Transport & Fleet Management</h4>
+                        <p class="text-muted small mb-0">Manage school bus routes, drivers, pickup stops, and student bus pass allocations.</p>
+                    </div>
+                    <div>
+                        <a href="/admin/transport/students" class="btn btn-outline-primary fw-semibold">
+                            <i class="fa-solid fa-users me-1"></i> Bus Passengers List
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <!-- Routes List -->
+                    <div class="col-lg-8">
+                        <div class="admin-card">
+                            <div class="admin-card-header">
+                                <h5>Active Bus Routes</h5>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Route Name</th>
+                                            <th>Vehicle No</th>
+                                            <th>Driver Name & Phone</th>
+                                            <th>Monthly Fee</th>
+                                            <th>Stops</th>
+                                            <th>Students</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (routes && routes.length > 0) { %>
+                                            <% routes.forEach(r => { %>
+                                                <tr>
+                                                    <td><strong><%= r.route_name %></strong></td>
+                                                    <td><span class="badge bg-light text-dark border"><%= r.vehicle_number %></span></td>
+                                                    <td>
+                                                        <div><%= r.driver_name %></div>
+                                                        <small><a href="tel:<%= r.driver_phone %>" class="text-muted text-decoration-none"><i class="fa-solid fa-phone me-1 text-success"></i><%= r.driver_phone %></a></small>
+                                                    </td>
+                                                    <td><strong>₹<%= Number(r.monthly_charge).toLocaleString('en-IN') %></strong></td>
+                                                    <td><span class="badge bg-secondary-subtle text-dark"><%= r.total_stops %> Stops</span></td>
+                                                    <td><span class="badge bg-primary-subtle text-primary border"><%= r.assigned_students %> Students</span></td>
+                                                </tr>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <tr><td colspan="6" class="text-center text-muted py-4">No transport routes added yet.</td></tr>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Stops Table -->
+                        <div class="admin-card">
+                            <div class="admin-card-header">
+                                <h5>Pickup & Drop Stops</h5>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Route ID</th>
+                                            <th>Stop Name</th>
+                                            <th>Morning Pickup</th>
+                                            <th>Evening Drop</th>
+                                            <th>Monthly Fare</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (stops && stops.length > 0) { %>
+                                            <% stops.forEach(s => { %>
+                                                <tr>
+                                                    <td><span class="badge bg-light text-dark border">Route <%= s.route_id %></span></td>
+                                                    <td><strong><%= s.stop_name %></strong></td>
+                                                    <td><span class="badge bg-success-subtle text-success"><%= s.pickup_time %></span></td>
+                                                    <td><span class="badge bg-warning-subtle text-dark"><%= s.drop_time %></span></td>
+                                                    <td>₹<%= Number(s.stop_fare).toLocaleString('en-IN') %></td>
+                                                </tr>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <tr><td colspan="5" class="text-center text-muted py-3">No stops added yet.</td></tr>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add Route & Stop Forms -->
+                    <div class="col-lg-4">
+                        <div class="admin-card mb-4">
+                            <div class="admin-card-header">
+                                <h5><i class="fa-solid fa-bus text-warning me-2"></i>Add Bus Route</h5>
+                            </div>
+                            <div class="admin-card-body">
+                                <form action="/admin/transport/routes/create" method="POST">
+                                    <div class="mb-2">
+                                        <label class="form-label small fw-bold">Route Title *</label>
+                                        <input type="text" name="route_name" class="form-control form-control-sm" required placeholder="e.g. Route 3: Sukhpura Chowk to Campus">
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label small fw-bold">Vehicle Registration No *</label>
+                                        <input type="text" name="vehicle_number" class="form-control form-control-sm" required placeholder="HR-12-XX-0000">
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label small fw-bold">Driver Name *</label>
+                                        <input type="text" name="driver_name" class="form-control form-control-sm" required placeholder="Driver Full Name">
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label small fw-bold">Driver Contact Mobile *</label>
+                                        <input type="tel" name="driver_phone" class="form-control form-control-sm" required placeholder="+91-9812XXXXXX">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Monthly Charge (₹)</label>
+                                        <input type="number" name="monthly_charge" class="form-control form-control-sm" value="1200">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm w-100 fw-bold">
+                                        <i class="fa-solid fa-plus me-1"></i> Save Route
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Add Stop -->
+                        <div class="admin-card">
+                            <div class="admin-card-header">
+                                <h5><i class="fa-solid fa-location-dot text-danger me-2"></i>Add Pickup Stop</h5>
+                            </div>
+                            <div class="admin-card-body">
+                                <form action="/admin/transport/stops/create" method="POST">
+                                    <div class="mb-2">
+                                        <label class="form-label small fw-bold">Assign to Route *</label>
+                                        <select name="route_id" class="form-select form-select-sm" required>
+                                            <% routes.forEach(r => { %>
+                                                <option value="<%= r.id %>"><%= r.route_name %></option>
+                                            <% }) %>
+                                        </select>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label small fw-bold">Stop Landmark / Name *</label>
+                                        <input type="text" name="stop_name" class="form-control form-control-sm" required placeholder="e.g. Model Town Market Gate">
+                                    </div>
+                                    <div class="row g-2 mb-2">
+                                        <div class="col-6">
+                                            <label class="form-label small fw-bold">Pickup Time</label>
+                                            <input type="text" name="pickup_time" class="form-control form-control-sm" value="07:30 AM">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="form-label small fw-bold">Drop Time</label>
+                                            <input type="text" name="drop_time" class="form-control form-control-sm" value="02:30 PM">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-outline-primary btn-sm w-100 fw-bold">
+                                        <i class="fa-solid fa-plus me-1"></i> Add Stop
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

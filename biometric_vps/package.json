@@ -1,0 +1,13 @@
+{
+  "name": "biometric-cloud-hub",
+  "version": "1.0.0",
+  "description": "Realand / BioFace M61 Dedicated Cloud Hub for aaPanel",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

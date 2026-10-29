@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || school.seo_meta_title || (school.school_name || 'Quantum Science Acadmey') + ' | Premier Science & Board Institute' %></title>
+    
+    <!-- Dynamic Favicon -->
+    <link rel="icon" type="image/x-icon" href="<%= school.favicon_url || school.logo_url || '/images/logo.png' %>">
+    <link rel="apple-touch-icon" href="<%= school.favicon_url || school.logo_url || '/images/logo.png' %>">
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="<%= metaDescription || school.seo_meta_description || ((school.school_name || 'Quantum Science Acadmey') + ' - Premier educational institute providing quality schooling, board preparation, and competitive exams foundation.') %>">
+    <meta name="keywords" content="<%= metaKeywords || school.seo_meta_keywords || ((school.school_name || 'Quantum Science Acadmey') + ', Science Academy, CBSE HBSE, NEET Coaching, JEE Prep') %>">
+    <meta name="author" content="<%= school.school_name || 'Quantum Science Acadmey' %>">
+    <meta name="robots" content="index, follow">
+    
+    <!-- OpenGraph Tags -->
+    <meta property="og:title" content="<%= title || school.school_name || 'Quantum Science Acadmey' %>">
+    <meta property="og:description" content="<%= metaDescription || school.tagline || 'Inspiring Innovation, Igniting Scientific Minds & Excellence.' %>">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="http://localhost:5004<%= currentUrl %>">
+    <meta property="og:image" content="<%= school.logo_url || '/images/logo.png' %>">
+
+    <!-- Schema.org JSON-LD for School -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "EducationalOrganization",
+      "name": "<%= school.school_name || 'Quantum Science Acadmey' %>",
+      "description": "<%= school.seo_meta_description || school.tagline || 'Premier Science & Board Institute' %>",
+      "url": "http://localhost:5004",
+      "logo": "http://localhost:5004<%= school.logo_url || '/images/logo.png' %>",
+      "telephone": "<%= school.phone || '+91-9467389100' %>",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "<%= school.address || 'Near Model Town' %>",
+        "addressLocality": "Rohtak",
+        "addressRegion": "Haryana",
+        "postalCode": "124001",
+        "addressCountry": "IN"
+      }
+    }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Custom Public CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        :root {
+            --brand-primary: <%= school.primary_color || '#142b3c' %>;
+            --brand-secondary: <%= school.secondary_color || '#1a56db' %>;
+            --brand-accent: <%= school.accent_color || '#f59e0b' %>;
+        }
+        .site-topbar {
+            background-color: var(--brand-primary);
+        }
+        .text-brand-primary {
+            color: var(--brand-primary) !important;
+        }
+        .bg-brand-primary {
+            background-color: var(--brand-primary) !important;
+        }
+        .marquee-strip {
+            background: linear-gradient(90deg, #1e293b, #0f172a);
+            color: #f8fafc;
+            font-size: 0.85rem;
+            padding: 7px 0;
+            overflow: hidden;
+            border-bottom: 2px solid var(--brand-accent);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Contact Bar -->
+    <div class="site-topbar d-none d-md-block">
+        <div class="container-xl d-flex justify-content-between align-items-center">
+            <div class="d-flex flex-wrap gap-3 align-items-center">
+                <span class="text-truncate" style="max-width: 380px;"><i class="fa-solid fa-location-dot text-warning me-1"></i> <%= school.address || 'Kaunt Road, Opposite Hanuman Mandir Bhiwani' %></span>
+                <span><i class="fa-solid fa-phone text-warning me-1"></i> <a href="tel:<%= (school.phone || '+919466255941').replace(/[^0-9+]/g, '') %>"><%= school.phone || '+91-9466255941' %></a></span>
+                <span class="d-none d-lg-inline"><i class="fa-solid fa-envelope text-warning me-1"></i> <a href="mailto:<%= school.email || 'info@quantumscience.in' %>"><%= school.email || 'info@quantumscience.in' %></a></span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <span class="badge bg-warning text-dark fw-bold px-2 py-1"><i class="fa-solid fa-check-circle me-1"></i> <%= school.institution_type || 'Academy' %></span>
+                <a href="/admin/login" class="text-white fw-bold"><i class="fa-solid fa-lock me-1"></i> Admin Portal</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Header -->
+    <nav class="navbar navbar-expand-lg site-navbar sticky-top bg-white shadow-sm">
+        <div class="container-xl">
+            <a class="navbar-brand d-flex align-items-center gap-2 py-0 text-decoration-none" href="/">
+                <% if (school.logo_display_mode !== 'text_only') { %>
+                    <img src="<%= school.logo_url || '/images/logo.png' %>" alt="<%= school.school_name || 'Quantum Science Acadmey' %> Logo" class="site-logo" style="height: <%= school.logo_height || 48 %>px; max-height: 90px; width: auto; object-fit: contain;">
+                <% } %>
+                
+                <% if (school.logo_display_mode !== 'logo_only') { %>
+                    <div class="d-flex flex-column justify-content-center">
+                        <span class="navbar-brand-title"><%= school.school_name || 'Quantum Science Acadmey' %></span>
+                        <small class="navbar-brand-tagline d-none d-sm-block text-uppercase fw-semibold"><%= school.tagline || (school.institution_type ? school.institution_type + ' of Science' : 'Inspiring Innovation, Igniting Scientific Minds') %></small>
+                    </div>
+                <% } %>
+            </a>
+            
+            <button class="navbar-toggler border-0 shadow-none p-1" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link <%= currentUrl === '/' ? 'active' : '' %>" href="/"><i class="fa-solid fa-house me-1 text-primary"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <%= currentUrl === '/about' ? 'active' : '' %>" href="/about"><i class="fa-solid fa-circle-info me-1 d-lg-none text-secondary"></i> About Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <%= currentUrl === '/academics' ? 'active' : '' %>" href="/academics"><i class="fa-solid fa-graduation-cap me-1 d-lg-none text-secondary"></i> Academics</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <%= currentUrl === '/admissions' ? 'active' : '' %>" href="/admissions"><i class="fa-solid fa-file-signature me-1 d-lg-none text-secondary"></i> Admissions</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <%= currentUrl === '/notices' ? 'active' : '' %>" href="/notices"><i class="fa-solid fa-bullhorn me-1 d-lg-none text-secondary"></i> Notice Board</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <%= currentUrl === '/gallery' ? 'active' : '' %>" href="/gallery"><i class="fa-solid fa-images me-1 d-lg-none text-secondary"></i> Gallery</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <%= currentUrl === '/contact' ? 'active' : '' %>" href="/contact"><i class="fa-solid fa-envelope me-1 d-lg-none text-secondary"></i> Contact</a>
+                    </li>
+                    
+                    <% if (school.admission_status !== 'closed') { %>
+                    <li class="nav-item ms-lg-2">
+                        <a href="/admissions#apply-now" class="btn btn-warning text-dark fw-bold rounded-pill shadow-sm btn-apply-nav px-3 py-2">
+                            <i class="fa-solid fa-paper-plane me-1"></i> Apply <span class="d-none d-xxl-inline"><%= school.current_session || '2026-27' %></span><span class="d-inline d-xxl-none">Now</span>
+                        </a>
+                    </li>
+                    <% } %>
+
+                    <li class="nav-item ms-lg-2 d-lg-none mt-2 pt-2 border-top">
+                        <a href="/admin/login" class="btn btn-outline-primary w-100 fw-bold">
+                            <i class="fa-solid fa-lock me-1"></i> Admin Web Portal
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Marquee Notice Ticker Strip -->
+    <% if (school.marquee_active !== '0' && school.marquee_notice) { %>
+    <div class="marquee-strip">
+        <div class="container d-flex align-items-center">
+            <span class="badge bg-warning text-dark fw-bold me-3 px-2 py-1 text-uppercase">
+                <i class="fa-solid fa-bullhorn me-1"></i> Notice
+            </span>
+            <marquee behavior="scroll" direction="left" scrollamount="6" onmouseover="this.stop();" onmouseout="this.start();" class="fw-semibold">
+                <%= school.marquee_notice %>
+            </marquee>
+        </div>
+    </div>
+    <% } %>

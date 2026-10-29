@@ -1,0 +1,279 @@
+<%- include('../partials/header') %>
+
+<style>
+    .error-page-wrapper {
+        min-height: 75vh;
+        background: radial-gradient(circle at 50% 20%, rgba(26, 86, 219, 0.05) 0%, rgba(248, 250, 252, 0.9) 70%);
+        position: relative;
+        overflow: hidden;
+        padding: 60px 0 80px 0;
+    }
+
+    /* Floating Science Formulas & Particles */
+    .floating-formula {
+        position: absolute;
+        color: rgba(20, 43, 60, 0.12);
+        font-weight: 700;
+        user-select: none;
+        pointer-events: none;
+        animation: floatParticle 8s ease-in-out infinite alternate;
+    }
+    .f1 { top: 12%; left: 8%; font-size: 1.8rem; animation-duration: 7s; }
+    .f2 { top: 20%; right: 10%; font-size: 2.2rem; animation-duration: 9s; animation-delay: 1s; }
+    .f3 { bottom: 25%; left: 12%; font-size: 1.6rem; animation-duration: 8s; animation-delay: 2s; }
+    .f4 { bottom: 20%; right: 14%; font-size: 2rem; animation-duration: 10s; animation-delay: 1.5s; }
+
+    @keyframes floatParticle {
+        0% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(6deg); }
+        100% { transform: translateY(0px) rotate(-4deg); }
+    }
+
+    /* 404 Hero Number */
+    .error-code-container {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .error-digit {
+        font-size: clamp(5rem, 14vw, 8.5rem);
+        font-weight: 900;
+        line-height: 1;
+        color: var(--primary-navy);
+        text-shadow: 0 10px 25px rgba(20, 43, 60, 0.15);
+    }
+
+    .error-orbit-badge {
+        width: clamp(75px, 11vw, 115px);
+        height: clamp(75px, 11vw, 115px);
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--brand-secondary, #1a56db), var(--brand-primary, #142b3c));
+        color: var(--brand-accent, #f59e0b);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: clamp(2.4rem, 5vw, 3.8rem);
+        box-shadow: 0 12px 30px rgba(26, 86, 219, 0.35);
+        animation: pulseOrbit 3s ease-in-out infinite;
+        position: relative;
+    }
+
+    .error-orbit-badge::after {
+        content: '';
+        position: absolute;
+        inset: -6px;
+        border-radius: 50%;
+        border: 2px dashed rgba(245, 158, 11, 0.5);
+        animation: spinOrbit 14s linear infinite;
+    }
+
+    @keyframes pulseOrbit {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
+    @keyframes spinOrbit {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    /* Error Text Styles */
+    .error-title {
+        font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+        font-weight: 800;
+        color: var(--primary-navy);
+        margin-bottom: 12px;
+    }
+
+    .error-subtitle {
+        font-size: 1.05rem;
+        color: #64748b;
+        max-width: 620px;
+        margin: 0 auto 32px auto;
+        line-height: 1.6;
+    }
+
+    /* Helpful Quick Link Cards */
+    .error-nav-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 18px 20px;
+        text-decoration: none;
+        color: var(--text-dark);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        transition: all 0.25s ease-in-out;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        height: 100%;
+    }
+
+    .error-nav-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 24px rgba(20, 43, 60, 0.08);
+        border-color: var(--brand-secondary, #1a56db);
+        color: var(--brand-secondary, #1a56db);
+    }
+
+    .error-nav-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+    }
+
+    .bg-icon-home { background: #eff6ff; color: #1a56db; }
+    .bg-icon-academics { background: #fef3c7; color: #d97706; }
+    .bg-icon-admissions { background: #ecfdf5; color: #059669; }
+    .bg-icon-notices { background: #fdf2f8; color: #db2777; }
+
+    /* Support Callout Box */
+    .error-support-box {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 24px 30px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+        margin-top: 40px;
+        max-width: 780px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+</style>
+
+<div class="error-page-wrapper">
+    <!-- Floating Decorative Background Elements -->
+    <div class="floating-formula f1"><i class="fa-solid fa-atom me-2"></i>E = mc²</div>
+    <div class="floating-formula f2"><i class="fa-solid fa-dna me-2"></i>DNA</div>
+    <div class="floating-formula f3"><i class="fa-solid fa-flask me-2"></i>H₂O + CO₂</div>
+    <div class="floating-formula f4"><i class="fa-solid fa-square-root-variable me-2"></i>π · r²</div>
+
+    <div class="container text-center position-relative" style="z-index: 2;">
+        
+        <!-- Big Animated 404 Atom Orbit -->
+        <div class="error-code-container">
+            <span class="error-digit">4</span>
+            <div class="error-orbit-badge">
+                <i class="fa-solid fa-atom"></i>
+            </div>
+            <span class="error-digit">4</span>
+        </div>
+
+        <span class="badge px-3 py-2 rounded-pill mb-3" style="background-color: #fef3c7; color: #b45309; font-weight: 700; font-size: 0.85rem;">
+            <i class="fa-solid fa-triangle-exclamation me-1"></i> HTTP 404: Coordinate Not Found
+        </span>
+
+        <h1 class="error-title">Oops! You've Drifted Out of Orbit</h1>
+        
+        <p class="error-subtitle">
+            The page you are looking for might have been moved, renamed, or is temporarily unavailable in our academy portal. 
+            <br class="d-none d-md-block">
+            <span class="text-secondary small">(Aap jis page ko dhoondh rahe hain wo uplabdh nahi hai ya link badal gaya hai.)</span>
+        </p>
+
+        <!-- Primary Action Buttons -->
+        <div class="d-flex flex-wrap justify-content-center gap-3 mb-5">
+            <a href="/" class="btn btn-primary px-4 py-2 rounded-pill fw-semibold shadow-sm" style="background-color: var(--brand-primary, #142b3c); border-color: var(--brand-primary, #142b3c);">
+                <i class="fa-solid fa-house me-2"></i> Return to Homepage
+            </a>
+            <a href="javascript:history.back()" class="btn btn-outline-secondary px-4 py-2 rounded-pill fw-semibold">
+                <i class="fa-solid fa-arrow-left me-2"></i> Go to Previous Page
+            </a>
+            <a href="/admissions" class="btn btn-warning px-4 py-2 rounded-pill fw-bold text-dark shadow-sm">
+                <i class="fa-solid fa-graduation-cap me-2"></i> Apply for Admissions
+            </a>
+        </div>
+
+        <!-- Quick Explore Links Grid -->
+        <div class="text-start mb-2 mx-auto" style="max-width: 900px;">
+            <h6 class="text-uppercase fw-bold text-muted small mb-3 text-center">
+                <i class="fa-solid fa-compass me-1 text-primary"></i> Helpful Quick Links to Explore
+            </h6>
+            
+            <div class="row g-3">
+                <div class="col-md-6 col-lg-3">
+                    <a href="/" class="error-nav-card">
+                        <div class="error-nav-icon bg-icon-home">
+                            <i class="fa-solid fa-school"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark">Home Portal</div>
+                            <small class="text-muted">Explore Campus</small>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+                    <a href="/academics" class="error-nav-card">
+                        <div class="error-nav-icon bg-icon-academics">
+                            <i class="fa-solid fa-book-open"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark">Academics</div>
+                            <small class="text-muted">NEET, JEE & Board</small>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+                    <a href="/notices" class="error-nav-card">
+                        <div class="error-nav-icon bg-icon-notices">
+                            <i class="fa-solid fa-bullhorn"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark">Notice Board</div>
+                            <small class="text-muted">Latest Circulars</small>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+                    <a href="/contact" class="error-nav-card">
+                        <div class="error-nav-icon bg-icon-admissions">
+                            <i class="fa-solid fa-headset"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark">Helpdesk</div>
+                            <small class="text-muted">Reach School Office</small>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Support Card -->
+        <div class="error-support-box">
+            <div class="row align-items-center g-3 text-start">
+                <div class="col-md-8">
+                    <h6 class="fw-bold text-dark mb-1">
+                        <i class="fa-solid fa-circle-question text-primary me-2"></i>Need Help Finding Something?
+                    </h6>
+                    <p class="text-muted small mb-0">
+                        Our administration and admissions team is available Monday to Saturday to assist you with student enrollment, queries, and reports.
+                    </p>
+                </div>
+                <div class="col-md-4 text-md-end text-start">
+                    <div class="d-flex flex-column gap-2">
+                        <a href="tel:<%= school.phone || '+91-9467389100' %>" class="btn btn-sm btn-outline-primary fw-semibold rounded-pill text-nowrap">
+                            <i class="fa-solid fa-phone me-1"></i> <%= school.phone || '+91-9467389100' %>
+                        </a>
+                        <a href="/admin/login" class="btn btn-sm btn-light fw-semibold text-secondary rounded-pill border text-nowrap">
+                            <i class="fa-solid fa-lock me-1"></i> Admin Web Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+    <div class="admin-wrapper">
+        <%- include('../../partials/admin_sidebar') %>
+
+        <div class="admin-main">
+            <%- include('../../partials/admin_header') %>
+
+            <main class="admin-content">
+                <%- include('../../partials/alerts') %>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1">Fee Structures & Head Setup</h4>
+                        <p class="text-muted small mb-0">Define fee types for Whole School, Specific Class, Section, or Custom for an Individual Student.</p>
+                    </div>
+                    <a href="/admin/fees" class="btn btn-outline-secondary btn-sm">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Fee Overview
+                    </a>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <!-- Structures List -->
+                    <div class="col-lg-8">
+                        <div class="admin-card mb-4">
+                            <div class="admin-card-header">
+                                <h5>Configured Fee Structures</h5>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Fee Head Name</th>
+                                            <th>Applies To</th>
+                                            <th>Target Class / Student</th>
+                                            <th>Amount (₹)</th>
+                                            <th>Frequency</th>
+                                            <th class="text-end">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (structures && structures.length > 0) { %>
+                                            <% structures.forEach(ft => { %>
+                                                <tr>
+                                                    <td><strong><%= ft.fee_name %></strong></td>
+                                                    <td>
+                                                        <span class="badge <%= ft.applies_to === 'whole_school' ? 'bg-primary' : (ft.applies_to === 'class' ? 'bg-info text-dark' : (ft.applies_to === 'section' ? 'bg-secondary' : 'bg-warning text-dark')) %> text-uppercase">
+                                                            <%= ft.applies_to.replace('_', ' ') %>
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <% if (ft.applies_to === 'whole_school') { %>
+                                                            <span class="text-muted">All Students</span>
+                                                        <% } else if (ft.applies_to === 'class') { %>
+                                                            <span class="fw-bold"><%= ft.class_name %></span>
+                                                        <% } else if (ft.applies_to === 'section') { %>
+                                                            <span><%= ft.class_name %> (<%= ft.section_name %>)</span>
+                                                        <% } else if (ft.applies_to === 'student') { %>
+                                                            <span class="fw-bold text-primary"><%= ft.first_name %> <%= ft.last_name %> (<%= ft.admission_no %>)</span>
+                                                        <% } %>
+                                                    </td>
+                                                    <td><strong class="text-dark">₹<%= Number(ft.amount).toLocaleString('en-IN') %></strong></td>
+                                                    <td><span class="badge bg-light text-dark border text-capitalize"><%= ft.frequency %></span></td>
+                                                    <td class="text-end">
+                                                        <form action="/admin/fees/structures/<%= ft.id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Delete this fee structure?');">
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2">
+                                                                <i class="fa-solid fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <tr><td colspan="6" class="text-center text-muted py-4">No fee structures configured.</td></tr>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Generate Dues Box -->
+                        <div class="admin-card border-primary">
+                            <div class="admin-card-header bg-primary-subtle text-primary">
+                                <h5 class="mb-0"><i class="fa-solid fa-gears me-2"></i>Generate Monthly / Quarterly Student Dues</h5>
+                            </div>
+                            <div class="admin-card-body">
+                                <form action="/admin/fees/generate-dues" method="POST" class="row g-3 align-items-end">
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold">Select Fee Head *</label>
+                                        <select name="fee_type_id" class="form-select form-select-sm" required>
+                                            <% structures.forEach(ft => { %>
+                                                <option value="<%= ft.id %>"><%= ft.fee_name %> (₹<%= ft.amount %> - <%= ft.applies_to %>)</option>
+                                            <% }) %>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-bold">Target Month / Term *</label>
+                                        <input type="text" name="month_year" class="form-control form-control-sm" required value="November 2026" placeholder="e.g. November 2026">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-bold">Due Date *</label>
+                                        <input type="date" name="due_date" class="form-control form-control-sm" required value="<%= new Date(Date.now() + 86400000 * 15).toISOString().split('T')[0] %>">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="submit" class="btn btn-primary btn-sm w-100 fw-bold">
+                                            <i class="fa-solid fa-bolt me-1"></i> Generate
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Create Fee Head Form -->
+                    <div class="col-lg-4">
+                        <div class="admin-card">
+                            <div class="admin-card-header">
+                                <h5><i class="fa-solid fa-plus-circle text-primary me-2"></i>Create New Fee Type</h5>
+                            </div>
+                            <div class="admin-card-body">
+                                <form action="/admin/fees/structures/create" method="POST">
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Fee Name *</label>
+                                        <input type="text" name="fee_name" class="form-control form-control-sm" required placeholder="e.g. Tuition Fee, Exam Fee, Lab Fee">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Fee Scope / Applies To *</label>
+                                        <select name="applies_to" id="appliesToSelect" class="form-select form-select-sm" onchange="toggleScopeInputs()">
+                                            <option value="whole_school">Whole School (All Students)</option>
+                                            <option value="class">Specific Class</option>
+                                            <option value="section">Specific Section</option>
+                                            <option value="student">Individual Student (Custom Fee)</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Class Select -->
+                                    <div class="mb-3 d-none" id="classSelectDiv">
+                                        <label class="form-label small fw-bold">Select Class</label>
+                                        <select name="class_id" id="feeClassSelect" class="form-select form-select-sm">
+                                            <% classes.forEach(c => { %>
+                                                <option value="<%= c.id %>"><%= c.class_name %></option>
+                                            <% }) %>
+                                        </select>
+                                    </div>
+
+                                    <!-- Section Select -->
+                                    <div class="mb-3 d-none" id="sectionSelectDiv">
+                                        <label class="form-label small fw-bold">Select Section</label>
+                                        <select name="section_id" id="feeSectionSelect" class="form-select form-select-sm">
+                                            <% const initClassId = classes.length > 0 ? classes[0].id : null; %>
+                                            <% sections.filter(s => s.class_id === initClassId).forEach(s => { %>
+                                                <option value="<%= s.id %>">Section <%= s.section_name %></option>
+                                            <% }) %>
+                                        </select>
+                                    </div>
+
+                                    <!-- Student Select -->
+                                    <div class="mb-3 d-none" id="studentSelectDiv">
+                                        <label class="form-label small fw-bold">Select Student</label>
+                                        <select name="student_id" class="form-select form-select-sm">
+                                            <% students.forEach(st => { %>
+                                                <option value="<%= st.id %>"><%= st.first_name %> <%= st.last_name %> (<%= st.admission_no %>)</option>
+                                            <% }) %>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Amount (₹) *</label>
+                                        <input type="number" step="10" name="amount" class="form-control form-control-sm" required placeholder="e.g. 3200">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Frequency</label>
+                                        <select name="frequency" class="form-select form-select-sm">
+                                            <option value="monthly">Monthly</option>
+                                            <option value="quarterly">Quarterly</option>
+                                            <option value="yearly">Yearly / Annual</option>
+                                            <option value="one_time">One-Time (Admission / Registration)</option>
+                                        </select>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary btn-sm w-100 fw-bold">
+                                        <i class="fa-solid fa-check me-1"></i> Save Fee Structure
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const allSections = <%- JSON.stringify(sections) %>;
+        const feeClassSelect = document.getElementById('feeClassSelect');
+        const feeSectionSelect = document.getElementById('feeSectionSelect');
+
+        function updateFeeSections(classId) {
+            if (!feeSectionSelect) return;
+            feeSectionSelect.innerHTML = '';
+            const filtered = allSections.filter(s => String(s.class_id) === String(classId));
+            if (filtered.length === 0) {
+                const opt = document.createElement('option');
+                opt.value = '';
+                opt.textContent = 'No sections';
+                feeSectionSelect.appendChild(opt);
+            } else {
+                filtered.forEach((s, idx) => {
+                    const opt = document.createElement('option');
+                    opt.value = s.id;
+                    opt.textContent = `Section ${s.section_name}`;
+                    if (idx === 0) opt.selected = true;
+                    feeSectionSelect.appendChild(opt);
+                });
+            }
+        }
+
+        if (feeClassSelect) {
+            feeClassSelect.addEventListener('change', function() {
+                updateFeeSections(this.value);
+            });
+        }
+
+        function toggleScopeInputs() {
+            const scope = document.getElementById('appliesToSelect').value;
+            const classDiv = document.getElementById('classSelectDiv');
+            const secDiv = document.getElementById('sectionSelectDiv');
+            const stuDiv = document.getElementById('studentSelectDiv');
+
+            classDiv.classList.add('d-none');
+            secDiv.classList.add('d-none');
+            stuDiv.classList.add('d-none');
+
+            if (scope === 'class') {
+                classDiv.classList.remove('d-none');
+            } else if (scope === 'section') {
+                classDiv.classList.remove('d-none');
+                secDiv.classList.remove('d-none');
+                if (feeClassSelect) updateFeeSections(feeClassSelect.value);
+            } else if (scope === 'student') {
+                stuDiv.classList.remove('d-none');
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

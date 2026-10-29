@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || 'Admin Portal Login | Star Academy Rohtak' %></title>
+    <!-- Fonts & Bootstrap -->
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0d1e2b 0%, #142b3c 50%, #1a56db 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Rubik', sans-serif;
+            padding: 20px;
+        }
+        .login-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+            max-width: 440px;
+            width: 100%;
+            overflow: hidden;
+        }
+        .login-header {
+            background-color: #142b3c;
+            color: white;
+            padding: 30px 24px;
+            text-align: center;
+            border-bottom: 3px solid #f59e0b;
+        }
+        .login-body {
+            padding: 35px 30px;
+        }
+        .role-notice {
+            background-color: #eff6ff;
+            border-left: 4px solid #1a56db;
+            padding: 12px 14px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            color: #1e3a8a;
+            margin-bottom: 22px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="login-header">
+            <img src="<%= school.logo_url || '/images/logo.png' %>" alt="<%= school.school_name || 'Quantum Science Acadmey' %> Logo" style="height: <%= school.logo_height || 52 %>px; max-height: 80px; background: white; padding: 4px; border-radius: 8px; margin-bottom: 12px; object-fit: contain;">
+            <h4 class="fw-bold mb-0"><%= school.school_name || 'Quantum Science Acadmey' %></h4>
+            <small class="text-white-50"><%= school.institution_type || 'Academy' %> Web Admin Management Portal</small>
+        </div>
+
+        <div class="login-body">
+            <!-- User restriction note -->
+            <div class="role-notice">
+                <i class="fa-solid fa-circle-info me-1"></i>
+                <strong>Notice:</strong> This web panel is strictly for <strong>School Administrators</strong>. Teachers, Students & Parents must log in using the <strong>Star Academy Android App</strong>.
+            </div>
+
+            <% if (error) { %>
+                <div class="alert alert-danger alert-dismissible fade show small d-flex align-items-center gap-2" role="alert">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <div><%= error %></div>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+                </div>
+            <% } %>
+
+            <form action="/admin/login" method="POST">
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-dark">Admin Username / Email</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="fa-solid fa-user text-muted"></i></span>
+                        <input type="text" name="username" class="form-control" placeholder="admin" required autofocus value="admin">
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-bold text-dark">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="fa-solid fa-lock text-muted"></i></span>
+                        <input type="password" name="password" class="form-control" placeholder="••••••••" required value="admin123">
+                    </div>
+                    <div class="form-text small text-muted">Demo Admin: username <code>admin</code> / password <code>admin123</code></div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 fw-bold py-2 shadow-sm" style="background-color: #1a56db;">
+                    <i class="fa-solid fa-right-to-bracket me-1"></i> Sign In to Admin ERP
+                </button>
+            </form>
+
+            <div class="text-center mt-4 pt-2 border-top">
+                <a href="/" class="text-decoration-none text-muted small fw-semibold">
+                    <i class="fa-solid fa-arrow-left me-1"></i> Return to Public Website
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="bgGradTeacherMale" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f766e"/>
+      <stop offset="100%" stop-color="#115e59"/>
+    </linearGradient>
+    <linearGradient id="skinTeacherMale" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fed7aa"/>
+      <stop offset="100%" stop-color="#fcd34d"/>
+    </linearGradient>
+  </defs>
+  <!-- Background Circle -->
+  <circle cx="64" cy="64" r="64" fill="url(#bgGradTeacherMale)"/>
+  
+  <!-- Blazer / Formal Jacket -->
+  <path d="M24 128 C24 96 40 84 64 84 C88 84 104 96 104 128 Z" fill="#1e293b"/>
+  <!-- Light Blue Shirt -->
+  <polygon points="64,96 52,84 64,88 76,84" fill="#e0f2fe"/>
+  <!-- Maroon Tie -->
+  <polygon points="61,88 67,88 65,116 63,116" fill="#991b1b"/>
+
+  <!-- Neck -->
+  <rect x="56" y="70" width="16" height="18" rx="4" fill="url(#skinTeacherMale)"/>
+  
+  <!-- Head & Face -->
+  <ellipse cx="64" cy="52" rx="20" ry="24" fill="url(#skinTeacherMale)"/>
+  <!-- Ears -->
+  <circle cx="43" cy="52" r="5" fill="url(#skinTeacherMale)"/>
+  <circle cx="85" cy="52" r="5" fill="url(#skinTeacherMale)"/>
+  
+  <!-- Professional Hair with side part -->
+  <path d="M43 46 C41 30 50 22 64 22 C78 22 87 30 85 46 C81 38 74 30 64 30 C54 30 47 38 43 46 Z" fill="#292524"/>
+
+  <!-- Teacher Glasses -->
+  <rect x="49" y="47" width="12" height="9" rx="2" fill="none" stroke="#0f172a" stroke-width="2"/>
+  <rect x="67" y="47" width="12" height="9" rx="2" fill="none" stroke="#0f172a" stroke-width="2"/>
+  <line x1="61" y1="51" x2="67" y2="51" stroke="#0f172a" stroke-width="2"/>
+  <line x1="43" y1="50" x2="49" y2="50" stroke="#0f172a" stroke-width="2"/>
+  <line x1="79" y1="50" x2="85" y2="50" stroke="#0f172a" stroke-width="2"/>
+
+  <!-- Eyes behind glasses -->
+  <circle cx="55" cy="51" r="2" fill="#0f172a"/>
+  <circle cx="73" cy="51" r="2" fill="#0f172a"/>
+
+  <!-- Eyebrows -->
+  <path d="M48 43 Q54 41 60 43" stroke="#292524" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <path d="M68 43 Q74 41 80 43" stroke="#292524" stroke-width="2" stroke-linecap="round" fill="none"/>
+  
+  <!-- Friendly Teacher Smile -->
+  <path d="M57 65 Q64 70 71 65" stroke="#78350f" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+</svg>

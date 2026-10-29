@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .settings-sidebar-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            overflow: hidden;
+        }
+        .settings-nav {
+            padding: 0.5rem;
+        }
+        .settings-nav .nav-link {
+            color: #4b5563;
+            font-weight: 500;
+            font-size: 0.92rem;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 0.35rem;
+            display: flex;
+            align-items: center;
+            border: 1px solid transparent;
+            transition: all 0.2s ease-in-out;
+            text-align: left;
+        }
+        .settings-nav .nav-link i.tab-icon {
+            width: 28px;
+            font-size: 1rem;
+            color: #64748b;
+            transition: color 0.2s;
+        }
+        .settings-nav .nav-link .chevron-indicator {
+            font-size: 0.72rem;
+            color: #94a3b8;
+            transition: transform 0.2s;
+        }
+        .settings-nav .nav-link:hover {
+            background-color: #f8fafc;
+            color: #1a56db;
+            border-color: #e2e8f0;
+        }
+        .settings-nav .nav-link:hover i.tab-icon {
+            color: #1a56db;
+        }
+        .settings-nav .nav-link.active {
+            background: linear-gradient(135deg, #1a56db 0%, #1e40af 100%);
+            color: #ffffff;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(26, 86, 219, 0.25);
+            border-color: transparent;
+        }
+        .settings-nav .nav-link.active i.tab-icon {
+            color: #ffffff;
+        }
+        .settings-nav .nav-link.active .chevron-indicator {
+            color: rgba(255, 255, 255, 0.8);
+            transform: translateX(3px);
+        }
+        .section-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+        .section-card-header {
+            background-color: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1.1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .section-card-header h5 {
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin: 0;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .section-card-body {
+            padding: 1.5rem;
+        }
+        .form-label-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 0.4rem;
+        }
+        .preview-box {
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+        .preview-box:hover {
+            border-color: #1a56db;
+            background: #f1f5f9;
+        }
+        .navbar-live-preview {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+        }
+    </style>
+</head>
+<body class="admin-body">
+
+    <div class="admin-wrapper">
+        <%- include('../../partials/admin_sidebar') %>
+
+        <div class="admin-main">
+            <%- include('../../partials/admin_header') %>
+
+            <main class="admin-content">
+                <%- include('../../partials/alerts') %>
+
+                <!-- Page Top Title Bar -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1 text-dark">
+                            <i class="fa-solid fa-sliders text-primary me-2"></i>Site Configuration & Profile
+                        </h4>
+                        <p class="text-muted small mb-0">Customize institution identity, branding, logo dimensions, contacts, admissions, and SEO metadata.</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="/" target="_blank" class="btn btn-outline-secondary btn-sm fw-semibold">
+                            <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> Preview Live Website
+                        </a>
+                    </div>
+                </div>
+
+                <form action="/admin/settings/update" method="POST" enctype="multipart/form-data" id="settingsForm">
+                    <div class="row g-4">
+                        
+                        <!-- Settings Navigation Sidebar -->
+                        <div class="col-lg-3">
+                            <div class="settings-sidebar-card sticky-top" style="top: 20px; z-index: 10;">
+                                <div class="p-3 border-bottom bg-light bg-opacity-50">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="rounded-3 bg-primary bg-opacity-10 p-2 text-primary">
+                                            <i class="fa-solid fa-gears fa-lg"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark" style="font-size: 0.92rem;">Configuration Menu</div>
+                                            <div class="text-muted" style="font-size: 0.72rem;">Quick Section Navigation</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="nav flex-column settings-nav" id="v-pills-tab" role="tablist">
+                                    <button class="nav-link active" id="tab-identity-btn" data-bs-toggle="pill" data-bs-target="#tab-identity" type="button" role="tab">
+                                        <i class="fa-solid fa-school tab-icon"></i>
+                                        <span>Identity & Classification</span>
+                                        <i class="fa-solid fa-chevron-right ms-auto chevron-indicator"></i>
+                                    </button>
+                                    <button class="nav-link" id="tab-branding-btn" data-bs-toggle="pill" data-bs-target="#tab-branding" type="button" role="tab">
+                                        <i class="fa-solid fa-palette tab-icon"></i>
+                                        <span>Logo & Branding</span>
+                                        <i class="fa-solid fa-chevron-right ms-auto chevron-indicator"></i>
+                                    </button>
+                                    <button class="nav-link" id="tab-contact-btn" data-bs-toggle="pill" data-bs-target="#tab-contact" type="button" role="tab">
+                                        <i class="fa-solid fa-address-book tab-icon"></i>
+                                        <span>Contact & Campus</span>
+                                        <i class="fa-solid fa-chevron-right ms-auto chevron-indicator"></i>
+                                    </button>
+                                    <button class="nav-link" id="tab-academics-btn" data-bs-toggle="pill" data-bs-target="#tab-academics" type="button" role="tab">
+                                        <i class="fa-solid fa-receipt tab-icon"></i>
+                                        <span>Session & Fee Billing</span>
+                                        <i class="fa-solid fa-chevron-right ms-auto chevron-indicator"></i>
+                                    </button>
+                                    <button class="nav-link" id="tab-notices-btn" data-bs-toggle="pill" data-bs-target="#tab-notices" type="button" role="tab">
+                                        <i class="fa-solid fa-bullhorn tab-icon"></i>
+                                        <span>Marquee & Admissions</span>
+                                        <i class="fa-solid fa-chevron-right ms-auto chevron-indicator"></i>
+                                    </button>
+                                    <button class="nav-link" id="tab-leadership-btn" data-bs-toggle="pill" data-bs-target="#tab-leadership" type="button" role="tab">
+                                        <i class="fa-solid fa-user-tie tab-icon"></i>
+                                        <span>Leadership & Overview</span>
+                                        <i class="fa-solid fa-chevron-right ms-auto chevron-indicator"></i>
+                                    </button>
+                                    <button class="nav-link" id="tab-seo-btn" data-bs-toggle="pill" data-bs-target="#tab-seo" type="button" role="tab">
+                                        <i class="fa-solid fa-magnifying-glass tab-icon"></i>
+                                        <span>SEO & Social Handles</span>
+                                        <i class="fa-solid fa-chevron-right ms-auto chevron-indicator"></i>
+                                    </button>
+                                </div>
+
+                                <div class="p-3 border-top bg-light bg-opacity-25">
+                                    <button type="submit" class="btn btn-primary w-100 fw-bold py-2 shadow-sm">
+                                        <i class="fa-solid fa-floppy-disk me-1"></i> Save Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Settings Content Panels -->
+                        <div class="col-lg-9">
+                            <div class="tab-content" id="v-pills-tabContent">
+                                
+                                <!-- Identity & Classification -->
+                                <div class="tab-pane fade show active" id="tab-identity" role="tabpanel">
+                                    <div class="section-card">
+                                        <div class="section-card-header">
+                                            <h5><i class="fa-solid fa-school text-primary"></i>Institution Identity & Classification</h5>
+                                            <span class="badge bg-primary-subtle text-primary border">Basic Details</span>
+                                        </div>
+                                        <div class="section-card-body">
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label-title">Institution Classification / Type *</label>
+                                                    <select name="institution_type" id="institution_type" class="form-select" required>
+                                                        <option value="Academy" <%= (settings.institution_type === 'Academy') ? 'selected' : '' %>>Academy (e.g. Science / Foundation Academy)</option>
+                                                        <option value="School" <%= (settings.institution_type === 'School') ? 'selected' : '' %>>School (e.g. Senior Secondary School)</option>
+                                                        <option value="Coaching Institute" <%= (settings.institution_type === 'Coaching Institute') ? 'selected' : '' %>>Coaching Institute (NEET/JEE Foundation)</option>
+                                                        <option value="Junior College" <%= (settings.institution_type === 'Junior College') ? 'selected' : '' %>>Junior College / +2 College</option>
+                                                        <option value="Public School" <%= (settings.institution_type === 'Public School') ? 'selected' : '' %>>Public / Grammar School</option>
+                                                    </select>
+                                                    <div class="form-text">Used on report cards, fee receipts, certificates, and website header.</div>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="form-label-title">Institution Legal Name *</label>
+                                                    <input type="text" name="school_name" id="school_name" class="form-control fw-bold" value="<%= settings.school_name || 'Quantum Science Acadmey' %>" required>
+                                                    <div class="form-text">Display name shown in top navigation, invoices, and certificates.</div>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="form-label-title">Short Acronym / Code</label>
+                                                    <input type="text" name="school_acronym" class="form-control" value="<%= settings.school_acronym || 'QSA' %>" placeholder="e.g. QSA">
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="form-label-title">Board / Affiliation Information</label>
+                                                    <input type="text" name="affiliation_no" class="form-control" value="<%= settings.affiliation_no || '' %>" placeholder="e.g. CBSE / HBSE Board Affiliated">
+                                                </div>
+
+                                                <div class="col-12">
+                                                    <label class="form-label-title">Motto / Tagline</label>
+                                                    <input type="text" name="tagline" id="tagline" class="form-control" value="<%= settings.tagline || 'Inspiring Innovation, Igniting Scientific Minds & Excellence.' %>" placeholder="Inspiring tagline">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Logo & Branding -->
+                                <div class="tab-pane fade" id="tab-branding" role="tabpanel">
+                                    <div class="section-card">
+                                        <div class="section-card-header">
+                                            <h5><i class="fa-solid fa-palette text-primary"></i>Logo, Icon & Header Appearance</h5>
+                                            <span class="badge bg-warning-subtle text-dark border">Live Preview</span>
+                                        </div>
+                                        <div class="section-card-body">
+                                            <!-- Live Header Preview -->
+                                            <div class="mb-4">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <label class="form-label-title text-muted text-uppercase mb-0" style="letter-spacing: 0.5px;">Live Navigation Header Preview</label>
+                                                    <span class="badge bg-light text-secondary border">Real-time Size & Mode</span>
+                                                </div>
+                                                <div class="navbar-live-preview">
+                                                    <div class="d-flex align-items-center justify-content-between">
+                                                        <div class="d-flex align-items-center gap-3" id="liveBrandContainer">
+                                                            <img src="<%= settings.logo_url || '/images/logo.png' %>" alt="Logo Preview" id="previewLogoImg" style="height: <%= settings.logo_height || 56 %>px; max-height: 120px; object-fit: contain; transition: height 0.15s ease;">
+                                                            <div id="previewBrandText">
+                                                                <span class="fw-bold fs-5 text-dark d-block lh-1" id="previewName"><%= settings.school_name || 'Quantum Science Acadmey' %></span>
+                                                                <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.68rem; letter-spacing: 1px;" id="previewTagline"><%= settings.address ? settings.address.split(',')[0] : 'Haryana, India' %></small>
+                                                            </div>
+                                                        </div>
+                                                        <div class="d-none d-md-flex align-items-center gap-3">
+                                                            <span class="badge bg-light text-dark border px-3 py-2">Home</span>
+                                                            <span class="badge bg-light text-dark border px-3 py-2">Academics</span>
+                                                            <span class="badge bg-warning text-dark px-3 py-2 fw-bold">Apply Now</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-text mt-2">Adjust the slider below to resize your logo in real time.</div>
+                                            </div>
+
+                                            <div class="row g-4">
+                                                <!-- Logo Upload -->
+                                                <div class="col-md-6">
+                                                    <div class="preview-box">
+                                                        <label class="form-label-title d-block">Institution Logo</label>
+                                                        <div class="mb-3 d-flex align-items-center justify-content-center" style="height: 90px;">
+                                                            <img src="<%= settings.logo_url || '/images/logo.png' %>" alt="Current Logo" class="img-thumbnail" style="max-height: 80px; max-width: 180px; object-fit: contain;" id="currentLogoThumb">
+                                                        </div>
+                                                        <input type="file" name="logo" id="logoInput" class="form-control form-control-sm" accept="image/*">
+                                                        <div class="form-text">Recommended: Transparent PNG, SVG or WebP.</div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Favicon Upload -->
+                                                <div class="col-md-6">
+                                                    <div class="preview-box">
+                                                        <label class="form-label-title d-block">Website Favicon & Mobile App Icon</label>
+                                                        <div class="mb-3 d-flex align-items-center justify-content-center" style="height: 90px;">
+                                                            <img src="<%= settings.favicon_url || settings.logo_url || '/images/logo.png' %>" alt="Favicon" class="img-thumbnail rounded-circle" style="width: 52px; height: 52px; object-fit: cover;">
+                                                        </div>
+                                                        <input type="file" name="favicon" class="form-control form-control-sm" accept="image/*,.ico">
+                                                        <div class="form-text">Recommended: 1:1 square icon (PNG, ICO, SVG, 512x512).</div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Logo Height Adjustment Slider -->
+                                                <div class="col-md-6">
+                                                    <div class="p-3 border rounded-3 bg-light">
+                                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                                            <label class="form-label-title mb-0">Logo Height Adjustment</label>
+                                                            <span class="badge bg-primary fs-6" id="logoHeightDisplay"><%= settings.logo_height || 56 %> px</span>
+                                                        </div>
+                                                        <input type="range" class="form-range" id="logoHeightSlider" name="logo_height" min="30" max="110" step="2" value="<%= settings.logo_height || 56 %>">
+                                                        <div class="d-flex justify-content-between small text-muted">
+                                                            <span>Compact (30px)</span>
+                                                            <span>Standard (56px)</span>
+                                                            <span>Prominent (110px)</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Logo Display Mode -->
+                                                <div class="col-md-6">
+                                                    <div class="p-3 border rounded-3 bg-light">
+                                                        <label class="form-label-title mb-2">Navbar Brand Display Mode</label>
+                                                        <select name="logo_display_mode" id="logoDisplayMode" class="form-select">
+                                                            <option value="both" <%= (settings.logo_display_mode === 'both' || !settings.logo_display_mode) ? 'selected' : '' %>>Show Both (Logo Image + Name Text)</option>
+                                                            <option value="logo_only" <%= (settings.logo_display_mode === 'logo_only') ? 'selected' : '' %>>Logo Image Only (Hidden Text)</option>
+                                                            <option value="text_only" <%= (settings.logo_display_mode === 'text_only') ? 'selected' : '' %>>Institution Name Text Only (No Image)</option>
+                                                        </select>
+                                                        <div class="form-text">Choose whether the header displays logo graphic, institution text, or both.</div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Theme Colors -->
+                                                <div class="col-md-4">
+                                                    <label class="form-label-title">Primary Brand Color</label>
+                                                    <div class="input-group">
+                                                        <input type="color" class="form-control form-control-color" name="primary_color" value="<%= settings.primary_color || '#142b3c' %>" title="Choose Primary Color">
+                                                        <input type="text" class="form-control text-uppercase" value="<%= settings.primary_color || '#142b3c' %>" readonly>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label-title">Secondary Color</label>
+                                                    <div class="input-group">
+                                                        <input type="color" class="form-control form-control-color" name="secondary_color" value="<%= settings.secondary_color || '#1a56db' %>" title="Choose Secondary Color">
+                                                        <input type="text" class="form-control text-uppercase" value="<%= settings.secondary_color || '#1a56db' %>" readonly>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label-title">Accent / Button Color</label>
+                                                    <div class="input-group">
+                                                        <input type="color" class="form-control form-control-color" name="accent_color" value="<%= settings.accent_color || '#f59e0b' %>" title="Choose Accent Color">
+                                                        <input type="text" class="form-control text-uppercase" value="<%= settings.accent_color || '#f59e0b' %>" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Contact & Campus -->
+                                <div class="tab-pane fade" id="tab-contact" role="tabpanel">
+                                    <div class="section-card">
+                                        <div class="section-card-header">
+                                            <h5><i class="fa-solid fa-address-book text-primary"></i>Campus Contact & Helpline</h5>
+                                            <span class="badge bg-success-subtle text-success border">Contact Info</span>
+                                        </div>
+                                        <div class="section-card-body">
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label-title">Primary Phone Helpline *</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text bg-light"><i class="fa-solid fa-phone text-muted"></i></span>
+                                                        <input type="tel" name="phone" class="form-control" value="<%= settings.phone || '+91-9466255941' %>" required>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label-title">Alternate Phone / Inquiry Desk</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text bg-light"><i class="fa-solid fa-phone-flip text-muted"></i></span>
+                                                        <input type="tel" name="phone_alt" class="form-control" value="<%= settings.phone_alt || '' %>">
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="form-label-title">Official WhatsApp Helpline</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text bg-light text-success"><i class="fa-brands fa-whatsapp"></i></span>
+                                                        <input type="tel" name="whatsapp_no" class="form-control" value="<%= settings.whatsapp_no || '+91-9467389100' %>" placeholder="WhatsApp contact number">
+                                                    </div>
+                                                    <div class="form-text">Used for direct WhatsApp chat buttons on the website.</div>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="form-label-title">Official Email Address *</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text bg-light"><i class="fa-solid fa-envelope text-muted"></i></span>
+                                                        <input type="email" name="email" class="form-control" value="<%= settings.email || 'info@quantumscience.in' %>" required>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-12">
+                                                    <label class="form-label-title">Full Campus Physical Address *</label>
+                                                    <textarea name="address" rows="2" class="form-control" required><%= settings.address || 'Kaunt Road, Opposite Hanuman Mandir Bhiwani' %></textarea>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="form-label-title">Office & Campus Hours</label>
+                                                    <input type="text" name="office_hours" class="form-control" value="<%= settings.office_hours || 'Monday to Saturday: 8:00 AM - 4:00 PM' %>">
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="form-label-title">Google Maps Embed / Location Link</label>
+                                                    <input type="text" name="google_maps_url" class="form-control" value="<%= settings.google_maps_url || '' %>" placeholder="https://maps.google.com/...">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Session & Fee Billing -->
+                                <div class="tab-pane fade" id="tab-academics" role="tabpanel">
+                                    <div class="section-card">
+                                        <div class="section-card-header">
+                                            <h5><i class="fa-solid fa-receipt text-primary"></i>Academic Session & Billing Settings</h5>
+                                            <span class="badge bg-info-subtle text-dark border">Financial Setup</span>
+                                        </div>
+                                        <div class="section-card-body">
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label-title">Current Academic Session *</label>
+                                                    <input type="text" name="current_session" class="form-control fw-bold" value="<%= settings.current_session || '2026-2027' %>" required>
+                                                    <div class="form-text">Active session for fee records, student admissions and attendance.</div>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="form-label-title">Fee Receipt Invoice Prefix *</label>
+                                                    <input type="text" name="receipt_prefix" class="form-control fw-bold" value="<%= settings.receipt_prefix || 'QSA/2026/' %>" required>
+                                                    <div class="form-text">Generated receipt numbers follow this format, e.g. <code>QSA/2026/0001</code>.</div>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="form-label-title">Currency Symbol</label>
+                                                    <input type="text" name="currency_symbol" class="form-control" value="<%= settings.currency_symbol || '₹' %>">
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="form-label-title">Fee Due Day of Every Month</label>
+                                                    <input type="number" name="fee_due_day" class="form-control" min="1" max="28" value="<%= settings.fee_due_day || '10' %>">
+                                                    <div class="form-text">Day of month after which fee is flagged overdue (1 - 28).</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Marquee & Admissions -->
+                                <div class="tab-pane fade" id="tab-notices" role="tabpanel">
+                                    <div class="section-card">
+                                        <div class="section-card-header">
+                                            <h5><i class="fa-solid fa-bullhorn text-primary"></i>Live Marquee Notice & Admissions Status</h5>
+                                            <span class="badge bg-danger-subtle text-danger border">Urgent Alerts</span>
+                                        </div>
+                                        <div class="section-card-body">
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label-title">New Admissions Status</label>
+                                                    <select name="admission_status" class="form-select">
+                                                        <option value="open" <%= (settings.admission_status === 'open' || !settings.admission_status) ? 'selected' : '' %>>🟢 Admissions Open (Show Apply Buttons)</option>
+                                                        <option value="closed" <%= (settings.admission_status === 'closed') ? 'selected' : '' %>>🔴 Admissions Closed</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="form-label-title">Marquee Ticker Status</label>
+                                                    <select name="marquee_active" class="form-select">
+                                                        <option value="1" <%= (settings.marquee_active !== '0') ? 'selected' : '' %>>Active (Show scrolling ticker on Homepage)</option>
+                                                        <option value="0" <%= (settings.marquee_active === '0') ? 'selected' : '' %>>Hidden</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-12">
+                                                    <label class="form-label-title">Marquee Announcement Banner Text</label>
+                                                    <textarea name="marquee_notice" rows="2" class="form-control"><%= settings.marquee_notice || 'Admissions Open for Session 2026-27: Foundation, JEE & NEET Batches at Quantum Science Acadmey!' %></textarea>
+                                                    <div class="form-text">Scrolling alert ticker displayed across public pages for urgent announcements.</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Leadership & Overview -->
+                                <div class="tab-pane fade" id="tab-leadership" role="tabpanel">
+                                    <div class="section-card">
+                                        <div class="section-card-header">
+                                            <h5><i class="fa-solid fa-user-tie text-primary"></i>Director & About Institution</h5>
+                                            <span class="badge bg-secondary-subtle text-secondary border">Leadership</span>
+                                        </div>
+                                        <div class="section-card-body">
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label-title">Director / Principal Name</label>
+                                                    <input type="text" name="director_name" class="form-control" value="<%= settings.director_name || 'Dr. S. K. Hooda' %>">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label-title">Designation / Title</label>
+                                                    <input type="text" name="director_title" class="form-control" value="<%= settings.director_title || 'Director & Head of Academics' %>">
+                                                </div>
+
+                                                <div class="col-12">
+                                                    <label class="form-label-title">Director's Welcome Message</label>
+                                                    <textarea name="director_message" rows="3" class="form-control"><%= settings.director_message || '' %></textarea>
+                                                </div>
+
+                                                <div class="col-12">
+                                                    <label class="form-label-title">Short Institution Summary (Footer & Cards)</label>
+                                                    <textarea name="about_short" rows="2" class="form-control"><%= settings.about_short || '' %></textarea>
+                                                </div>
+
+                                                <div class="col-12">
+                                                    <label class="form-label-title">Full Institution Overview (About Us Page)</label>
+                                                    <textarea name="about_full" rows="4" class="form-control"><%= settings.about_full || '' %></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- SEO & Social Handles -->
+                                <div class="tab-pane fade" id="tab-seo" role="tabpanel">
+                                    <div class="section-card">
+                                        <div class="section-card-header">
+                                            <h5><i class="fa-solid fa-magnifying-glass text-primary"></i>Search Engine Optimization & Social Handles</h5>
+                                            <span class="badge bg-dark-subtle text-dark border">SEO Metadata</span>
+                                        </div>
+                                        <div class="section-card-body">
+                                            <div class="row g-3">
+                                                <div class="col-12">
+                                                    <label class="form-label-title">Homepage SEO Title</label>
+                                                    <input type="text" name="seo_meta_title" class="form-control" value="<%= settings.seo_meta_title || 'Quantum Science Acadmey | Premier Science & Board Institute' %>">
+                                                </div>
+
+                                                <div class="col-12">
+                                                    <label class="form-label-title">SEO Meta Description</label>
+                                                    <textarea name="seo_meta_description" rows="2" class="form-control"><%= settings.seo_meta_description || 'Quantum Science Acadmey provides top-tier education in Science, CBSE/HBSE Boards, and NEET/JEE preparation.' %></textarea>
+                                                </div>
+
+                                                <div class="col-12">
+                                                    <label class="form-label-title">SEO Meta Keywords</label>
+                                                    <input type="text" name="seo_meta_keywords" class="form-control" value="<%= settings.seo_meta_keywords || 'Quantum Science Acadmey, Science Academy Rohtak, CBSE school, NEET, JEE preparation' %>">
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <label class="form-label-title">Facebook Page URL</label>
+                                                    <input type="url" name="social_facebook" class="form-control" value="<%= settings.social_facebook || 'https://facebook.com' %>">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label-title">Instagram Handle URL</label>
+                                                    <input type="url" name="social_instagram" class="form-control" value="<%= settings.social_instagram || 'https://instagram.com' %>">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label-title">YouTube Channel URL</label>
+                                                    <input type="url" name="social_youtube" class="form-control" value="<%= settings.social_youtube || 'https://youtube.com' %>">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- Bottom Floating Action Bar -->
+                            <div class="section-card p-3 d-flex flex-wrap justify-content-between align-items-center gap-3">
+                                <span class="text-muted small">
+                                    <i class="fa-solid fa-circle-check text-success me-1"></i> Changes take effect immediately across all website pages and Android App endpoints.
+                                </span>
+                                <button type="submit" class="btn btn-primary fw-bold px-4 py-2 shadow-sm">
+                                    <i class="fa-solid fa-floppy-disk me-1"></i> Save All Site Settings
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Live Preview Controls
+        const slider = document.getElementById('logoHeightSlider');
+        const display = document.getElementById('logoHeightDisplay');
+        const previewLogoImg = document.getElementById('previewLogoImg');
+        const schoolNameInput = document.getElementById('school_name');
+        const previewName = document.getElementById('previewName');
+        const logoDisplayMode = document.getElementById('logoDisplayMode');
+        const previewBrandText = document.getElementById('previewBrandText');
+        const logoInput = document.getElementById('logoInput');
+
+        if (slider) {
+            slider.addEventListener('input', function() {
+                const val = this.value;
+                display.innerText = val + ' px';
+                if (previewLogoImg) {
+                    previewLogoImg.style.height = val + 'px';
+                }
+            });
+        }
+
+        if (schoolNameInput) {
+            schoolNameInput.addEventListener('input', function() {
+                if (previewName) {
+                    previewName.innerText = this.value || 'Quantum Science Acadmey';
+                }
+            });
+        }
+
+        function updateDisplayModePreview() {
+            const mode = logoDisplayMode.value;
+            if (mode === 'logo_only') {
+                if (previewLogoImg) previewLogoImg.style.display = 'block';
+                if (previewBrandText) previewBrandText.style.display = 'none';
+            } else if (mode === 'text_only') {
+                if (previewLogoImg) previewLogoImg.style.display = 'none';
+                if (previewBrandText) previewBrandText.style.display = 'block';
+            } else {
+                if (previewLogoImg) previewLogoImg.style.display = 'block';
+                if (previewBrandText) previewBrandText.style.display = 'block';
+            }
+        }
+
+        if (logoDisplayMode) {
+            logoDisplayMode.addEventListener('change', updateDisplayModePreview);
+            updateDisplayModePreview();
+        }
+
+        if (logoInput) {
+            logoInput.addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(evt) {
+                        if (previewLogoImg) previewLogoImg.src = evt.target.result;
+                        const thumb = document.getElementById('currentLogoThumb');
+                        if (thumb) thumb.src = evt.target.result;
+                    };
+                    reader.readAsDataURL(e.target.files[0]);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

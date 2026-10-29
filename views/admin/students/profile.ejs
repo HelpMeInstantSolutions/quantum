@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+    <div class="admin-wrapper">
+        <%- include('../../partials/admin_sidebar') %>
+
+        <div class="admin-main">
+            <%- include('../../partials/admin_header') %>
+
+            <main class="admin-content">
+                <%- include('../../partials/alerts') %>
+
+                <!-- Profile Header Card -->
+                <div class="admin-card mb-4">
+                    <div class="admin-card-body p-4">
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-4">
+                            <div class="d-flex align-items-center gap-4">
+                                <img src="<%= getAvatar(student.photo_url, student.gender, 'student') %>" alt="Photo" class="rounded-4 border shadow-sm" style="width: 100px; height: 100px; object-fit: cover;">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <h3 class="fw-bold mb-0 text-dark"><%= student.first_name %> <%= student.last_name %></h3>
+                                        <span class="badge bg-success-subtle text-success border">Active</span>
+                                    </div>
+                                    <p class="text-muted small mb-2">
+                                        Admission No: <strong class="text-primary"><%= student.admission_no %></strong> | Roll No: <strong><%= student.roll_no || 'N/A' %></strong> | Session: <strong><%= student.session_year %></strong>
+                                    </p>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <span class="badge bg-primary-subtle text-primary border"><i class="fa-solid fa-graduation-cap me-1"></i><%= student.class_name %> - Section <%= student.section_name %></span>
+                                        <span class="badge bg-dark text-white border"><i class="fa-solid fa-fingerprint me-1"></i>Biometric Machine ID: <%= student.biometric_id || 'Not Assigned' %></span>
+                                        <% if (student.srn_no) { %>
+                                            <span class="badge bg-warning text-dark border"><i class="fa-solid fa-address-card me-1"></i>SRN: <%= student.srn_no %></span>
+                                        <% } %>
+                                        <% if (student.pen_no) { %>
+                                            <span class="badge bg-secondary text-white border"><i class="fa-solid fa-fingerprint me-1"></i>PEN: <%= student.pen_no %></span>
+                                        <% } %>
+                                        <span class="badge bg-light text-dark border"><i class="fa-solid fa-droplet text-danger me-1"></i><%= student.blood_group %></span>
+                                        <% if (student.route_name) { %>
+                                            <span class="badge bg-info-subtle text-info border"><i class="fa-solid fa-bus me-1"></i>Bus: <%= student.vehicle_number %></span>
+                                        <% } %>
+                                        <% if (student.app_username) { %>
+                                            <span class="badge bg-success-subtle text-success border"><i class="fa-solid fa-mobile-screen me-1"></i>App ID: <%= student.app_username %></span>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-warning text-dark btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#changeStudentPassModal">
+                                    <i class="fa-solid fa-key me-1"></i> Change App Password
+                                </button>
+                                <a href="/admin/fees/collect?student_id=<%= student.id %>" class="btn btn-success btn-sm fw-semibold">
+                                    <i class="fa-solid fa-cash-register me-1"></i> Collect Fee
+                                </a>
+                                <a href="/admin/results/report-card/<%= student.id %>" target="_blank" class="btn btn-outline-primary btn-sm fw-semibold">
+                                    <i class="fa-solid fa-print me-1"></i> Report Card
+                                </a>
+                                <a href="/admin/students/<%= student.id %>/edit" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fa-solid fa-pen-to-square me-1"></i> Edit Profile
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <ul class="nav nav-pills mb-4 bg-white p-2 rounded-3 border shadow-sm" id="studentTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active fw-semibold" id="details-tab" data-bs-toggle="pill" data-bs-target="#details" type="button" role="tab">
+                            <i class="fa-solid fa-user me-1"></i> Personal & Guardian
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-semibold" id="documents-tab" data-bs-toggle="pill" data-bs-target="#documents" type="button" role="tab">
+                            <i class="fa-solid fa-folder-open me-1"></i> Documents (<%= documents.length %>)
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-semibold" id="attendance-tab" data-bs-toggle="pill" data-bs-target="#attendance" type="button" role="tab">
+                            <i class="fa-solid fa-calendar-check me-1"></i> Attendance (<%= attendance.rate %>%)
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-semibold" id="fees-tab" data-bs-toggle="pill" data-bs-target="#fees" type="button" role="tab">
+                            <i class="fa-solid fa-receipt me-1"></i> Fees Ledger & Receipts
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-semibold" id="results-tab" data-bs-toggle="pill" data-bs-target="#results" type="button" role="tab">
+                            <i class="fa-solid fa-chart-column me-1"></i> Exam Results
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="studentTabContent">
+                    <!-- Tab 1: Personal & Guardian Details -->
+                    <div class="tab-pane fade show active" id="details" role="tabpanel">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="admin-card">
+                                    <div class="admin-card-header">
+                                        <h5>Student Bio</h5>
+                                    </div>
+                                    <div class="admin-card-body p-0">
+                                        <table class="table mb-0">
+                                            <tr><td class="text-muted small" style="width: 40%;">Full Name</td><td><strong><%= student.first_name %> <%= student.last_name %></strong></td></tr>
+                                            <tr><td class="text-muted small">SRN (MIS Portal)</td><td><%- student.srn_no ? `<span class="badge bg-warning-subtle text-dark border font-monospace">${student.srn_no}</span>` : '<span class="text-muted">Not Assigned</span>' %></td></tr>
+                                            <tr><td class="text-muted small">PEN Number (UDISE+)</td><td><%- student.pen_no ? `<span class="badge bg-light text-dark border font-monospace">${student.pen_no}</span>` : '<span class="text-muted">Not Assigned</span>' %></td></tr>
+                                            <tr><td class="text-muted small">Aadhaar Card No.</td><td><%= student.aadhar_no || 'N/A' %></td></tr>
+                                            <tr><td class="text-muted small">Family ID (PPP)</td><td><%= student.family_id || 'N/A' %></td></tr>
+                                            <tr><td class="text-muted small">Gender</td><td><%= student.gender %></td></tr>
+                                            <tr><td class="text-muted small">Date of Birth</td><td><%= student.dob || 'N/A' %></td></tr>
+                                            <tr><td class="text-muted small">Blood Group</td><td><%= student.blood_group %></td></tr>
+                                            <tr><td class="text-muted small">Class & Section</td><td><%= student.class_name %> (<%= student.section_name %>)</td></tr>
+                                            <tr><td class="text-muted small">Admission Date</td><td><%= student.admission_date || 'N/A' %></td></tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="admin-card">
+                                    <div class="admin-card-header">
+                                        <h5>Guardian & Transport Details</h5>
+                                    </div>
+                                    <div class="admin-card-body p-0">
+                                        <table class="table mb-0">
+                                            <tr><td class="text-muted small" style="width: 40%;">Father's Name</td><td><strong><%= student.father_name %></strong></td></tr>
+                                            <tr><td class="text-muted small">Father's Phone</td><td><a href="tel:<%= student.father_phone %>"><%= student.father_phone %></a></td></tr>
+                                            <tr><td class="text-muted small">Mother's Name</td><td><%= student.mother_name || '-' %></td></tr>
+                                            <tr><td class="text-muted small">Residential Address</td><td><%= student.current_address || 'Rohtak, Haryana' %></td></tr>
+                                            <tr><td class="text-muted small">Bus Transport</td><td><%= student.route_name ? `${student.route_name} (${student.vehicle_number})` : 'Self Commute' %></td></tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Documents (Aadhaar, Marksheets, etc.) -->
+                    <div class="tab-pane fade" id="documents" role="tabpanel">
+                        <div class="row g-4">
+                            <!-- Document List -->
+                            <div class="col-lg-8">
+                                <div class="admin-card">
+                                    <div class="admin-card-header">
+                                        <h5><i class="fa-solid fa-file-shield text-primary me-2"></i>Uploaded Documents</h5>
+                                    </div>
+                                    <div class="admin-card-body p-0">
+                                        <div class="table-responsive">
+                                            <table class="admin-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Document Type</th>
+                                                        <th>Document Title</th>
+                                                        <th>File Size</th>
+                                                        <th>Uploaded On</th>
+                                                        <th class="text-end">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <% if (documents && documents.length > 0) { %>
+                                                        <% documents.forEach(doc => { %>
+                                                            <tr>
+                                                                <td><span class="badge bg-light text-dark border"><%= doc.doc_type %></span></td>
+                                                                <td><strong><%= doc.doc_title %></strong></td>
+                                                                <td><small class="text-muted"><%= doc.file_size %></small></td>
+                                                                <td><small class="text-muted"><%= new Date(doc.uploaded_at).toLocaleDateString('en-IN') %></small></td>
+                                                                <td class="text-end">
+                                                                    <a href="<%= doc.file_url %>" target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2" title="Download / View">
+                                                                        <i class="fa-solid fa-eye"></i>
+                                                                    </a>
+                                                                    <form action="/admin/students/<%= student.id %>/documents/<%= doc.id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Delete this document?');">
+                                                                        <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" title="Delete">
+                                                                            <i class="fa-solid fa-trash"></i>
+                                                                        </button>
+                                                                    </form>
+                                                                </td>
+                                                            </tr>
+                                                        <% }) %>
+                                                    <% } else { %>
+                                                        <tr>
+                                                            <td colspan="5" class="text-center text-muted py-4">No documents uploaded yet.</td>
+                                                        </tr>
+                                                    <% } %>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Upload Form -->
+                            <div class="col-lg-4">
+                                <div class="admin-card">
+                                    <div class="admin-card-header">
+                                        <h5><i class="fa-solid fa-cloud-arrow-up text-primary me-2"></i>Upload New Document</h5>
+                                    </div>
+                                    <div class="admin-card-body">
+                                        <form action="/admin/students/<%= student.id %>/documents" method="POST" enctype="multipart/form-data">
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold">Document Type *</label>
+                                                <select name="doc_type" class="form-select form-select-sm" required>
+                                                    <option value="Aadhaar Card">Aadhaar Card</option>
+                                                    <option value="Birth Certificate">Birth Certificate</option>
+                                                    <option value="Previous Marksheet">Previous Class Marksheet</option>
+                                                    <option value="Transfer Certificate">Transfer Certificate (TC)</option>
+                                                    <option value="Character Certificate">Character Certificate</option>
+                                                    <option value="Medical Certificate">Medical Fitness Certificate</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold">Document Title</label>
+                                                <input type="text" name="doc_title" class="form-control form-control-sm" placeholder="e.g. Class 9 Marksheet">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold">Choose File (PDF/Image) *</label>
+                                                <input type="file" name="document_file" class="form-control form-control-sm" required accept=".pdf,.jpg,.jpeg,.png">
+                                            </div>
+                                            <button type="submit" class="btn btn-primary btn-sm w-100 fw-bold">
+                                                <i class="fa-solid fa-upload me-1"></i> Upload Document
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: Attendance -->
+                    <div class="tab-pane fade" id="attendance" role="tabpanel">
+                        <div class="row g-4">
+                            <div class="col-md-4">
+                                <div class="admin-card p-4 text-center">
+                                    <h1 class="display-4 fw-bold text-success mb-0"><%= attendance.rate %>%</h1>
+                                    <p class="text-muted small fw-semibold">Overall Attendance Rate</p>
+                                    <div class="d-flex justify-content-around mt-3 pt-3 border-top">
+                                        <div><strong class="text-success"><%= attendance.presentDays %></strong><br><small class="text-muted">Present</small></div>
+                                        <div><strong class="text-danger"><%= attendance.absentDays %></strong><br><small class="text-muted">Absent</small></div>
+                                        <div><strong><%= attendance.totalDays %></strong><br><small class="text-muted">Total Recorded</small></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="admin-card">
+                                    <div class="admin-card-header">
+                                        <h5>Recent Attendance History</h5>
+                                    </div>
+                                    <div class="admin-card-body p-0">
+                                        <table class="admin-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>School (Morning)</th>
+                                                    <th>Tuition (Evening)</th>
+                                                    <th>Status</th>
+                                                    <th>Remarks</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (attendance.recent && attendance.recent.length > 0) { %>
+                                                    <% attendance.recent.forEach(att => { %>
+                                                        <tr>
+                                                            <td><%= new Date(att.attendance_date).toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) %></td>
+                                                            <td>
+                                                                <% if (att.morning_in) { %>
+                                                                    <span class="badge bg-success-subtle text-success border">IN: <%= att.morning_in.slice(0, 5) %></span>
+                                                                    <span class="badge bg-light text-secondary border">OUT: <%= att.morning_out ? att.morning_out.slice(0, 5) : '--:--' %></span>
+                                                                <% } else { %>
+                                                                    <span class="text-muted small">--</span>
+                                                                <% } %>
+                                                            </td>
+                                                            <td>
+                                                                <% if (att.tuition_in) { %>
+                                                                    <span class="badge bg-warning-subtle text-warning-emphasis border">IN: <%= att.tuition_in.slice(0, 5) %></span>
+                                                                    <span class="badge bg-light text-secondary border">OUT: <%= att.tuition_out ? att.tuition_out.slice(0, 5) : '--:--' %></span>
+                                                                <% } else { %>
+                                                                    <span class="text-muted small">--</span>
+                                                                <% } %>
+                                                            </td>
+                                                            <td>
+                                                                <span class="badge-status <%= att.status === 'Present' ? 'badge-present' : (att.status === 'Absent' ? 'badge-absent' : 'badge-late') %>">
+                                                                    <%= att.status %>
+                                                                </span>
+                                                            </td>
+                                                            <td><small class="text-muted"><%= att.remarks || '-' %></small></td>
+                                                        </tr>
+                                                    <% }) %>
+                                                <% } else { %>
+                                                    <tr><td colspan="5" class="text-center text-muted py-3">No attendance records.</td></tr>
+                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 4: Fees Ledger & Receipts -->
+                    <div class="tab-pane fade" id="fees" role="tabpanel">
+                        <div class="row g-4">
+                            <!-- Pending Dues -->
+                            <div class="col-lg-6">
+                                <div class="admin-card">
+                                    <div class="admin-card-header">
+                                        <h5>Fee Dues Ledger</h5>
+                                    </div>
+                                    <div class="admin-card-body p-0">
+                                        <table class="admin-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Fee Head</th>
+                                                    <th>Total</th>
+                                                    <th>Paid</th>
+                                                    <th>Balance</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (feeDues && feeDues.length > 0) { %>
+                                                    <% feeDues.forEach(due => { %>
+                                                        <tr>
+                                                            <td><%= due.fee_title %></td>
+                                                            <td>₹<%= Number(due.net_amount).toLocaleString('en-IN') %></td>
+                                                            <td>₹<%= Number(due.paid_amount).toLocaleString('en-IN') %></td>
+                                                            <td><strong class="text-danger">₹<%= Number(due.balance_amount).toLocaleString('en-IN') %></strong></td>
+                                                            <td>
+                                                                <span class="badge <%= due.status === 'paid' ? 'bg-success' : (due.status === 'partially_paid' ? 'bg-warning text-dark' : 'bg-danger') %>">
+                                                                    <%= due.status %>
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    <% }) %>
+                                                <% } else { %>
+                                                    <tr><td colspan="5" class="text-center text-muted py-3">No dues recorded.</td></tr>
+                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Receipts History -->
+                            <div class="col-lg-6">
+                                <div class="admin-card">
+                                    <div class="admin-card-header">
+                                        <h5>Payment Receipts</h5>
+                                    </div>
+                                    <div class="admin-card-body p-0">
+                                        <table class="admin-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Receipt No</th>
+                                                    <th>Date</th>
+                                                    <th>Amount</th>
+                                                    <th>Mode</th>
+                                                    <th>Print</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (receipts && receipts.length > 0) { %>
+                                                    <% receipts.forEach(rc => { %>
+                                                        <tr>
+                                                            <td><strong class="text-primary"><%= rc.receipt_no %></strong></td>
+                                                            <td><%= new Date(rc.payment_date).toLocaleDateString('en-IN') %></td>
+                                                            <td><strong>₹<%= Number(rc.amount_paid).toLocaleString('en-IN') %></strong></td>
+                                                            <td><span class="badge bg-light text-dark border"><%= rc.payment_mode %></span></td>
+                                                            <td>
+                                                                <a href="/admin/receipts/<%= rc.id %>/print" target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2">
+                                                                    <i class="fa-solid fa-print"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    <% }) %>
+                                                <% } else { %>
+                                                    <tr><td colspan="5" class="text-center text-muted py-3">No receipts recorded yet.</td></tr>
+                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 5: Exam Results -->
+                    <div class="tab-pane fade" id="results" role="tabpanel">
+                        <div class="admin-card">
+                            <div class="admin-card-header">
+                                <h5>Academic Assessments & Test Scores</h5>
+                                <a href="/admin/results/report-card/<%= student.id %>" target="_blank" class="btn btn-sm btn-primary">
+                                    <i class="fa-solid fa-file-pdf me-1"></i> Generate Marksheet
+                                </a>
+                            </div>
+                            <div class="admin-card-body p-0">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Exam</th>
+                                            <th>Subject</th>
+                                            <th>Marks Obtained</th>
+                                            <th>Max Marks</th>
+                                            <th>Grade</th>
+                                            <th>Remarks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (results && results.length > 0) { %>
+                                            <% results.forEach(res => { %>
+                                                <tr>
+                                                    <td><strong><%= res.exam_name %></strong></td>
+                                                    <td><%= res.subject_name %></td>
+                                                    <td>
+                                                        <% if (res.is_absent) { %>
+                                                            <span class="badge bg-danger">ABSENT</span>
+                                                        <% } else { %>
+                                                            <strong class="text-primary"><%= res.marks_obtained %></strong>
+                                                        <% } %>
+                                                    </td>
+                                                    <td><%= res.max_marks %></td>
+                                                    <td><span class="grade-badge"><%= res.grade %></span></td>
+                                                    <td><small class="text-muted"><%= res.remarks || '-' %></small></td>
+                                                </tr>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <tr><td colspan="6" class="text-center text-muted py-4">No examination scores entered for this student yet.</td></tr>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODAL: Change Password for Parent / Student -->
+                <div class="modal fade" id="changeStudentPassModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form action="/admin/students/<%= student.id %>/change-password" method="POST">
+                                <div class="modal-header">
+                                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-key text-warning me-2"></i>Change Parent / Student App Password</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="p-3 bg-light rounded-3 mb-3 border">
+                                        <div class="row g-2 small">
+                                            <div class="col-6">Student Name: <strong class="text-dark"><%= student.first_name %> <%= student.last_name %></strong></div>
+                                            <div class="col-6 text-end">Admission No: <strong class="text-primary"><%= student.admission_no %></strong></div>
+                                            <div class="col-6">Class & Section: <strong><%= student.class_name %> - <%= student.section_name %></strong></div>
+                                            <div class="col-6 text-end">Father: <strong><%= student.father_name %></strong> (<%= student.father_phone %>)</div>
+                                            <% if (student.app_username) { %>
+                                                <div class="col-12 border-top pt-1 mt-1">App Login Username: <code><%= student.app_username %></code></div>
+                                            <% } %>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">New App Password *</label>
+                                        <input type="text" name="new_password" id="modalProfPass" class="form-control fw-bold" required minlength="4" value="student123">
+                                        <div class="form-text">Parents and students will use this password to log in to the Android App.</div>
+                                    </div>
+
+                                    <div class="d-flex gap-2 mb-2">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('modalProfPass').value='student123';">Default: student123</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('modalProfPass').value='123456';">123456</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('modalProfPass').value='pass@2026';">pass@2026</button>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-warning text-dark fw-bold">Save New Password</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

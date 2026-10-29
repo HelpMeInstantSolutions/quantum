@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+    <div class="admin-wrapper">
+        <%- include('../../partials/admin_sidebar') %>
+
+        <div class="admin-main">
+            <%- include('../../partials/admin_header') %>
+
+            <main class="admin-content">
+                <%- include('../../partials/alerts') %>
+
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1">Homework Management</h4>
+                        <p class="text-muted small mb-0">Daily subject homework assignments, submission deadlines, and digital tracking.</p>
+                    </div>
+                    <div>
+                        <a href="/admin/homework/create" class="btn btn-primary fw-semibold">
+                            <i class="fa-solid fa-plus me-1"></i> Assign New Homework
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Homework Table -->
+                <div class="admin-card">
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Class & Sec</th>
+                                    <th>Subject</th>
+                                    <th>Homework Title & Description</th>
+                                    <th>Assigned Date</th>
+                                    <th>Submission Deadline</th>
+                                    <th>Assigned By</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (homeworkList && homeworkList.length > 0) { %>
+                                    <% homeworkList.forEach(hw => { %>
+                                        <tr>
+                                            <td><span class="badge bg-primary-subtle text-primary border"><%= hw.class_name %>-<%= hw.section_name %></span></td>
+                                            <td><strong><%= hw.subject_name %></strong></td>
+                                            <td>
+                                                <div class="fw-bold text-dark"><%= hw.title %></div>
+                                                <small class="text-muted text-truncate d-block" style="max-width: 320px;"><%= hw.description %></small>
+                                                <% if (hw.attachment_url) { %>
+                                                    <a href="<%= hw.attachment_url %>" target="_blank" class="small text-primary"><i class="fa-solid fa-paperclip me-1"></i>View Attachment</a>
+                                                <% } %>
+                                            </td>
+                                            <td><small class="text-muted"><%= new Date(hw.homework_date).toLocaleDateString('en-IN') %></small></td>
+                                            <td><span class="badge bg-danger-subtle text-danger border"><%= new Date(hw.due_date).toLocaleDateString('en-IN') %></span></td>
+                                            <td><small class="text-muted"><%= hw.teacher_name || 'Admin' %></small></td>
+                                            <td class="text-end">
+                                                <a href="/admin/homework/<%= hw.id %>" class="btn btn-sm btn-outline-primary py-0 px-2" title="View Submissions">
+                                                    <i class="fa-solid fa-users"></i>
+                                                </a>
+                                                <form action="/admin/homework/<%= hw.id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Delete this homework assignment?');">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2">
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr><td colspan="7" class="text-center text-muted py-5">No homework records found.</td></tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

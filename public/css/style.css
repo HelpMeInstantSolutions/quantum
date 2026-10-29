@@ -1,0 +1,356 @@
+/* Star Academy Rohtak - Public Website Styles */
+:root {
+    --primary-navy: #142b3c;
+    --primary-blue: #1a56db;
+    --accent-gold: #f59e0b;
+    --accent-emerald: #10b981;
+    --accent-coral: #ef4444;
+    --bg-light: #f8fafc;
+    --text-dark: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+}
+
+body {
+    font-family: 'Rubik', sans-serif;
+    color: var(--text-dark);
+    background-color: #ffffff;
+    overflow-x: hidden;
+}
+
+/* Topbar */
+.site-topbar {
+    background-color: var(--primary-navy);
+    color: #cbd5e1;
+    font-size: 0.88rem;
+    padding: 7px 0;
+    border-bottom: 2px solid var(--accent-gold);
+}
+.site-topbar a {
+    color: #cbd5e1;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.site-topbar a:hover {
+    color: var(--accent-gold);
+}
+
+/* Main Navbar */
+.site-navbar {
+    background-color: #ffffff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    padding: 10px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    transition: all 0.25s ease;
+}
+.site-logo {
+    height: 48px;
+    width: auto;
+    object-fit: contain;
+    transition: height 0.2s ease;
+}
+.navbar-brand-title {
+    font-size: clamp(1.05rem, 1.8vw, 1.35rem);
+    font-weight: 800;
+    line-height: 1.15;
+    color: var(--brand-primary, #142b3c);
+    letter-spacing: -0.2px;
+}
+.navbar-brand-tagline {
+    font-size: 0.65rem;
+    letter-spacing: 0.8px;
+    color: var(--text-muted, #64748b);
+    line-height: 1.1;
+    margin-top: 3px;
+    display: block;
+    max-width: 320px;
+    white-space: normal;
+}
+
+/* Nav links responsive desktop */
+.navbar-nav .nav-link {
+    font-weight: 500;
+    font-size: 0.92rem;
+    color: var(--primary-navy, #142b3c) !important;
+    padding: 7px 12px !important;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+    white-space: nowrap;
+}
+.navbar-nav .nav-link:hover {
+    color: var(--brand-secondary, #1a56db) !important;
+    background-color: #f1f5f9;
+}
+.navbar-nav .nav-link.active {
+    color: var(--brand-secondary, #1a56db) !important;
+    background-color: #eff6ff;
+    font-weight: 600;
+}
+
+.btn-apply-nav {
+    font-size: 0.88rem;
+    white-space: nowrap;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-apply-nav:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(245, 158, 11, 0.35) !important;
+}
+
+/* Intermediate laptop screen optimization (992px to 1240px) */
+@media (min-width: 992px) and (max-width: 1240px) {
+    .navbar-nav .nav-link {
+        font-size: 0.84rem;
+        padding: 6px 7px !important;
+    }
+    .site-logo {
+        height: 40px !important;
+    }
+    .navbar-brand-title {
+        font-size: 1.1rem !important;
+    }
+    .navbar-brand-tagline {
+        display: none !important;
+    }
+    .btn-apply-nav {
+        padding: 6px 12px !important;
+        font-size: 0.82rem !important;
+    }
+}
+
+/* Mobile & Tablet (< 992px) */
+@media (max-width: 991.98px) {
+    .site-navbar {
+        padding: 8px 0;
+    }
+    .navbar-collapse {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 16px 14px 20px 14px;
+        margin-top: 10px;
+        box-shadow: 0 14px 30px rgba(0,0,0,0.1);
+        border: 1px solid #e2e8f0;
+    }
+    .navbar-nav .nav-link {
+        padding: 10px 14px !important;
+        margin-bottom: 3px;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-radius: 8px;
+    }
+    .navbar-nav .nav-link.active {
+        background-color: #eff6ff;
+        border-left: 3px solid var(--brand-secondary, #1a56db);
+    }
+    .btn-apply-nav {
+        margin-top: 10px;
+        width: 100%;
+        text-align: center;
+        padding: 10px 16px !important;
+    }
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, rgba(20, 43, 60, 0.95), rgba(26, 86, 219, 0.88)), url('/images/1789551671_6aaa643768381.png') center/cover no-repeat;
+    color: #ffffff;
+    padding: 110px 0 90px 0;
+    position: relative;
+}
+.hero-badge {
+    background-color: var(--accent-gold);
+    color: #1e293b;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 6px 16px;
+    border-radius: 50px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.hero-title {
+    font-size: 3.2rem;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    margin-top: 15px;
+}
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: #e2e8f0;
+    max-width: 650px;
+    margin: 20px 0 35px 0;
+    font-weight: 300;
+}
+
+/* Feature Cards */
+.feature-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 30px 24px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    border-top: 4px solid var(--primary-blue);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    height: 100%;
+}
+.feature-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 32px rgba(0,0,0,0.1);
+}
+.feature-icon-wrapper {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    background-color: #eff6ff;
+    color: var(--primary-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.7rem;
+    margin-bottom: 20px;
+}
+
+/* Notice Ticker */
+.notice-ticker-bar {
+    background-color: #f1f5f9;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 8px 0;
+}
+.ticker-badge {
+    background: #ef4444;
+    color: white;
+    font-weight: 700;
+    font-size: 0.78rem;
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Section Header */
+.section-badge {
+    color: var(--primary-blue);
+    background-color: #eff6ff;
+    padding: 4px 14px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.section-title {
+    font-size: 2.3rem;
+    font-weight: 800;
+    color: var(--primary-navy);
+    margin-top: 8px;
+}
+.section-subtitle {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Course Card */
+.program-card {
+    border-radius: 12px;
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    border: 1px solid var(--border-color);
+    transition: all 0.25s ease;
+    height: 100%;
+}
+.program-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary-blue);
+}
+.program-img {
+    height: 180px;
+    width: 100%;
+    object-fit: cover;
+}
+
+/* Footer */
+.site-footer {
+    background-color: var(--primary-navy);
+    color: #94a3b8;
+    padding: 60px 0 25px 0;
+}
+.footer-title {
+    color: #ffffff;
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    position: relative;
+}
+.footer-title::after {
+    content: '';
+    display: block;
+    width: 35px;
+    height: 3px;
+    background: var(--accent-gold);
+    margin-top: 6px;
+    border-radius: 2px;
+}
+.footer-links a {
+    color: #cbd5e1;
+    text-decoration: none;
+    display: block;
+    margin-bottom: 10px;
+    transition: all 0.2s;
+}
+.footer-links a:hover {
+    color: var(--accent-gold);
+    transform: translateX(4px);
+}
+
+/* Responsive tweaks */
+@media (max-width: 991.98px) {
+    .navbar-brand {
+        max-width: calc(100% - 64px);
+    }
+    .navbar-toggler {
+        padding: 6px 10px;
+        border: 1.5px solid #cbd5e1 !important;
+        border-radius: 8px;
+        background: #f8fafc;
+        transition: all 0.2s ease;
+    }
+    .navbar-toggler:focus {
+        box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.15) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: clamp(1.8rem, 5.5vw, 2.5rem);
+        line-height: 1.2;
+    }
+    .hero-subtitle {
+        font-size: 1.05rem;
+    }
+    .hero-section {
+        padding: 50px 0 40px 0;
+    }
+    .section-title {
+        font-size: clamp(1.5rem, 4.5vw, 2rem);
+    }
+}
+
+@media (max-width: 575.98px) {
+    .site-logo {
+        height: 38px !important;
+    }
+    .navbar-brand-title {
+        font-size: 1.05rem !important;
+    }
+    .hero-badge {
+        font-size: 0.78rem;
+        padding: 5px 12px;
+    }
+}

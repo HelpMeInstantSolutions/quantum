@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            background-color: #f1f5f9;
+            font-family: 'Rubik', -apple-system, sans-serif;
+            color: #0f172a;
+        }
+        .receipt-card {
+            max-width: 760px;
+            margin: 30px auto;
+            background: #ffffff;
+            border: 2px solid #0f172a;
+            padding: 30px 35px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            position: relative;
+        }
+        .receipt-header {
+            text-align: center;
+            border-bottom: 2px solid #0f172a;
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+        .receipt-logo {
+            height: 55px;
+            margin-bottom: 5px;
+        }
+        .receipt-table th, .receipt-table td {
+            border: 1px solid #cbd5e1;
+            padding: 8px 12px;
+            font-size: 0.88rem;
+        }
+        .receipt-table th {
+            background-color: #f8fafc;
+        }
+        @media print {
+            body { background: white; margin: 0; }
+            .receipt-card { border: 1px solid black; box-shadow: none; margin: 0; max-width: 100%; width: 100%; }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container text-center my-3 no-print">
+        <button onclick="window.print()" class="btn btn-primary fw-bold px-4 py-2 shadow-sm">
+            <i class="fa-solid fa-print me-1"></i> Print Fee Receipt Slip
+        </button>
+        <button onclick="window.close()" class="btn btn-outline-secondary px-3 py-2 ms-2">
+            Close Window
+        </button>
+    </div>
+
+    <div class="receipt-card">
+        <!-- School Header -->
+        <div class="receipt-header">
+            <img src="<%= school.logo_url || '/images/logo.png' %>" alt="<%= school.school_name || 'Quantum Science Acadmey' %> Logo" class="receipt-logo" style="height: <%= school.logo_height ? Math.min(school.logo_height, 65) : 55 %>px; object-fit: contain;">
+            <h3 class="fw-bold mb-0" style="color: #142b3c;"><%= school.school_name || 'Quantum Science Acadmey' %></h3>
+            <div class="small text-muted"><%= school.address || 'Kaunt Road, Opposite Hanuman Mandir Bhiwani' %> | Tel: <%= school.phone || '+91-9466255941' %></div>
+            <div class="small text-muted"><%= school.affiliation_no || (school.institution_type ? school.institution_type : 'Academy of Science') %> | Email: <%= school.email || 'info@quantumscience.in' %></div>
+            <div class="badge bg-dark text-white text-uppercase px-3 py-1 mt-2 fw-semibold">
+                Official Fee Payment Receipt (Student Copy)
+            </div>
+        </div>
+
+        <!-- Receipt Metadata Grid -->
+        <div class="row g-2 mb-3 bg-light p-2 rounded-2 border small">
+            <div class="col-6">
+                Receipt Number: <strong class="text-primary fs-6"><%= receipt.receipt_no %></strong>
+            </div>
+            <div class="col-6 text-end">
+                Payment Date: <strong><%= new Date(receipt.payment_date).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }) %></strong>
+            </div>
+            <div class="col-6">
+                Admission No: <strong><%= receipt.admission_no %></strong>
+            </div>
+            <div class="col-6 text-end">
+                Payment Mode: <strong class="badge bg-secondary-subtle text-dark border"><%= receipt.payment_mode %></strong>
+            </div>
+            <div class="col-6">
+                Student Name: <strong><%= receipt.first_name %> <%= receipt.last_name %></strong>
+            </div>
+            <div class="col-6 text-end">
+                Class / Section: <strong><%= receipt.class_name %> - <%= receipt.section_name %></strong> (Roll: <%= receipt.roll_no || '-' %>)
+            </div>
+            <div class="col-6">
+                Father's Name: <strong><%= receipt.father_name %></strong>
+            </div>
+            <div class="col-6 text-end">
+                Mobile: <strong><%= receipt.father_phone %></strong>
+            </div>
+            <% if (receipt.transaction_reference) { %>
+                <div class="col-12 border-top pt-1 text-muted">
+                    Txn / Cheque Reference: <code><%= receipt.transaction_reference %></code>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Itemized Allocation Table -->
+        <table class="table receipt-table mb-3">
+            <thead>
+                <tr>
+                    <th style="width: 50px;">#</th>
+                    <th>Fee Particulars / Account Head</th>
+                    <th class="text-end" style="width: 150px;">Amount Paid (₹)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (items && items.length > 0) { %>
+                    <% items.forEach((it, idx) => { %>
+                        <tr>
+                            <td><%= idx + 1 %></td>
+                            <td><%= it.fee_title %></td>
+                            <td class="text-end">₹<%= Number(it.amount).toLocaleString('en-IN') %></td>
+                        </tr>
+                    <% }) %>
+                <% } else { %>
+                    <tr>
+                        <td>1</td>
+                        <td>School Academic & Tuition Dues Clearance</td>
+                        <td class="text-end">₹<%= Number(receipt.amount_paid).toLocaleString('en-IN') %></td>
+                    </tr>
+                <% } %>
+            </tbody>
+            <tfoot>
+                <% if (receipt.discount_given > 0) { %>
+                    <tr>
+                        <td colspan="2" class="text-end small text-muted">Concession / Scholarship Discount:</td>
+                        <td class="text-end text-success small">- ₹<%= Number(receipt.discount_given).toLocaleString('en-IN') %></td>
+                    </tr>
+                <% } %>
+                <% if (receipt.fine_included > 0) { %>
+                    <tr>
+                        <td colspan="2" class="text-end small text-muted">Late Fine Included:</td>
+                        <td class="text-end text-danger small">+ ₹<%= Number(receipt.fine_included).toLocaleString('en-IN') %></td>
+                    </tr>
+                <% } %>
+                <tr class="table-secondary fw-bold fs-6">
+                    <td colspan="2" class="text-end">NET AMOUNT RECEIVED:</td>
+                    <td class="text-end text-success">₹<%= Number(receipt.amount_paid).toLocaleString('en-IN') %></td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <!-- Amount In Words -->
+        <div class="p-2 bg-light border rounded-2 mb-3 small">
+            <strong>Amount In Words:</strong> <span class="text-dark fst-italic"><%= amountInWords %></span>
+        </div>
+
+        <!-- Balance Due & Remarks -->
+        <div class="row align-items-center mb-4 small">
+            <div class="col-6">
+                Remaining Outstanding Balance: <strong class="text-danger">₹<%= current_balance %></strong>
+            </div>
+            <div class="col-6 text-end text-muted">
+                <% if (receipt.remarks) { %>
+                    Note: <%= receipt.remarks %>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Authorization Signatures -->
+        <div class="row pt-4 text-center" style="margin-top: 35px;">
+            <div class="col-6">
+                <hr style="border-top: 1px dashed black; width: 70%; margin: 0 auto 5px auto;">
+                <small class="text-muted">Parent / Depositor Signature</small>
+            </div>
+            <div class="col-6">
+                <hr style="border-top: 1px dashed black; width: 70%; margin: 0 auto 5px auto;">
+                <small class="fw-bold">Authorized Accounts Officer / Cashier</small>
+                <div class="text-muted" style="font-size: 0.75rem;"><%= receipt.cashier_name || 'Accounts Desk' %></div>
+            </div>
+        </div>
+
+        <div class="text-center text-muted border-top pt-2 mt-4" style="font-size: 0.72rem;">
+            * Computer generated receipt. Fee once deposited is non-refundable. Thank you for timely fee payment.
+        </div>
+    </div>
+
+</body>
+</html>

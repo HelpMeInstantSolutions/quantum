@@ -1,0 +1,41 @@
+<%- include('../partials/header') %>
+
+<div class="py-5 bg-light border-bottom">
+    <div class="container text-center">
+        <span class="section-badge">Know Our Heritage</span>
+        <h1 class="fw-bold mt-2 text-dark">About <%= school.school_name || 'Quantum Science Acadmey' %></h1>
+        <p class="text-muted mx-auto" style="max-width: 650px;">
+            A premier educational powerhouse nurturing intellect, moral integrity, and national-level excellence since inception.
+        </p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row align-items-center g-5 mb-5">
+        <div class="col-lg-6">
+            <h3 class="fw-bold text-navy" style="color: #142b3c;">Our Vision & Academic Heritage</h3>
+            <p class="text-muted">
+                <%= school.about_full || 'Star Academy Rohtak was established with a singular objective: to transform traditional learning into an inspiring, empowering, and holistic growth experience. Located in Rohtak, Haryana, our institution has earned a stellar reputation for delivering top academic results in HBSE & CBSE Board examinations as well as competitive entrance tests.' %>
+            </p>
+            <div class="row g-3 mt-2">
+                <div class="col-sm-6">
+                    <div class="p-3 bg-light rounded-3 border-start border-4 border-primary">
+                        <h6 class="fw-bold mb-1"><i class="fa-solid fa-bullseye text-primary me-2"></i>Our Mission</h6>
+                        <small class="text-muted">To instill analytical thinking, conceptual clarity, and disciplined character in every learner.</small>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="p-3 bg-light rounded-3 border-start border-4 border-warning">
+                        <h6 class="fw-bold mb-1"><i class="fa-solid fa-eye text-warning me-2"></i>Our Vision</h6>
+                        <small class="text-muted">To be recognized as Haryana's finest academy for holistic education and board toppers.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 text-center">
+            <img src="/images/gallery_campus.jpg" alt="Star Academy Campus" class="img-fluid rounded-4 shadow" onerror="this.src='/images/1789551671_6aaa643768381.png'">
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

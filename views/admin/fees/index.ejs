@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+    <div class="admin-wrapper">
+        <%- include('../../partials/admin_sidebar') %>
+
+        <div class="admin-main">
+            <%- include('../../partials/admin_header') %>
+
+            <main class="admin-content">
+                <%- include('../../partials/alerts') %>
+
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1">Fee Management & Billing</h4>
+                        <p class="text-muted small mb-0">Define fee structures, generate monthly dues, collect fees and manage overdue defaulters.</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="/admin/fees/structures" class="btn btn-outline-primary fw-semibold">
+                            <i class="fa-solid fa-layer-group me-1"></i> Fee Structures
+                        </a>
+                        <a href="/admin/fees/collect" class="btn btn-success fw-bold">
+                            <i class="fa-solid fa-cash-register me-1"></i> Collect Fee
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Financial Stats -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="stat-widget">
+                            <div class="stat-icon bg-success-subtle text-success">
+                                <i class="fa-solid fa-indian-rupee-sign"></i>
+                            </div>
+                            <div>
+                                <div class="stat-val">₹<%= stats.totalCollected %></div>
+                                <div class="stat-label">Total Fee Collected</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-widget">
+                            <div class="stat-icon bg-danger-subtle text-danger">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            </div>
+                            <div>
+                                <div class="stat-val">₹<%= stats.totalPending %></div>
+                                <div class="stat-label">Total Pending / Overdue</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-widget">
+                            <div class="stat-icon bg-primary-subtle text-primary">
+                                <i class="fa-solid fa-sliders"></i>
+                            </div>
+                            <div>
+                                <div class="stat-val"><%= stats.totalStructures %></div>
+                                <div class="stat-label">Configured Fee Heads</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Action Banners -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="p-3 bg-white rounded-3 border d-flex align-items-center justify-content-between shadow-sm">
+                            <div>
+                                <h6 class="fw-bold text-dark mb-1">Fee Structures (School / Class / Student)</h6>
+                                <p class="text-muted small mb-0">Create flexible fee heads for whole school, specific class, section or student.</p>
+                            </div>
+                            <a href="/admin/fees/structures" class="btn btn-sm btn-primary fw-semibold text-nowrap ms-2">Manage Structures</a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-white rounded-3 border d-flex align-items-center justify-content-between shadow-sm">
+                            <div>
+                                <h6 class="fw-bold text-danger mb-1">Pending Fees & Overdue Defaulters</h6>
+                                <p class="text-muted small mb-0">Analyze students with unpaid balance and dispatch 1-click app notifications.</p>
+                            </div>
+                            <a href="/admin/pending-fees" class="btn btn-sm btn-danger fw-semibold text-nowrap ms-2">Pending Fees &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Payments Register -->
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <h5>Recent Fee Receipts</h5>
+                        <a href="/admin/receipts" class="btn btn-sm btn-outline-secondary">All Receipts Register</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Receipt No</th>
+                                    <th>Date</th>
+                                    <th>Student Name</th>
+                                    <th>Class</th>
+                                    <th>Amount Paid</th>
+                                    <th>Payment Mode</th>
+                                    <th class="text-end">Print Receipt</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (recentReceipts && recentReceipts.length > 0) { %>
+                                    <% recentReceipts.forEach(r => { %>
+                                        <tr>
+                                            <td><strong class="text-primary"><%= r.receipt_no %></strong></td>
+                                            <td><%= new Date(r.payment_date).toLocaleDateString('en-IN') %></td>
+                                            <td><%= r.first_name %> <%= r.last_name %></td>
+                                            <td><span class="badge bg-light text-dark border"><%= r.class_name %>-<%= r.section_name %></span></td>
+                                            <td><strong>₹<%= Number(r.amount_paid).toLocaleString('en-IN') %></strong></td>
+                                            <td><span class="badge bg-secondary-subtle text-dark"><%= r.payment_mode %></span></td>
+                                            <td class="text-end">
+                                                <a href="/admin/receipts/<%= r.id %>/print" target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2" title="Print Slip">
+                                                    <i class="fa-solid fa-print"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr><td colspan="7" class="text-center text-muted py-4">No receipts recorded yet.</td></tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

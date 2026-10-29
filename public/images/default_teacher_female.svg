@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="bgGradTeacherFemale" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#6d28d9"/>
+    </linearGradient>
+    <linearGradient id="skinTeacherFemale" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fed7aa"/>
+      <stop offset="100%" stop-color="#fcd34d"/>
+    </linearGradient>
+  </defs>
+  <!-- Background Circle -->
+  <circle cx="64" cy="64" r="64" fill="url(#bgGradTeacherFemale)"/>
+  
+  <!-- Hair Bun (Updo) -->
+  <circle cx="64" cy="24" r="13" fill="#1c1917"/>
+
+  <!-- Shoulders & Blazer / Kurti -->
+  <path d="M26 128 C26 96 42 86 64 86 C86 86 102 96 102 128 Z" fill="#047857"/>
+  <!-- Inner Collar / Scarf -->
+  <polygon points="64,98 56,86 72,86" fill="#fef08a"/>
+
+  <!-- Neck -->
+  <rect x="57" y="70" width="14" height="18" rx="4" fill="url(#skinTeacherFemale)"/>
+  
+  <!-- Head & Face -->
+  <ellipse cx="64" cy="53" rx="19" ry="23" fill="url(#skinTeacherFemale)"/>
+  
+  <!-- Pearl Earrings -->
+  <circle cx="43" cy="57" r="3" fill="#ffffff"/>
+  <circle cx="85" cy="57" r="3" fill="#ffffff"/>
+
+  <!-- Professional Hair Front & Sides -->
+  <path d="M42 50 C40 32 48 24 64 24 C80 24 88 32 86 50 C80 34 76 30 64 30 C52 30 48 34 42 50 Z" fill="#1c1917"/>
+
+  <!-- Female Teacher Stylish Glasses -->
+  <rect x="49" y="47" width="12" height="9" rx="2" fill="none" stroke="#be185d" stroke-width="2"/>
+  <rect x="67" y="47" width="12" height="9" rx="2" fill="none" stroke="#be185d" stroke-width="2"/>
+  <line x1="61" y1="51" x2="67" y2="51" stroke="#be185d" stroke-width="2"/>
+  <line x1="43" y1="50" x2="49" y2="50" stroke="#be185d" stroke-width="2"/>
+  <line x1="79" y1="50" x2="85" y2="50" stroke="#be185d" stroke-width="2"/>
+
+  <!-- Eyes behind glasses -->
+  <circle cx="55" cy="51" r="2" fill="#0f172a"/>
+  <circle cx="73" cy="51" r="2" fill="#0f172a"/>
+  <!-- Lashes -->
+  <path d="M52 48 L50 46" stroke="#0f172a" stroke-width="1.2" stroke-linecap="round"/>
+  <path d="M76 48 L78 46" stroke="#0f172a" stroke-width="1.2" stroke-linecap="round"/>
+
+  <!-- Eyebrows -->
+  <path d="M48 43 Q54 41 60 43" stroke="#1c1917" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+  <path d="M68 43 Q74 41 80 43" stroke="#1c1917" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+  
+  <!-- Warm Smile with soft magenta/coral lips -->
+  <path d="M58 65 Q64 70 70 65" stroke="#be185d" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  <circle cx="64" cy="40" r="1.5" fill="#dc2626"/> <!-- Bindi -->
+</svg>

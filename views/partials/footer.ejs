@@ -1,0 +1,92 @@
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="row g-4 mb-5">
+                <div class="col-lg-4 col-md-6">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <img src="<%= school.logo_url || '/images/logo.png' %>" alt="<%= school.school_name || 'Quantum Science Acadmey' %> Logo" style="height: 48px; background: white; padding: 4px; border-radius: 6px; object-fit: contain;">
+                        <span class="fs-4 fw-bold text-white"><%= school.school_name || 'Quantum Science Acadmey' %></span>
+                    </div>
+                    <p class="text-secondary small mb-3">
+                        <%= school.tagline || 'Inspiring Innovation, Igniting Scientific Minds & Excellence.' %>
+                    </p>
+                    <p class="text-secondary small">
+                        <%= school.about_short || 'Premier educational institute providing holistic schooling, board preparation, and competitive entrance exam foundation coaching for science aspirants.' %>
+                    </p>
+                    <div class="d-flex gap-2 mt-3">
+                        <a href="<%= school.social_facebook || 'https://facebook.com' %>" target="_blank" class="btn btn-outline-light btn-sm rounded-circle" style="width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="<%= school.social_instagram || 'https://instagram.com' %>" target="_blank" class="btn btn-outline-light btn-sm rounded-circle" style="width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="<%= school.social_youtube || 'https://youtube.com' %>" target="_blank" class="btn btn-outline-light btn-sm rounded-circle" style="width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;"><i class="fa-brands fa-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <div class="col-lg-2 col-md-6">
+                    <h5 class="footer-title">Quick Links</h5>
+                    <div class="footer-links">
+                        <a href="/"><i class="fa-solid fa-chevron-right me-1 small"></i> Home</a>
+                        <a href="/about"><i class="fa-solid fa-chevron-right me-1 small"></i> About Us</a>
+                        <a href="/academics"><i class="fa-solid fa-chevron-right me-1 small"></i> Academics</a>
+                        <a href="/admissions"><i class="fa-solid fa-chevron-right me-1 small"></i> Admissions</a>
+                        <a href="/notices"><i class="fa-solid fa-chevron-right me-1 small"></i> Notice Board</a>
+                        <a href="/gallery"><i class="fa-solid fa-chevron-right me-1 small"></i> Photo Gallery</a>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="footer-title">Programs Offered</h5>
+                    <div class="footer-links">
+                        <a href="/academics#science-foundation"><i class="fa-solid fa-atom me-1 small"></i> Science Foundation (8th - 10th)</a>
+                        <a href="/academics#senior-science"><i class="fa-solid fa-microscope me-1 small"></i> Senior Secondary Science (Medical & Non-Medical)</a>
+                        <a href="/academics#neet"><i class="fa-solid fa-dna me-1 small"></i> NEET Pre-Medical Comprehensive</a>
+                        <a href="/academics#jee"><i class="fa-solid fa-calculator me-1 small"></i> IIT-JEE (Mains + Advanced) Batch</a>
+                        <a href="/academics#olympiad"><i class="fa-solid fa-award me-1 small"></i> Science Olympiad & KVPY Mentorship</a>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="footer-title">Contact Campus</h5>
+                    <ul class="list-unstyled text-secondary small">
+                        <li class="mb-2 d-flex gap-2">
+                            <i class="fa-solid fa-map-location-dot text-warning mt-1"></i>
+                            <span><%= school.address || 'Kaunt Road, Opposite Hanuman Mandir Bhiwani' %></span>
+                        </li>
+                        <li class="mb-2 d-flex gap-2">
+                            <i class="fa-solid fa-phone-volume text-warning mt-1"></i>
+                            <span><%= school.phone || '+91-9466255941' %></span>
+                        </li>
+                        <li class="mb-2 d-flex gap-2">
+                            <i class="fa-solid fa-envelope text-warning mt-1"></i>
+                            <span><%= school.email || 'info@quantumscience.in' %></span>
+                        </li>
+                        <li class="d-flex gap-2">
+                            <i class="fa-solid fa-clock text-warning mt-1"></i>
+                            <span><%= school.office_hours || 'Mon - Sat: 8:00 AM - 4:00 PM' %></span>
+                        </li>
+                    </ul>
+                    <div class="mt-3">
+                        <a href="/admin/login" class="btn btn-sm btn-outline-warning text-warning fw-semibold">
+                            <i class="fa-solid fa-shield-halved me-1"></i> Staff Admin Access
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <hr style="border-color: rgba(255,255,255,0.1);">
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center text-secondary small py-2">
+                <div>
+                    &copy; <%= new Date().getFullYear() %> <%= school.school_name || 'Quantum Science Acadmey' %>. All rights reserved.
+                </div>
+                <div class="d-flex gap-3 mt-2 mt-md-0">
+                    <span class="text-muted"><%= school.affiliation_no || (school.institution_type ? school.institution_type : 'Academy of Science') %></span>
+                    <span>|</span>
+                    <a href="/admin/login" class="text-warning text-decoration-none fw-semibold">Admin Login</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

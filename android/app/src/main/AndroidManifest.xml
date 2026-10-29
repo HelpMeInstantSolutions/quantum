@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_qsa_logo"
+        android:label="@string/app_name"
+        android:roundIcon="@drawable/ic_qsa_logo"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.StarAcademySchool"
+        android:usesCleartextTraffic="true">
+
+        <!-- Launcher Splash Activity -->
+        <activity
+            android:name=".ui.SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.StarAcademySchool.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Login Activity -->
+        <activity
+            android:name=".ui.LoginActivity"
+            android:exported="false"
+            android:theme="@style/Theme.StarAcademySchool.NoActionBar" />
+
+        <!-- Student & Parent Main Activity -->
+        <activity
+            android:name=".ui.StudentMainActivity"
+            android:exported="false" />
+
+        <!-- Teacher Main Activity -->
+        <activity
+            android:name=".ui.TeacherMainActivity"
+            android:exported="false" />
+
+        <!-- Teacher Mark Attendance Activity -->
+        <activity
+            android:name=".ui.TeacherAttendanceActivity"
+            android:exported="false" />
+
+        <!-- Teacher Post Homework Activity -->
+        <activity
+            android:name=".ui.TeacherHomeworkActivity"
+            android:exported="false" />
+
+        <!-- Teacher Enter Marks Activity -->
+        <activity
+            android:name=".ui.TeacherMarksActivity"
+            android:exported="false" />
+
+        <!-- Admin Limited Mobile Activity -->
+        <activity
+            android:name=".ui.AdminMainActivity"
+            android:exported="false" />
+
+        <!-- Notification Hub Activity -->
+        <activity
+            android:name=".ui.NotificationHubActivity"
+            android:exported="false" />
+
+        <!-- Firebase Cloud Messaging Push Notification Service -->
+        <service
+            android:name=".network.MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+    </application>
+
+</manifest>

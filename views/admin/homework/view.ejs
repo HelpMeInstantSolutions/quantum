@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+    <div class="admin-wrapper">
+        <%- include('../../partials/admin_sidebar') %>
+
+        <div class="admin-main">
+            <%- include('../../partials/admin_header') %>
+
+            <main class="admin-content">
+                <%- include('../../partials/alerts') %>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1"><%= hw.title %></h4>
+                        <p class="text-muted small mb-0"><%= hw.class_name %>-<%= hw.section_name %> | Subject: <strong><%= hw.subject_name %></strong> | Due: <strong><%= new Date(hw.due_date).toLocaleDateString('en-IN') %></strong></p>
+                    </div>
+                    <a href="/admin/homework" class="btn btn-outline-secondary btn-sm">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Back
+                    </a>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-8">
+                        <div class="admin-card">
+                            <div class="admin-card-header">
+                                <h5>Homework Assignment Content</h5>
+                            </div>
+                            <div class="admin-card-body">
+                                <p class="text-dark" style="white-space: pre-line;"><%= hw.description %></p>
+                                <% if (hw.attachment_url) { %>
+                                    <div class="p-3 bg-light rounded-3 mt-3">
+                                        <i class="fa-solid fa-paperclip text-primary me-2"></i>
+                                        <a href="<%= hw.attachment_url %>" target="_blank" class="fw-bold text-decoration-none">Download Assignment File / Worksheet</a>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="admin-card">
+                            <div class="admin-card-header">
+                                <h5>Details</h5>
+                            </div>
+                            <div class="admin-card-body p-0">
+                                <table class="table mb-0">
+                                    <tr><td class="text-muted small">Assigned Date</td><td><%= new Date(hw.homework_date).toLocaleDateString('en-IN') %></td></tr>
+                                    <tr><td class="text-muted small">Deadline</td><td><strong class="text-danger"><%= new Date(hw.due_date).toLocaleDateString('en-IN') %></strong></td></tr>
+                                    <tr><td class="text-muted small">Faculty</td><td><%= hw.teacher_name || 'Admin' %></td></tr>
+                                    <tr><td class="text-muted small">Class Enrolled</td><td><%= submissions.length %> Students</td></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submissions Tracking Table -->
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <h5>Student Submission & Evaluation Status</h5>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Roll</th>
+                                    <th>Admission No</th>
+                                    <th>Student Name</th>
+                                    <th>Status</th>
+                                    <th>Submitted On</th>
+                                    <th>Grade / Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (submissions && submissions.length > 0) { %>
+                                    <% submissions.forEach(s => { %>
+                                        <tr>
+                                            <td><strong><%= s.roll_no %></strong></td>
+                                            <td><small class="text-muted"><%= s.admission_no %></small></td>
+                                            <td><strong><%= s.first_name %> <%= s.last_name %></strong></td>
+                                            <td>
+                                                <% if (s.submission_id) { %>
+                                                    <span class="badge bg-success-subtle text-success border"><i class="fa-solid fa-check me-1"></i>Submitted</span>
+                                                <% } else { %>
+                                                    <span class="badge bg-warning-subtle text-dark border">Pending</span>
+                                                <% } %>
+                                            </td>
+                                            <td><small class="text-muted"><%= s.submitted_at ? new Date(s.submitted_at).toLocaleDateString('en-IN') : '-' %></small></td>
+                                            <td>
+                                                <small class="text-muted"><%= s.grade ? `Grade: ${s.grade}` : 'Not evaluated yet' %></small>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

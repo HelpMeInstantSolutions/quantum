@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+    <div class="admin-wrapper">
+        <%- include('../../partials/admin_sidebar') %>
+
+        <div class="admin-main">
+            <%- include('../../partials/admin_header') %>
+
+            <main class="admin-content">
+                <%- include('../../partials/alerts') %>
+
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1"><i class="fa-solid fa-triangle-exclamation text-danger me-2"></i>Pending Fees & Defaulters</h4>
+                        <p class="text-muted small mb-0">Track overdue balances, pending student accounts, and dispatch 1-click alert notifications.</p>
+                    </div>
+                    <div>
+                        <!-- 1-Click Broadcast Reminders to All Parents -->
+                        <button type="button" class="btn btn-danger fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#reminderAllModal">
+                            <i class="fa-solid fa-bell me-1"></i> Send App Reminders (1-Click)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Overdue KPI Banner -->
+                <div class="p-3 bg-danger-subtle text-danger rounded-3 border border-danger mb-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="fw-bold fs-5">Total Outstanding Fee Balance: ₹<%= totalPendingSum %></span>
+                        <small class="d-block text-dark mt-1">Across <%= defaulters.length %> overdue student accounts.</small>
+                    </div>
+                    <a href="/admin/fees/structures" class="btn btn-outline-danger btn-sm fw-semibold">Manage Structures</a>
+                </div>
+
+                <!-- Filters -->
+                <div class="admin-card mb-4">
+                    <div class="admin-card-body p-3">
+                        <form method="GET" action="/admin/pending-fees" class="row g-2 align-items-end">
+                            <div class="col-md-3">
+                                <label class="small text-muted fw-semibold">Class Filter</label>
+                                <select name="class_id" class="form-select form-select-sm">
+                                    <option value="">All Classes</option>
+                                    <% classes.forEach(c => { %>
+                                        <option value="<%= c.id %>" <%= filters.class_id == c.id ? 'selected' : '' %>><%= c.class_name %></option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="small text-muted fw-semibold">Minimum Overdue (₹)</label>
+                                <input type="number" name="min_amount" class="form-control form-control-sm" placeholder="e.g. 1000" value="<%= filters.min_amount || '' %>">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="small text-muted fw-semibold">Search by Name / Admission No / Phone</label>
+                                <input type="text" name="search" class="form-control form-control-sm" placeholder="Search..." value="<%= filters.search || '' %>">
+                            </div>
+                            <div class="col-md-2 d-flex gap-2">
+                                <button type="submit" class="btn btn-sm btn-primary w-100 fw-bold">Filter</button>
+                                <a href="/admin/pending-fees" class="btn btn-sm btn-outline-secondary">Reset</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Defaulters Table -->
+                <div class="admin-card">
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Adm No</th>
+                                    <th>Roll</th>
+                                    <th>Student Name</th>
+                                    <th>Class & Sec</th>
+                                    <th>Father Name & Phone</th>
+                                    <th>Unpaid Fee Heads</th>
+                                    <th>Due Since</th>
+                                    <th>Total Overdue (₹)</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (defaulters && defaulters.length > 0) { %>
+                                    <% defaulters.forEach(df => { %>
+                                        <tr>
+                                            <td><span class="badge bg-light text-primary border"><%= df.admission_no %></span></td>
+                                            <td><strong><%= df.roll_no || '-' %></strong></td>
+                                            <td>
+                                                <a href="/admin/students/<%= df.student_id %>" class="fw-bold text-dark text-decoration-none">
+                                                    <%= df.first_name %> <%= df.last_name %>
+                                                </a>
+                                            </td>
+                                            <td><span class="badge bg-secondary-subtle text-dark"><%= df.class_name %>-<%= df.section_name %></span></td>
+                                            <td>
+                                                <div><%= df.father_name %></div>
+                                                <small><a href="tel:<%= df.father_phone %>" class="text-muted"><i class="fa-solid fa-phone me-1 text-success"></i><%= df.father_phone %></a></small>
+                                            </td>
+                                            <td>
+                                                <small class="text-muted text-truncate d-block" style="max-width: 200px;"><%= df.pending_fee_titles %></small>
+                                            </td>
+                                            <td><small class="text-danger fw-semibold"><%= new Date(df.oldest_due_date).toLocaleDateString('en-IN') %></small></td>
+                                            <td><strong class="text-danger fs-6">₹<%= Number(df.total_due_amount).toLocaleString('en-IN') %></strong></td>
+                                            <td class="text-end text-nowrap">
+                                                <a href="/admin/fees/collect?student_id=<%= df.student_id %>" class="btn btn-sm btn-success py-0 px-2 fw-semibold" title="Collect Payment">
+                                                    <i class="fa-solid fa-cash-register me-1"></i> Pay
+                                                </a>
+                                                <form action="/admin/pending-fees/send-reminder-single" method="POST" class="d-inline">
+                                                    <input type="hidden" name="student_id" value="<%= df.student_id %>">
+                                                    <input type="hidden" name="amount" value="<%= df.total_due_amount %>">
+                                                    <button type="submit" class="btn btn-sm btn-outline-warning text-dark py-0 px-2" title="Send Direct App Reminder">
+                                                        <i class="fa-solid fa-bell"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="9" class="text-center text-success py-5">
+                                            <i class="fa-solid fa-check-circle fs-2 mb-2 d-block"></i>
+                                            All clear! No students have overdue fees matching your filter.
+                                        </td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Modal: Send Reminder to All Overdue Parents -->
+                <div class="modal fade" id="reminderAllModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form action="/admin/pending-fees/send-reminder-all" method="POST">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-bell me-2"></i>Send Fee Reminder Alert</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p class="small text-muted">
+                                        This will send an instant notification alert directly to the mobile app for <strong>all <%= defaulters.length %> overdue student / parent accounts</strong>.
+                                    </p>
+                                    <input type="hidden" name="class_id" value="<%= filters.class_id || '' %>">
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Custom Note / Due Deadline</label>
+                                        <textarea name="reminder_note" rows="3" class="form-control" placeholder="Kindly deposit the pending balance before the 10th of this month to avoid late fine charges."></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-danger fw-bold">
+                                        <i class="fa-solid fa-paper-plane me-1"></i> Send Broadcast Reminders
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

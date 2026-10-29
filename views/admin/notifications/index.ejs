@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+    <div class="admin-wrapper">
+        <%- include('../../partials/admin_sidebar') %>
+
+        <div class="admin-main">
+            <%- include('../../partials/admin_header') %>
+
+            <main class="admin-content">
+                <%- include('../../partials/alerts') %>
+
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1">Notifications & Broadcast Circulars</h4>
+                        <p class="text-muted small mb-0">Push announcements, holiday alerts, and emergency notifications to web & mobile app feeds.</p>
+                    </div>
+                    <div>
+                        <a href="/admin/notifications/create" class="btn btn-primary fw-semibold">
+                            <i class="fa-solid fa-bullhorn me-1"></i> Broadcast New Notice
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Notifications List -->
+                <div class="admin-card">
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 130px;">Category</th>
+                                    <th>Title & Announcement Message</th>
+                                    <th>Target Audience</th>
+                                    <th>Posted By</th>
+                                    <th>Date</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (notifications && notifications.length > 0) { %>
+                                    <% notifications.forEach(n => { %>
+                                        <tr>
+                                            <td>
+                                                <span class="badge <%= n.category === 'holiday' ? 'bg-danger' : (n.category === 'attendance_alert' ? 'bg-warning text-dark' : (n.category === 'fee_reminder' ? 'bg-danger-subtle text-danger' : 'bg-primary')) %> text-uppercase" style="font-size: 0.72rem;">
+                                                    <%= n.category.replace('_', ' ') %>
+                                                </span>
+                                                <% if (n.is_pinned) { %>
+                                                    <span class="badge bg-warning text-dark d-block mt-1"><i class="fa-solid fa-thumbtack me-1"></i>Pinned</span>
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <h6 class="fw-bold text-dark mb-1"><%= n.title %></h6>
+                                                <p class="text-muted small mb-0"><%= n.message %></p>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-light text-dark border">
+                                                    <%= n.target_role.toUpperCase() %>
+                                                    <% if (n.class_name) { %> (<%= n.class_name %>) <% } %>
+                                                </span>
+                                            </td>
+                                            <td><small class="text-muted"><%= n.sender_name || 'Admin' %></small></td>
+                                            <td><small class="text-muted"><%= new Date(n.created_at).toLocaleDateString('en-IN') %></small></td>
+                                            <td class="text-end">
+                                                <form action="/admin/notifications/<%= n.id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Remove this notification?');">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" title="Delete">
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr><td colspan="6" class="text-center text-muted py-5">No notifications currently active.</td></tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

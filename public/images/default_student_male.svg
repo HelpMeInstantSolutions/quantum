@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="bgGradStudentBoy" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0369a1"/>
+    </linearGradient>
+    <linearGradient id="skinBoy" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fed7aa"/>
+      <stop offset="100%" stop-color="#fcd34d"/>
+    </linearGradient>
+    <linearGradient id="uniformBoy" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a"/>
+      <stop offset="100%" stop-color="#172554"/>
+    </linearGradient>
+  </defs>
+  <!-- Background Circle -->
+  <circle cx="64" cy="64" r="64" fill="url(#bgGradStudentBoy)"/>
+  
+  <!-- School Uniform -->
+  <path d="M26 128 C26 98 42 86 64 86 C86 86 102 98 102 128 Z" fill="url(#uniformBoy)"/>
+  <!-- White Shirt Collar -->
+  <polygon points="64,96 52,86 64,89 76,86" fill="#ffffff"/>
+  <!-- School Tie (Gold & Blue stripes) -->
+  <polygon points="61,89 67,89 65,116 63,116" fill="#f59e0b"/>
+  <line x1="62" y1="96" x2="66" y2="98" stroke="#1e3a8a" stroke-width="2"/>
+  <line x1="62" y1="104" x2="66" y2="106" stroke="#1e3a8a" stroke-width="2"/>
+
+  <!-- Neck -->
+  <rect x="56" y="72" width="16" height="16" rx="4" fill="url(#skinBoy)"/>
+  
+  <!-- Boy Head & Face -->
+  <ellipse cx="64" cy="54" rx="20" ry="23" fill="url(#skinBoy)"/>
+  <!-- Ears -->
+  <circle cx="43" cy="54" r="4.5" fill="url(#skinBoy)"/>
+  <circle cx="85" cy="54" r="4.5" fill="url(#skinBoy)"/>
+  
+  <!-- Boyish Haircut -->
+  <path d="M43 48 C41 32 50 24 64 24 C78 24 87 32 85 48 C80 40 74 34 64 34 C54 34 47 40 43 48 Z" fill="#18181b"/>
+  <!-- Sideburns & Tufts -->
+  <path d="M42 44 Q48 30 64 30 Q54 36 50 44 Z" fill="#27272a"/>
+
+  <!-- Eyes -->
+  <circle cx="56" cy="53" r="2.5" fill="#0f172a"/>
+  <circle cx="72" cy="53" r="2.5" fill="#0f172a"/>
+  <!-- Catchlight -->
+  <circle cx="57" cy="52" r="0.8" fill="#ffffff"/>
+  <circle cx="73" cy="52" r="0.8" fill="#ffffff"/>
+
+  <!-- Eyebrows -->
+  <path d="M52 48 Q56 46 60 48" stroke="#18181b" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <path d="M68 48 Q72 46 76 48" stroke="#18181b" stroke-width="2" stroke-linecap="round" fill="none"/>
+  
+  <!-- Cheerful Smile -->
+  <path d="M57 65 Q64 71 71 65" stroke="#b45309" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+</svg>

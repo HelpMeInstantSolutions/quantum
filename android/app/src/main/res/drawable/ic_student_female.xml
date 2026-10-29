@@ -1,0 +1,41 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+    <!-- Circle background -->
+    <path
+        android:fillColor="#EC4899"
+        android:pathData="M32,0A32,32 0 1,0 64,32A32,32 0 0,0 32,0Z"/>
+    <!-- Hair Base & Ponytails -->
+    <path
+        android:fillColor="#331A15"
+        android:pathData="M18,25C15,22 14,28 17,32C19,34 22,32 21,28ZM46,25C49,22 50,28 47,32C45,34 42,32 43,28Z"/>
+    <!-- Red Ribbons -->
+    <path
+        android:fillColor="#EF4444"
+        android:pathData="M18,26C17,25 18,24 20,25C21,26 20,28 19,27ZM46,26C47,25 46,24 44,25C43,26 44,28 45,27Z"/>
+    <!-- Hair Top -->
+    <path
+        android:fillColor="#331A15"
+        android:pathData="M22,23C22,14 26,12 32,12C38,12 42,14 42,23C42,25 39,26 32,26C25,26 22,25 22,23Z"/>
+    <!-- Face -->
+    <path
+        android:fillColor="#FED7AA"
+        android:pathData="M24,24C24,29 27.5,33 32,33C36.5,33 40,29 40,24C40,20 37,18 32,18C27,18 24,20 24,24Z"/>
+    <!-- Neck -->
+    <path
+        android:fillColor="#FDBA74"
+        android:pathData="M29,32H35V38H29Z"/>
+    <!-- Uniform Pinafore / Shirt -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M16,56C16,44 23,39 32,39C41,39 48,44 48,56H16Z"/>
+    <!-- Pinafore Straps (Navy) -->
+    <path
+        android:fillColor="#1E3A8A"
+        android:pathData="M23,40L26,56H22L19,42ZM41,40L38,56H42L45,42Z"/>
+    <path
+        android:fillColor="#EF4444"
+        android:pathData="M29,39H35V42H29Z"/>
+</vector>

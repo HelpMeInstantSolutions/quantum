@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .class-tab .nav-link {
+            font-weight: 600;
+            color: #4b5563;
+            border-radius: 8px;
+            padding: 0.6rem 1.25rem;
+            margin-right: 0.5rem;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+        .class-tab .nav-link:hover {
+            background-color: #f3f4f6;
+            color: #1a56db;
+        }
+        .class-tab .nav-link.active {
+            background-color: #1a56db;
+            color: #ffffff;
+            box-shadow: 0 4px 8px rgba(26, 86, 219, 0.2);
+        }
+    </style>
+</head>
+<body class="admin-body">
+
+    <div class="admin-wrapper">
+        <%- include('../../partials/admin_sidebar') %>
+
+        <div class="admin-main">
+            <%- include('../../partials/admin_header') %>
+
+            <main class="admin-content">
+                <%- include('../../partials/alerts') %>
+
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1"><i class="fa-solid fa-school text-primary me-2"></i>Classes, Sections & Subject Teacher Allocations</h4>
+                        <p class="text-muted small mb-0">Create classes, sections, curriculum subjects, and assign teachers to respective subjects per class & section.</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#addClassModal">
+                            <i class="fa-solid fa-plus me-1"></i> Add Class
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#addSectionModal">
+                            <i class="fa-solid fa-layer-group me-1"></i> Add Section
+                        </button>
+                        <button class="btn btn-outline-success btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#addSubjectModal">
+                            <i class="fa-solid fa-book me-1"></i> Add Subject
+                        </button>
+                        <button class="btn btn-warning text-dark btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#assignTeacherModal">
+                            <i class="fa-solid fa-chalkboard-user me-1"></i> Assign Teacher
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Nav Tabs for Class Management -->
+                <ul class="nav nav-pills class-tab mb-4" id="classTabs" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active" id="tab-classes-btn" data-bs-toggle="pill" data-bs-target="#tab-classes" type="button">
+                            <i class="fa-solid fa-school me-1"></i> 1. Classes & Sections (<%= classes.length %>)
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="tab-subjects-btn" data-bs-toggle="pill" data-bs-target="#tab-subjects" type="button">
+                            <i class="fa-solid fa-book-open me-1"></i> 2. Subjects Catalog (<%= subjects.length %>)
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="tab-allocations-btn" data-bs-toggle="pill" data-bs-target="#tab-allocations" type="button">
+                            <i class="fa-solid fa-chalkboard-user me-1"></i> 3. Subject Teacher Allocations (<%= assignments.length %>)
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="classTabsContent">
+                    
+                    <!-- TAB 1: Classes & Sections -->
+                    <div class="tab-pane fade show active" id="tab-classes" role="tabpanel">
+                        <div class="row g-4">
+                            <!-- Classes Table -->
+                            <div class="col-lg-8">
+                                <div class="admin-card">
+                                    <div class="admin-card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0 fw-bold">Active Classes & Enrolled Students</h5>
+                                        <span class="badge bg-primary"><%= classes.length %> Classes Configured</span>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="admin-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Class Name</th>
+                                                    <th>Stream</th>
+                                                    <th>Numeric Level</th>
+                                                    <th>Sections</th>
+                                                    <th>Students</th>
+                                                    <th>Subjects</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (classes && classes.length > 0) { %>
+                                                    <% classes.forEach(c => { %>
+                                                        <tr>
+                                                            <td>
+                                                                <strong class="text-dark fs-6"><%= c.class_name %></strong>
+                                                            </td>
+                                                            <td><span class="badge bg-light text-dark border"><%= c.stream || 'General' %></span></td>
+                                                            <td><span class="badge bg-secondary-subtle text-dark">Level <%= c.numeric_level %></span></td>
+                                                            <td>
+                                                                <span class="badge bg-info-subtle text-info border">
+                                                                    <%= c.section_count %> Section(s)
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                <span class="badge bg-primary-subtle text-primary border">
+                                                                    <%= c.student_count %> Active Students
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                <span class="badge bg-success-subtle text-success border">
+                                                                    <%= c.subject_count %> Subjects
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    <% }) %>
+                                                <% } else { %>
+                                                    <tr><td colspan="6" class="text-center py-4 text-muted">No classes configured yet.</td></tr>
+                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sections Breakdown -->
+                            <div class="col-lg-4">
+                                <div class="admin-card">
+                                    <div class="admin-card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0 fw-bold">Sections by Class</h5>
+                                        <button class="btn btn-sm btn-outline-primary py-0" data-bs-toggle="modal" data-bs-target="#addSectionModal">
+                                            <i class="fa-solid fa-plus"></i> New Section
+                                        </button>
+                                    </div>
+                                    <div class="table-responsive" style="max-height: 480px; overflow-y: auto;">
+                                        <table class="table table-hover align-middle mb-0 small">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Class & Section</th>
+                                                    <th>Room</th>
+                                                    <th>Students</th>
+                                                    <th class="text-end">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (sections && sections.length > 0) { %>
+                                                    <% sections.forEach(sec => { %>
+                                                        <tr>
+                                                            <td>
+                                                                <strong><%= sec.class_name %></strong>
+                                                                <span class="badge bg-primary ms-1">Sec <%= sec.section_name %></span>
+                                                            </td>
+                                                            <td><span class="text-muted"><%= sec.room_no || 'TBD' %></span></td>
+                                                            <td><span class="badge bg-light text-dark border"><%= sec.student_count %></span></td>
+                                                            <td class="text-end">
+                                                                <form action="/admin/classes/sections/<%= sec.id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Delete this section?');">
+                                                                    <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" title="Delete Section">
+                                                                        <i class="fa-solid fa-trash-can"></i>
+                                                                    </button>
+                                                                </form>
+                                                            </td>
+                                                        </tr>
+                                                    <% }) %>
+                                                <% } else { %>
+                                                    <tr><td colspan="4" class="text-center py-3 text-muted">No sections created yet.</td></tr>
+                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: Subjects Catalog -->
+                    <div class="tab-pane fade" id="tab-subjects" role="tabpanel">
+                        <div class="admin-card">
+                            <div class="admin-card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0 fw-bold">Academic Subjects & Applicable Sections</h5>
+                                <button class="btn btn-sm btn-success fw-bold" data-bs-toggle="modal" data-bs-target="#addSubjectModal">
+                                    <i class="fa-solid fa-plus me-1"></i> Add Subject
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Class Name</th>
+                                            <th>Section Coverage</th>
+                                            <th>Subject Name</th>
+                                            <th>Subject Code</th>
+                                            <th class="text-end">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (subjects && subjects.length > 0) { %>
+                                            <% subjects.forEach(sub => { %>
+                                                <tr>
+                                                    <td><strong><%= sub.class_name %></strong></td>
+                                                    <td>
+                                                        <% if (sub.section_name) { %>
+                                                            <span class="badge bg-primary-subtle text-primary border">Section <%= sub.section_name %> Only</span>
+                                                        <% } else { %>
+                                                            <span class="badge bg-success-subtle text-success border">All Sections (Common)</span>
+                                                        <% } %>
+                                                    </td>
+                                                    <td>
+                                                        <span class="fw-bold text-dark"><%= sub.subject_name %></span>
+                                                    </td>
+                                                    <td>
+                                                        <% if (sub.subject_code) { %>
+                                                            <code><%= sub.subject_code %></code>
+                                                        <% } else { %>
+                                                            <span class="text-muted">-</span>
+                                                        <% } %>
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <form action="/admin/classes/subjects/<%= sub.id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Delete subject <%= sub.subject_name %>?');">
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" title="Delete Subject">
+                                                                <i class="fa-solid fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <tr><td colspan="5" class="text-center py-4 text-muted">No subjects configured. Click "Add Subject" to create one.</td></tr>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: Subject Teacher Allocations -->
+                    <div class="tab-pane fade" id="tab-allocations" role="tabpanel">
+                        <div class="row g-4">
+                            <!-- Direct Allocation Form -->
+                            <div class="col-lg-4">
+                                <div class="admin-card">
+                                    <div class="admin-card-header bg-light">
+                                        <h5 class="mb-0 fw-bold"><i class="fa-solid fa-link text-primary me-2"></i>Assign Teacher to Subject</h5>
+                                    </div>
+                                    <div class="admin-card-body">
+                                        <form action="/admin/classes/assign-teacher" method="POST" id="assignTeacherForm">
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold">1. Select Class *</label>
+                                                <select name="class_id" id="allocClassSelect" class="form-select form-select-sm" required>
+                                                    <option value="">-- Choose Class --</option>
+                                                    <% classes.forEach(c => { %>
+                                                        <option value="<%= c.id %>"><%= c.class_name %> (<%= c.stream || 'General' %>)</option>
+                                                    <% }) %>
+                                                </select>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold">2. Select Section *</label>
+                                                <select name="section_id" id="allocSectionSelect" class="form-select form-select-sm" required>
+                                                    <option value="">-- Select Class First --</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold">3. Select Subject *</label>
+                                                <select name="subject_id" id="allocSubjectSelect" class="form-select form-select-sm" required>
+                                                    <option value="">-- Select Class First --</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="mb-4">
+                                                <label class="form-label small fw-bold">4. Assign Teacher / Faculty *</label>
+                                                <select name="teacher_id" class="form-select form-select-sm" required>
+                                                    <option value="">-- Select Faculty Member --</option>
+                                                    <% teachers.forEach(t => { %>
+                                                        <option value="<%= t.id %>"><%= t.name %> (<%= t.designation || 'Faculty' %> <%= t.employee_code ? '| ' + t.employee_code : '' %>)</option>
+                                                    <% }) %>
+                                                </select>
+                                                <div class="form-text">Teacher will get Android App access to enter homework and marks for this subject.</div>
+                                            </div>
+
+                                            <button type="submit" class="btn btn-warning text-dark w-100 fw-bold py-2 shadow-sm">
+                                                <i class="fa-solid fa-check-double me-1"></i> Save Subject Allocation
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Allocations Matrix Table -->
+                            <div class="col-lg-8">
+                                <div class="admin-card">
+                                    <div class="admin-card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0 fw-bold">Current Subject & Faculty Allocations Matrix</h5>
+                                        <span class="badge bg-warning text-dark"><%= assignments.length %> Allocations</span>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="admin-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Class & Section</th>
+                                                    <th>Subject</th>
+                                                    <th>Assigned Subject Teacher</th>
+                                                    <th>Teacher Contact</th>
+                                                    <th class="text-end">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (assignments && assignments.length > 0) { %>
+                                                    <% assignments.forEach(a => { %>
+                                                        <tr>
+                                                            <td>
+                                                                <strong class="text-dark"><%= a.class_name %></strong>
+                                                                <span class="badge bg-primary ms-1">Sec <%= a.section_name %></span>
+                                                            </td>
+                                                            <td>
+                                                                <span class="fw-bold text-primary"><%= a.subject_name %></span>
+                                                                <% if (a.subject_code) { %>
+                                                                    <code class="small d-block"><%= a.subject_code %></code>
+                                                                <% } %>
+                                                            </td>
+                                                            <td>
+                                                                <div class="fw-bold text-dark"><i class="fa-solid fa-chalkboard-user text-secondary me-1"></i><%= a.teacher_name %></div>
+                                                                <% if (a.employee_code) { %>
+                                                                    <small class="badge bg-light text-muted border"><%= a.employee_code %></small>
+                                                                <% } %>
+                                                            </td>
+                                                            <td>
+                                                                <% if (a.teacher_phone) { %>
+                                                                    <a href="tel:<%= a.teacher_phone %>" class="text-muted small"><i class="fa-solid fa-phone text-success me-1"></i><%= a.teacher_phone %></a>
+                                                                <% } else { %>
+                                                                    <span class="text-muted small">-</span>
+                                                                <% } %>
+                                                            </td>
+                                                            <td class="text-end">
+                                                                <form action="/admin/classes/assignments/<%= a.id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Remove teacher allocation for this subject?');">
+                                                                    <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" title="Unassign Teacher">
+                                                                        <i class="fa-solid fa-user-xmark"></i>
+                                                                    </button>
+                                                                </form>
+                                                            </td>
+                                                        </tr>
+                                                    <% }) %>
+                                                <% } else { %>
+                                                    <tr>
+                                                        <td colspan="5" class="text-center py-5 text-muted">
+                                                            <i class="fa-solid fa-circle-info fa-2x mb-2 text-warning d-block"></i>
+                                                            No subject teacher allocations yet. Use the form on the left to assign teachers to subjects of any class & section.
+                                                        </td>
+                                                    </tr>
+                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- MODAL 1: Add Class -->
+                <div class="modal fade" id="addClassModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form action="/admin/classes/create" method="POST">
+                                <div class="modal-header">
+                                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-school text-primary me-2"></i>Add New Class</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Class / Grade Name *</label>
+                                        <input type="text" name="class_name" class="form-control" required placeholder="e.g. Class 11 Science or Grade 6">
+                                    </div>
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-6">
+                                            <label class="form-label small fw-bold">Numeric Level (1-12) *</label>
+                                            <input type="number" name="numeric_level" class="form-control" min="1" max="12" value="10" required>
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="form-label small fw-bold">Stream</label>
+                                            <select name="stream" class="form-select">
+                                                <option value="General">General / Foundation</option>
+                                                <option value="Science (Medical)">Science (Medical)</option>
+                                                <option value="Science (Non-Medical)">Science (Non-Medical)</option>
+                                                <option value="Commerce">Commerce</option>
+                                                <option value="Arts / Humanities">Arts / Humanities</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Initial Default Section</label>
+                                        <input type="text" name="initial_section" class="form-control" value="A" placeholder="e.g. A">
+                                        <div class="form-text">You can add more sections (B, C, etc.) anytime.</div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary fw-bold">Create Class</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODAL 2: Add Section -->
+                <div class="modal fade" id="addSectionModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form action="/admin/classes/sections/create" method="POST">
+                                <div class="modal-header">
+                                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-layer-group text-primary me-2"></i>Add Section to Class</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Select Class *</label>
+                                        <select name="class_id" class="form-select" required>
+                                            <% classes.forEach(c => { %>
+                                                <option value="<%= c.id %>"><%= c.class_name %> (<%= c.stream || 'General' %>)</option>
+                                            <% }) %>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Section Name *</label>
+                                        <input type="text" name="section_name" class="form-control" required placeholder="e.g. B, C, Rose, Einstein">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Classroom / Room Number</label>
+                                        <input type="text" name="room_no" class="form-control" placeholder="e.g. Room 204">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary fw-bold">Add Section</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODAL 3: Add Subject -->
+                <div class="modal fade" id="addSubjectModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form action="/admin/classes/subjects/create" method="POST">
+                                <div class="modal-header">
+                                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-book text-success me-2"></i>Add Subject to Class & Section</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Select Class *</label>
+                                        <select name="class_id" id="modalSubjectClassSelect" class="form-select" required>
+                                            <option value="">-- Choose Class --</option>
+                                            <% classes.forEach(c => { %>
+                                                <option value="<%= c.id %>"><%= c.class_name %> (<%= c.stream || 'General' %>)</option>
+                                            <% }) %>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Applicable Section</label>
+                                        <select name="section_id" id="modalSubjectSectionSelect" class="form-select">
+                                            <option value="">All Sections of this Class (Common Subject)</option>
+                                        </select>
+                                        <div class="form-text">Choose a specific section if this subject only applies to one section.</div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Subject Name *</label>
+                                        <input type="text" name="subject_name" class="form-control" required placeholder="e.g. Physics, Chemistry, Mathematics, English">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Subject Code (Optional)</label>
+                                        <input type="text" name="subject_code" class="form-control" placeholder="e.g. PHY-101, BIO-12">
+                                    </div>
+
+                                    <div class="mb-3 border-top pt-2">
+                                        <label class="form-label small fw-bold">Assign Teacher Immediately (Optional)</label>
+                                        <select name="assign_teacher_id" class="form-select form-select-sm">
+                                            <option value="">-- Assign Later --</option>
+                                            <% teachers.forEach(t => { %>
+                                                <option value="<%= t.id %>"><%= t.name %> (<%= t.designation || 'Faculty' %>)</option>
+                                            <% }) %>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-success fw-bold">Create Subject</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODAL 4: Quick Assign Teacher -->
+                <div class="modal fade" id="assignTeacherModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form action="/admin/classes/assign-teacher" method="POST">
+                                <div class="modal-header">
+                                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-chalkboard-user text-warning me-2"></i>Assign Teacher to Subject</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Class *</label>
+                                        <select name="class_id" id="quickAllocClass" class="form-select" required>
+                                            <option value="">-- Choose Class --</option>
+                                            <% classes.forEach(c => { %>
+                                                <option value="<%= c.id %>"><%= c.class_name %></option>
+                                            <% }) %>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Section *</label>
+                                        <select name="section_id" id="quickAllocSection" class="form-select" required>
+                                            <option value="">-- Select Class First --</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Subject *</label>
+                                        <select name="subject_id" id="quickAllocSubject" class="form-select" required>
+                                            <option value="">-- Select Class First --</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Teacher / Faculty *</label>
+                                        <select name="teacher_id" class="form-select" required>
+                                            <option value="">-- Select Faculty --</option>
+                                            <% teachers.forEach(t => { %>
+                                                <option value="<%= t.id %>"><%= t.name %> (<%= t.designation || 'Faculty' %>)</option>
+                                            <% }) %>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-warning text-dark fw-bold">Assign Teacher</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Data Payloads for Dynamic Dropdown Cascades -->
+    <script>
+        const allSections = <%- JSON.stringify(sections) %>;
+        const allSubjects = <%- JSON.stringify(subjects) %>;
+
+        function setupClassCascades(classSelectId, sectionSelectId, subjectSelectId, includeAllSectionsOption = false) {
+            const classSelect = document.getElementById(classSelectId);
+            const sectionSelect = document.getElementById(sectionSelectId);
+            const subjectSelect = subjectSelectId ? document.getElementById(subjectSelectId) : null;
+
+            if (!classSelect || !sectionSelect) return;
+
+            classSelect.addEventListener('change', function() {
+                const classId = parseInt(this.value);
+
+                // Populate sections
+                sectionSelect.innerHTML = includeAllSectionsOption 
+                    ? '<option value="">All Sections of this Class (Common)</option>' 
+                    : '<option value="">-- Choose Section --</option>';
+
+                if (classId) {
+                    const filteredSections = allSections.filter(s => s.class_id === classId);
+                    filteredSections.forEach(s => {
+                        const opt = document.createElement('option');
+                        opt.value = s.id;
+                        opt.textContent = `Section ${s.section_name} (${s.room_no || 'No Room'})`;
+                        sectionSelect.appendChild(opt);
+                    });
+
+                    // Populate subjects if subjectSelect provided
+                    if (subjectSelect) {
+                        subjectSelect.innerHTML = '<option value="">-- Choose Subject --</option>';
+                        const filteredSubjects = allSubjects.filter(sub => sub.class_id === classId);
+                        filteredSubjects.forEach(sub => {
+                            const opt = document.createElement('option');
+                            opt.value = sub.id;
+                            const secTag = sub.section_name ? ` [Sec ${sub.section_name}]` : '';
+                            opt.textContent = `${sub.subject_name}${secTag}`;
+                            subjectSelect.appendChild(opt);
+                        });
+                    }
+                } else {
+                    if (subjectSelect) {
+                        subjectSelect.innerHTML = '<option value="">-- Select Class First --</option>';
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup for In-Tab Allocations Form
+            setupClassCascades('allocClassSelect', 'allocSectionSelect', 'allocSubjectSelect', false);
+
+            // Setup for Modal Subject Form
+            setupClassCascades('modalSubjectClassSelect', 'modalSubjectSectionSelect', null, true);
+
+            // Setup for Quick Assign Modal
+            setupClassCascades('quickAllocClass', 'quickAllocSection', 'quickAllocSubject', false);
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

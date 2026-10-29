@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+    <div class="admin-wrapper">
+        <%- include('../../partials/admin_sidebar') %>
+
+        <div class="admin-main">
+            <%- include('../../partials/admin_header') %>
+
+            <main class="admin-content">
+                <%- include('../../partials/alerts') %>
+
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1">Monthly Dual-Session Attendance Register</h4>
+                        <p class="text-muted small mb-0">Complete tracking for School (Morning In/Out) and Tuition (Evening In/Out) for month: <strong><%= month %></strong>.</p>
+                    </div>
+                    <div class="d-flex gap-2 mt-2 mt-sm-0">
+                        <% if (class_id && section_id) { %>
+                            <a href="/admin/attendance/export-csv?class_id=<%= class_id %>&section_id=<%= section_id %>&month=<%= month %>" class="btn btn-outline-success btn-sm fw-bold">
+                                <i class="fa-solid fa-file-excel me-1"></i> Export Excel/CSV
+                            </a>
+                        <% } %>
+                        <a href="/admin/attendance" class="btn btn-outline-secondary btn-sm">
+                            <i class="fa-solid fa-arrow-left me-1"></i> Daily Attendance
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="admin-card mb-4">
+                    <div class="admin-card-body p-3">
+                        <form method="GET" action="/admin/attendance/report" class="row g-2 align-items-end">
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-muted">Class</label>
+                                <select name="class_id" id="reportClassSelect" class="form-select form-select-sm" required>
+                                    <% classes.forEach(c => { %>
+                                        <option value="<%= c.id %>" <%= class_id == c.id ? 'selected' : '' %>><%= c.class_name %></option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-muted">Section</label>
+                                <select name="section_id" id="reportSectionSelect" class="form-select form-select-sm" required>
+                                    <% (classSections && classSections.length > 0 ? classSections : sections.filter(s => s.class_id == class_id)).forEach(s => { %>
+                                        <option value="<%= s.id %>" <%= section_id == s.id ? 'selected' : '' %>>Section <%= s.section_name %></option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-muted">Month (YYYY-MM)</label>
+                                <input type="month" name="month" class="form-control form-control-sm" value="<%= month %>" required>
+                            </div>
+                            <div class="col-md-3">
+                                <button type="submit" class="btn btn-primary btn-sm w-100 fw-bold">
+                                    <i class="fa-solid fa-arrows-rotate me-1"></i> Generate Monthly Report
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Dual-Session Register Table -->
+                <div class="admin-card">
+                    <div class="table-responsive">
+                        <table class="admin-table align-middle">
+                            <thead>
+                                <tr>
+                                    <th style="width: 70px;">Roll</th>
+                                    <th>Student Details</th>
+                                    <th class="text-center" style="width: 150px;">
+                                        <i class="fa-solid fa-school text-primary me-1"></i> School Sessions<br>
+                                        <small class="text-muted fw-normal" style="font-size: 0.72rem;">(Morning Present)</small>
+                                    </th>
+                                    <th class="text-center" style="width: 150px;">
+                                        <i class="fa-solid fa-book-open-reader text-warning me-1"></i> Tuition Sessions<br>
+                                        <small class="text-muted fw-normal" style="font-size: 0.72rem;">(Evening Present)</small>
+                                    </th>
+                                    <th class="text-center" style="width: 100px;">Absent</th>
+                                    <th class="text-center" style="width: 140px;">Attendance %</th>
+                                    <th class="text-end" style="width: 160px;">Daily In/Out Logs</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (reportData && reportData.length > 0) { %>
+                                    <% reportData.forEach(st => { %>
+                                        <tr>
+                                            <td><strong><%= st.roll_no || '-' %></strong></td>
+                                            <td>
+                                                <strong class="text-dark d-block"><%= st.first_name %> <%= st.last_name %></strong>
+                                                <div class="d-flex align-items-center gap-1 mt-1">
+                                                    <small class="text-muted"><%= st.admission_no %></small>
+                                                    <% if (st.biometric_id) { %>
+                                                        <span class="badge bg-primary text-white border-0 font-monospace p-0 px-1" style="font-size: 0.7rem;"><i class="fa-solid fa-fingerprint me-1"></i>Bio ID: <%= st.biometric_id %></span>
+                                                    <% } else { %>
+                                                        <span class="badge bg-light text-muted border font-monospace p-0 px-1" style="font-size: 0.7rem;"><i class="fa-solid fa-fingerprint me-1"></i>Bio ID: --</span>
+                                                    <% } %>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-success-subtle text-success border px-2 py-1 fs-6 fw-bold">
+                                                    <%= st.schoolPresent %> Days
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-warning-subtle text-warning-emphasis border px-2 py-1 fs-6 fw-bold">
+                                                    <%= st.tuitionPresent %> Days
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="text-danger fw-bold"><%= st.absent %></span>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="d-flex align-items-center justify-content-center gap-2">
+                                                    <span class="fw-bold <%= st.percentage >= 75 ? 'text-success' : 'text-danger' %>"><%= st.percentage %>%</span>
+                                                    <div class="progress" style="height: 6px; width: 50px;">
+                                                        <div class="progress-bar <%= st.percentage >= 75 ? 'bg-success' : 'bg-danger' %>" style="width: <%= st.percentage %>%;"></div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-end">
+                                                <button type="button" class="btn btn-sm btn-outline-primary fw-semibold" data-bs-toggle="modal" data-bs-target="#modalStudentLogs<%= st.id %>">
+                                                    <i class="fa-solid fa-clock-rotate-left me-1"></i> View Logs (<%= st.records.length %>)
+                                                </button>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Modal with Full Month In/Out Breakdown for this Student -->
+                                        <div class="modal fade" id="modalStudentLogs<%= st.id %>" tabindex="-1" aria-labelledby="modalLabel<%= st.id %>" aria-hidden="true">
+                                            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                                                <div class="modal-content">
+                                                    <div class="modal-header bg-light">
+                                                        <div>
+                                                            <h5 class="modal-title fw-bold text-dark" id="modalLabel<%= st.id %>">
+                                                                📅 Month-Wise Attendance Logs: <%= st.first_name %> <%= st.last_name %>
+                                                            </h5>
+                                                            <small class="text-muted">Admission No: <%= st.admission_no %> | Biometric ID: <strong><%= st.biometric_id || st.id %></strong> | Month: <strong><%= month %></strong></small>
+                                                        </div>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body p-0">
+                                                        <% if (st.records && st.records.length > 0) { %>
+                                                            <div class="table-responsive">
+                                                                <table class="table table-sm table-hover table-bordered mb-0 align-middle">
+                                                                    <thead class="table-light">
+                                                                        <tr>
+                                                                            <th style="width: 110px;">Date</th>
+                                                                            <th class="text-center text-primary" style="width: 160px;">
+                                                                                <i class="fa-solid fa-school me-1"></i> School (Morning)
+                                                                            </th>
+                                                                            <th class="text-center text-warning" style="width: 160px;">
+                                                                                <i class="fa-solid fa-book-open-reader me-1"></i> Tuition (Evening)
+                                                                            </th>
+                                                                            <th class="text-center" style="width: 100px;">Status</th>
+                                                                            <th>Remarks / Punch Details</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <% st.records.forEach(rec => { %>
+                                                                            <tr>
+                                                                                <td class="font-monospace fw-semibold"><%= rec.att_date %></td>
+                                                                                <td class="text-center">
+                                                                                    <% if (rec.morning_in) { %>
+                                                                                        <span class="badge bg-success-subtle text-success border">IN: <%= rec.morning_in.slice(0, 5) %></span>
+                                                                                        <span class="badge bg-light text-secondary border">OUT: <%= rec.morning_out ? rec.morning_out.slice(0, 5) : '--:--' %></span>
+                                                                                    <% } else { %>
+                                                                                        <span class="text-muted small">--</span>
+                                                                                    <% } %>
+                                                                                </td>
+                                                                                <td class="text-center">
+                                                                                    <% if (rec.tuition_in) { %>
+                                                                                        <span class="badge bg-warning-subtle text-warning-emphasis border">IN: <%= rec.tuition_in.slice(0, 5) %></span>
+                                                                                        <span class="badge bg-light text-secondary border">OUT: <%= rec.tuition_out ? rec.tuition_out.slice(0, 5) : '--:--' %></span>
+                                                                                    <% } else { %>
+                                                                                        <span class="text-muted small">--</span>
+                                                                                    <% } %>
+                                                                                </td>
+                                                                                <td class="text-center">
+                                                                                    <% if (rec.status === 'Present') { %>
+                                                                                        <span class="badge bg-success">Present</span>
+                                                                                    <% } else if (rec.status === 'Absent') { %>
+                                                                                        <span class="badge bg-danger">Absent</span>
+                                                                                    <% } else { %>
+                                                                                        <span class="badge bg-secondary"><%= rec.status %></span>
+                                                                                    <% } %>
+                                                                                </td>
+                                                                                <td><small class="text-muted"><%= rec.remarks || '-' %></small></td>
+                                                                            </tr>
+                                                                        <% }) %>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        <% } else { %>
+                                                            <div class="text-center py-5 text-muted">
+                                                                <i class="fa-solid fa-calendar-xmark fs-2 mb-2 d-block"></i>
+                                                                No attendance punches recorded for this student in <%= month %>.
+                                                            </div>
+                                                        <% } %>
+                                                    </div>
+                                                    <div class="modal-footer bg-light">
+                                                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr><td colspan="7" class="text-center text-muted py-5">
+                                        <i class="fa-solid fa-user-group fs-2 mb-2 d-block"></i>
+                                        Please select class, section, and month to generate attendance report.
+                                    </td></tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const allSections = <%- JSON.stringify(sections) %>;
+        const classSelect = document.getElementById('reportClassSelect');
+        const sectionSelect = document.getElementById('reportSectionSelect');
+
+        function updateSectionsForClass(classId) {
+            sectionSelect.innerHTML = '';
+            const filtered = allSections.filter(s => String(s.class_id) === String(classId));
+            if (filtered.length === 0) {
+                const opt = document.createElement('option');
+                opt.value = '';
+                opt.textContent = 'No sections available';
+                sectionSelect.appendChild(opt);
+                return;
+            }
+            filtered.forEach((s, idx) => {
+                const opt = document.createElement('option');
+                opt.value = s.id;
+                opt.textContent = `Section ${s.section_name}`;
+                if (idx === 0) opt.selected = true;
+                sectionSelect.appendChild(opt);
+            });
+        }
+
+        if (classSelect && sectionSelect) {
+            classSelect.addEventListener('change', function() {
+                updateSectionsForClass(this.value);
+            });
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

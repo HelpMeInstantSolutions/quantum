@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+    <div class="admin-wrapper">
+        <%- include('../../partials/admin_sidebar') %>
+
+        <div class="admin-main">
+            <%- include('../../partials/admin_header') %>
+
+            <main class="admin-content">
+                <%- include('../../partials/alerts') %>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1">Edit Student: <%= student.first_name %> <%= student.last_name %></h4>
+                        <p class="text-muted small mb-0">Admission No: <%= student.admission_no %></p>
+                    </div>
+                    <a href="/admin/students/<%= student.id %>" class="btn btn-outline-secondary btn-sm">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Back to Profile
+                    </a>
+                </div>
+
+                <form action="/admin/students/<%= student.id %>/edit" method="POST" enctype="multipart/form-data">
+                    <div class="row g-4">
+                        <div class="col-lg-8">
+                            <div class="admin-card">
+                                <div class="admin-card-header">
+                                    <h5>Personal Information</h5>
+                                </div>
+                                <div class="admin-card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">First Name *</label>
+                                            <input type="text" name="first_name" class="form-control" value="<%= student.first_name %>" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Last Name</label>
+                                            <input type="text" name="last_name" class="form-control" value="<%= student.last_name %>">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold">Roll Number</label>
+                                            <input type="text" name="roll_no" class="form-control" value="<%= student.roll_no || '' %>">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold text-primary">
+                                                <i class="fa-solid fa-fingerprint me-1"></i> Biometric Machine ID
+                                            </label>
+                                            <input type="text" name="biometric_id" class="form-control border-primary" value="<%= student.biometric_id || '' %>" placeholder="e.g. 1, 2, 101">
+                                            <small class="text-muted" style="font-size: 0.72rem;">User ID on Biometric Machine</small>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold">Class</label>
+                                            <select name="class_id" id="studentClassSelect" class="form-select">
+                                                <% classes.forEach(c => { %>
+                                                    <option value="<%= c.id %>" <%= student.class_id == c.id ? 'selected' : '' %>><%= c.class_name %></option>
+                                                <% }) %>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold">Section</label>
+                                            <select name="section_id" id="studentSectionSelect" class="form-select">
+                                                <% sections.filter(s => s.class_id == student.class_id).forEach(s => { %>
+                                                    <option value="<%= s.id %>" <%= student.section_id == s.id ? 'selected' : '' %>>Section <%= s.section_name %></option>
+                                                <% }) %>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-bold">Gender</label>
+                                            <select name="gender" class="form-select">
+                                                <option value="Male" <%= student.gender === 'Male' ? 'selected' : '' %>>Male</option>
+                                                <option value="Female" <%= student.gender === 'Female' ? 'selected' : '' %>>Female</option>
+                                                <option value="Other" <%= student.gender === 'Other' ? 'selected' : '' %>>Other</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-bold">Date of Birth</label>
+                                            <input type="date" name="dob" class="form-control" value="<%= student.dob ? student.dob.toISOString().split('T')[0] : '' %>">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-bold">Blood Group</label>
+                                            <input type="text" name="blood_group" class="form-control" value="<%= student.blood_group %>">
+                                        </div>
+
+                                        <div class="col-12 mt-3 pt-3 border-top">
+                                            <h6 class="fw-bold text-primary mb-1">
+                                                <i class="fa-solid fa-id-card me-1"></i> Academic & Govt. Identifiers (MIS / UDISE+)
+                                            </h6>
+                                            <small class="text-muted d-block mb-3">Govt. school portal details for Haryana MIS Portal & National UDISE+ database</small>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">SRN (MIS Portal)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-address-card"></i></span>
+                                                <input type="text" name="srn_no" class="form-control" value="<%= student.srn_no || '' %>" placeholder="e.g. 1901234567" maxlength="30">
+                                            </div>
+                                            <small class="text-muted" style="font-size: 0.75rem;">Student Registration Number (Haryana MIS Portal)</small>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">PEN Number (UDISE+)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-fingerprint"></i></span>
+                                                <input type="text" name="pen_no" class="form-control" value="<%= student.pen_no || '' %>" placeholder="e.g. 21061234567" maxlength="30">
+                                            </div>
+                                            <small class="text-muted" style="font-size: 0.75rem;">Permanent Education Number (National UDISE+ Portal)</small>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Aadhaar Card Number</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-id-badge"></i></span>
+                                                <input type="text" name="aadhar_no" class="form-control" value="<%= student.aadhar_no || '' %>" placeholder="12-digit Aadhaar Number" maxlength="20">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Family ID (PPP) / APAAR ID</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-users-rectangle"></i></span>
+                                                <input type="text" name="family_id" class="form-control" value="<%= student.family_id || '' %>" placeholder="Parivar Pehchan Patra (8-char) / APAAR" maxlength="30">
+                                            </div>
+                                            <small class="text-muted" style="font-size: 0.75rem;">Haryana Parivar Pehchan Patra (PPP)</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="admin-card">
+                                <div class="admin-card-header">
+                                    <h5>Guardian & Address</h5>
+                                </div>
+                                <div class="admin-card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Father's Name *</label>
+                                            <input type="text" name="father_name" class="form-control" value="<%= student.father_name %>" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Father's Phone *</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light fw-bold text-dark border-end-0">+91</span>
+                                                <input type="tel" name="father_phone" class="form-control" value="<%= (student.father_phone || '').replace(/^\+91-?/, '') %>" required placeholder="9812345678" maxlength="15">
+                                            </div>
+                                            <small class="text-muted" style="font-size: 0.75rem;">+91 pehle se laga hua hai (Enter 10-digit mobile number)</small>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Father's Occupation</label>
+                                            <div class="position-relative">
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-briefcase"></i></span>
+                                                    <input type="text" name="father_occupation" id="father_occupation" class="form-control" value="<%= student.father_occupation || '' %>" placeholder="Type occupation (e.g. Business, Officer, Doctor...)" autocomplete="off">
+                                                </div>
+                                                <div id="occupation_suggestions" class="google-suggestions-dropdown d-none"></div>
+                                            </div>
+                                            <small class="text-muted" style="font-size: 0.75rem;">Type krte hi suggestions aayenge, click krke select karein ya new type karein</small>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Mother's Name</label>
+                                            <input type="text" name="mother_name" class="form-control" value="<%= student.mother_name %>">
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label small fw-bold">Address</label>
+                                            <textarea name="current_address" rows="2" class="form-control"><%= student.current_address %></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="admin-card mb-4">
+                                <div class="admin-card-header">
+                                    <h5>Photo & Logistics</h5>
+                                </div>
+                                <div class="admin-card-body">
+                                    <div class="mb-3 text-center">
+                                        <img src="<%= getAvatar(student.photo_url, student.gender, 'student') %>" class="rounded-circle border mb-2" style="width: 80px; height: 80px; object-fit: cover;">
+                                        <input type="file" name="photo" class="form-control form-control-sm" accept="image/*">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Bus Route</label>
+                                        <select name="transport_route_id" class="form-select">
+                                            <option value="">No Transport</option>
+                                            <% routes.forEach(r => { %>
+                                                <option value="<%= r.id %>" <%= student.transport_route_id == r.id ? 'selected' : '' %>><%= r.route_name %></option>
+                                            <% }) %>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Enrollment Status</label>
+                                        <select name="status" class="form-select">
+                                            <option value="active" <%= student.status === 'active' ? 'selected' : '' %>>Active</option>
+                                            <option value="promoted" <%= student.status === 'promoted' ? 'selected' : '' %>>Promoted</option>
+                                            <option value="transferred" <%= student.status === 'transferred' ? 'selected' : '' %>>Transferred</option>
+                                            <option value="passed_out" <%= student.status === 'passed_out' ? 'selected' : '' %>>Passed Out</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="border-top pt-3 mt-3">
+                                        <h6 class="fw-bold small text-primary mb-2">
+                                            <i class="fa-solid fa-file-circle-plus me-1"></i> Attach New Document
+                                        </h6>
+                                        <div class="mb-2">
+                                            <label class="form-label small text-muted" style="font-size: 0.75rem;">Document Type</label>
+                                            <select name="doc_type" class="form-select form-select-sm">
+                                                <option value="Aadhaar Card">Aadhaar Card</option>
+                                                <option value="Birth Certificate">Birth Certificate</option>
+                                                <option value="Transfer Certificate (TC)">Transfer Certificate (TC)</option>
+                                                <option value="Previous Marksheet">Previous Marksheet</option>
+                                                <option value="Family ID (PPP)">Family ID (PPP)</option>
+                                                <option value="Caste Certificate">Caste Certificate</option>
+                                                <option value="Medical Certificate">Medical Certificate</option>
+                                                <option value="Character Certificate">Character Certificate</option>
+                                                <option value="Other">Other Document</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label class="form-label small text-muted" style="font-size: 0.75rem;">Document Title (Optional)</label>
+                                            <input type="text" name="doc_title" class="form-control form-control-sm" placeholder="e.g. Class 9 Marksheet">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label small text-muted" style="font-size: 0.75rem;">File (PDF, JPG, PNG)</label>
+                                            <input type="file" name="document_file" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png">
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary w-100 fw-bold">
+                                        <i class="fa-solid fa-floppy-disk me-1"></i> Save Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Section: Uploaded Documents & Certificates -->
+                <div class="row mt-4" id="documents">
+                    <div class="col-12">
+                        <div class="admin-card">
+                            <div class="admin-card-header d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-0">
+                                        <i class="fa-solid fa-folder-open text-primary me-2"></i>
+                                        Student Documents &amp; Certificates (<%= (documents || []).length %>)
+                                    </h5>
+                                    <small class="text-muted">Aadhaar, Birth Certificates, Marksheets, and Govt. Verification Files</small>
+                                </div>
+                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="collapse" data-bs-target="#collapseUploadDoc">
+                                    <i class="fa-solid fa-cloud-arrow-up me-1"></i> Upload New Document
+                                </button>
+                            </div>
+
+                            <!-- Quick Upload Collapse Form -->
+                            <div class="collapse p-3 bg-light border-bottom" id="collapseUploadDoc">
+                                <form action="/admin/students/<%= student.id %>/documents" method="POST" enctype="multipart/form-data">
+                                    <input type="hidden" name="redirect_to" value="edit">
+                                    <div class="row g-3 align-items-end">
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold">Document Type *</label>
+                                            <select name="doc_type" class="form-select form-select-sm" required>
+                                                <option value="Aadhaar Card">Aadhaar Card</option>
+                                                <option value="Birth Certificate">Birth Certificate</option>
+                                                <option value="Transfer Certificate (TC)">Transfer Certificate (TC)</option>
+                                                <option value="Previous Marksheet">Previous Marksheet</option>
+                                                <option value="Family ID (PPP)">Family ID (PPP)</option>
+                                                <option value="Caste Certificate">Caste Certificate</option>
+                                                <option value="Medical Certificate">Medical Certificate</option>
+                                                <option value="Character Certificate">Character Certificate</option>
+                                                <option value="Other">Other Document</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-bold">Document Title</label>
+                                            <input type="text" name="doc_title" class="form-control form-control-sm" placeholder="e.g. Student Original Aadhaar Scan">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold">Select File (PDF, JPG, PNG) *</label>
+                                            <input type="file" name="document_file" class="form-control form-control-sm" required accept=".pdf,.jpg,.jpeg,.png">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button type="submit" class="btn btn-success btn-sm w-100 fw-bold">
+                                                <i class="fa-solid fa-upload me-1"></i> Upload
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div class="admin-card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                 <th style="width: 50px;">#</th>
+                                                 <th>Document Type</th>
+                                                 <th>Document Title</th>
+                                                 <th>File Size</th>
+                                                 <th>Uploaded Date</th>
+                                                 <th class="text-end">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% if (documents && documents.length > 0) { %>
+                                                <% documents.forEach((doc, idx) => { %>
+                                                    <% const isPdf = doc.file_url.toLowerCase().endsWith('.pdf'); %>
+                                                    <tr>
+                                                        <td>
+                                                            <i class="fa-solid <%= isPdf ? 'fa-file-pdf text-danger' : 'fa-file-image text-primary' %> fa-lg"></i>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge bg-primary-subtle text-primary fw-semibold px-2 py-1">
+                                                                <%= doc.doc_type %>
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="fw-semibold text-dark"><%= doc.doc_title %></span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge bg-secondary-subtle text-secondary"><%= doc.file_size || 'N/A' %></span>
+                                                        </td>
+                                                        <td>
+                                                            <small class="text-muted"><%= new Date(doc.uploaded_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) %></small>
+                                                        </td>
+                                                        <td class="text-end">
+                                                            <a href="<%= doc.file_url %>" target="_blank" class="btn btn-sm btn-outline-primary me-1" title="View Document">
+                                                                <i class="fa-solid fa-eye me-1"></i> View
+                                                            </a>
+                                                            <form action="/admin/students/<%= student.id %>/documents/<%= doc.id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Delete this document?');">
+                                                                <input type="hidden" name="from" value="edit">
+                                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                                    <i class="fa-solid fa-trash-can"></i>
+                                                                </button>
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+                                                <% }) %>
+                                            <% } else { %>
+                                                <tr>
+                                                    <td colspan="6" class="text-center py-4 text-muted">
+                                                        <i class="fa-solid fa-folder-open d-block mb-2 text-muted" style="font-size: 2rem;"></i>
+                                                        No documents uploaded yet for this student. Click <strong>"Upload New Document"</strong> above to attach Aadhaar, Birth Certificate, etc.
+                                                    </td>
+                                                </tr>
+                                            <% } %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const allSections = <%- JSON.stringify(sections) %>;
+        const classSelect = document.getElementById('studentClassSelect');
+        const sectionSelect = document.getElementById('studentSectionSelect');
+
+        function updateSectionsForClass(classId) {
+            sectionSelect.innerHTML = '';
+            const filtered = allSections.filter(s => String(s.class_id) === String(classId));
+            if (filtered.length === 0) {
+                const opt = document.createElement('option');
+                opt.value = '';
+                opt.textContent = 'No sections available';
+                sectionSelect.appendChild(opt);
+                return;
+            }
+            filtered.forEach((s, idx) => {
+                const opt = document.createElement('option');
+                opt.value = s.id;
+                opt.textContent = `Section ${s.section_name}`;
+                if (idx === 0) opt.selected = true;
+                sectionSelect.appendChild(opt);
+            });
+        }
+
+        if (classSelect && sectionSelect) {
+            classSelect.addEventListener('change', function() {
+                updateSectionsForClass(this.value);
+            });
+        }
+
+        // Google-Style Auto-Suggestion for Father's Occupation
+        const occupationsList = <%- JSON.stringify(occupations || []) %>;
+        const occInput = document.getElementById('father_occupation');
+        const occSuggestions = document.getElementById('occupation_suggestions');
+        let selectedSuggestionIndex = -1;
+
+        function highlightMatch(text, query) {
+            if (!query) return text;
+            const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            return text.replace(regex, '<span class="google-suggestion-highlight">$1</span>');
+        }
+
+        function renderSuggestions(query) {
+            if (!occSuggestions) return;
+            const q = (query || '').trim().toLowerCase();
+            
+            let matches = [];
+            if (!q) {
+                matches = occupationsList.slice(0, 8);
+            } else {
+                matches = occupationsList.filter(item => item.toLowerCase().includes(q));
+            }
+
+            if (matches.length === 0) {
+                occSuggestions.innerHTML = `
+                    <div class="google-suggestion-item text-muted" style="cursor: default;">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                        <span>Keep typing: "<strong>${query}</strong>"</span>
+                    </div>
+                `;
+                occSuggestions.classList.remove('d-none');
+                selectedSuggestionIndex = -1;
+                return;
+            }
+
+            let html = `<div class="google-suggestion-header"><i class="fa-solid fa-magnifying-glass me-1"></i> Suggested Occupations</div>`;
+            matches.forEach((occ, idx) => {
+                const highlighted = highlightMatch(occ, q);
+                html += `
+                    <div class="google-suggestion-item" data-idx="${idx}" data-val="${occ.replace(/"/g, '&quot;')}">
+                        <i class="fa-solid fa-briefcase"></i>
+                        <span>${highlighted}</span>
+                    </div>
+                `;
+            });
+
+            occSuggestions.innerHTML = html;
+            occSuggestions.classList.remove('d-none');
+            selectedSuggestionIndex = -1;
+
+            occSuggestions.querySelectorAll('.google-suggestion-item[data-val]').forEach(item => {
+                item.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    const val = this.getAttribute('data-val');
+                    occInput.value = val;
+                    occSuggestions.classList.add('d-none');
+                });
+            });
+        }
+
+        if (occInput && occSuggestions) {
+            occInput.addEventListener('input', function() {
+                renderSuggestions(this.value);
+            });
+
+            occInput.addEventListener('focus', function() {
+                renderSuggestions(this.value);
+            });
+
+            occInput.addEventListener('keydown', function(e) {
+                const items = occSuggestions.querySelectorAll('.google-suggestion-item[data-val]');
+                if (!items.length || occSuggestions.classList.contains('d-none')) return;
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    selectedSuggestionIndex = (selectedSuggestionIndex + 1) % items.length;
+                    updateItemHighlight(items);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    selectedSuggestionIndex = (selectedSuggestionIndex - 1 + items.length) % items.length;
+                    updateItemHighlight(items);
+                } else if (e.key === 'Enter') {
+                    if (selectedSuggestionIndex >= 0 && items[selectedSuggestionIndex]) {
+                        e.preventDefault();
+                        occInput.value = items[selectedSuggestionIndex].getAttribute('data-val');
+                        occSuggestions.classList.add('d-none');
+                    }
+                } else if (e.key === 'Escape') {
+                    occSuggestions.classList.add('d-none');
+                }
+            });
+
+            function updateItemHighlight(items) {
+                items.forEach((it, idx) => {
+                    if (idx === selectedSuggestionIndex) {
+                        it.classList.add('active');
+                        it.scrollIntoView({ block: 'nearest' });
+                    } else {
+                        it.classList.remove('active');
+                    }
+                });
+            }
+
+            document.addEventListener('click', function(e) {
+                if (!occInput.contains(e.target) && !occSuggestions.contains(e.target)) {
+                    occSuggestions.classList.add('d-none');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

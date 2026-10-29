@@ -1,0 +1,94 @@
+<%- include('../partials/header') %>
+
+<div class="py-5 bg-light border-bottom">
+    <div class="container text-center">
+        <span class="section-badge">Session 2026-27</span>
+        <h1 class="fw-bold mt-2 text-dark">Admissions & Registration</h1>
+        <p class="text-muted mx-auto" style="max-width: 650px;">
+            Step into the world of inspiring education. Admissions are open for Academic Session 2026-27.
+        </p>
+    </div>
+</div>
+
+<div class="container py-5" id="apply-now">
+    <%- include('../partials/alerts') %>
+
+    <div class="row g-5">
+        <div class="col-lg-7">
+            <h3 class="fw-bold text-dark mb-3">Admission Procedure</h3>
+            <div class="d-flex gap-3 mb-4">
+                <div class="badge bg-primary fs-5 rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; flex-shrink: 0;">1</div>
+                <div>
+                    <h5 class="fw-bold mb-1">Online or Offline Inquiry</h5>
+                    <p class="text-muted small mb-0">Fill the inquiry form online or visit the <%= school.school_name || 'Quantum Science Acadmey' %> campus reception.</p>
+                </div>
+            </div>
+            <div class="d-flex gap-3 mb-4">
+                <div class="badge bg-primary fs-5 rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; flex-shrink: 0;">2</div>
+                <div>
+                    <h5 class="fw-bold mb-1">Aptitude & Scholarship Evaluation</h5>
+                    <p class="text-muted small mb-0">Students can appear for the Talent Scholarship Test to win up to 100% tuition waiver.</p>
+                </div>
+            </div>
+            <div class="d-flex gap-3 mb-4">
+                <div class="badge bg-primary fs-5 rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; flex-shrink: 0;">3</div>
+                <div>
+                    <h5 class="fw-bold mb-1">Document Verification & Admission</h5>
+                    <p class="text-muted small mb-0">Submit Aadhaar Card, Previous Marksheet, and Transfer Certificate to finalize admission.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="bg-white p-4 rounded-4 shadow border">
+                <h4 class="fw-bold text-dark mb-2"><i class="fa-solid fa-graduation-cap text-primary me-2"></i>Online Application Form</h4>
+                <p class="text-muted small mb-3">Submit your details and our admission officer will contact you within 24 hours.</p>
+
+                <form action="/inquiry" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Parent / Guardian Name *</label>
+                        <input type="text" name="parent_name" class="form-control" required placeholder="Full Name">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Student Name *</label>
+                        <input type="text" name="student_name" class="form-control" required placeholder="Child's Name">
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Phone Number *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light fw-bold text-dark border-end-0">+91</span>
+                                <input type="tel" name="phone" class="form-control" required placeholder="9812345678" maxlength="15">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Class Applying For</label>
+                            <select name="seeking_class" class="form-select">
+                                <% if (classes && classes.length > 0) { %>
+                                    <% classes.forEach(c => { %>
+                                        <option value="<%= c.class_name %>"><%= c.class_name %></option>
+                                    <% }) %>
+                                <% } else { %>
+                                    <option value="Class 10">Class 10</option>
+                                <% } %>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Email Address (Optional)</label>
+                        <input type="email" name="email" class="form-control" placeholder="parent@email.com">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Message or Specific Queries</label>
+                        <textarea name="message" rows="3" class="form-control" placeholder="Any queries regarding admission or bus facility..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-warning text-dark w-100 fw-bold py-2 shadow-sm">
+                        <i class="fa-solid fa-paper-plane me-1"></i> Submit Admission Application
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

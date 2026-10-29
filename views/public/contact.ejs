@@ -1,0 +1,87 @@
+<%- include('../partials/header') %>
+
+<div class="py-5 bg-light border-bottom">
+    <div class="container text-center">
+        <span class="section-badge">Get in Touch</span>
+        <h1 class="fw-bold mt-2 text-dark">Contact <%= school.school_name || 'Quantum Science Acadmey' %></h1>
+        <p class="text-muted mx-auto" style="max-width: 650px;">
+            Have questions about admissions, transport routes, or academics? Visit us or drop a message.
+        </p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <%- include('../partials/alerts') %>
+
+    <div class="row g-5">
+        <div class="col-lg-5">
+            <h4 class="fw-bold text-dark mb-4">Campus Location & Office</h4>
+            
+            <div class="d-flex gap-3 mb-4">
+                <div class="text-primary fs-4"><i class="fa-solid fa-map-location-dot"></i></div>
+                <div>
+                    <h6 class="fw-bold mb-1">Campus Address</h6>
+                    <p class="text-muted small mb-0"><%= school.address || 'Star Academy Campus, Near Model Town, Rohtak, Haryana 124001' %></p>
+                </div>
+            </div>
+
+            <div class="d-flex gap-3 mb-4">
+                <div class="text-primary fs-4"><i class="fa-solid fa-phone-volume"></i></div>
+                <div>
+                    <h6 class="fw-bold mb-1">Telephone & Helpline</h6>
+                    <p class="text-muted small mb-0"><%= school.phone || '+91-9467389100' %></p>
+                    <p class="text-muted small mb-0"><%= school.phone_alt || '+91-9812001234' %></p>
+                </div>
+            </div>
+
+            <div class="d-flex gap-3 mb-4">
+                <div class="text-primary fs-4"><i class="fa-solid fa-envelope-open-text"></i></div>
+                <div>
+                    <h6 class="fw-bold mb-1">Official Email</h6>
+                    <p class="text-muted small mb-0"><%= school.email || 'info@staracademy.in' %></p>
+                </div>
+            </div>
+
+            <div class="d-flex gap-3">
+                <div class="text-primary fs-4"><i class="fa-solid fa-clock"></i></div>
+                <div>
+                    <h6 class="fw-bold mb-1">Visiting Hours</h6>
+                    <p class="text-muted small mb-0">Monday to Saturday: 8:00 AM - 4:00 PM</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="bg-white p-4 rounded-4 shadow border">
+                <h4 class="fw-bold text-dark mb-3">Send a Message to Principal Office</h4>
+                <form action="/inquiry" method="POST">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Your Name *</label>
+                            <input type="text" name="parent_name" class="form-control" required placeholder="Full Name">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Contact Mobile *</label>
+                            <input type="tel" name="phone" class="form-control" required placeholder="+91-9812XXXXXX">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-semibold">Email (Optional)</label>
+                            <input type="email" name="email" class="form-control" placeholder="name@example.com">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-semibold">Subject / Message *</label>
+                            <textarea name="message" rows="4" class="form-control" required placeholder="Type your inquiry or message..."></textarea>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary fw-bold px-4 py-2" style="background-color: #1a56db;">
+                                <i class="fa-solid fa-paper-plane me-1"></i> Send Message
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+    <div class="admin-wrapper">
+        <%- include('../../partials/admin_sidebar') %>
+
+        <div class="admin-main">
+            <%- include('../../partials/admin_header') %>
+
+            <main class="admin-content">
+                <%- include('../../partials/alerts') %>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1">Publish New Notification</h4>
+                        <p class="text-muted small mb-0">Dispatches real-time alerts to the mobile app notification center and public notice board.</p>
+                    </div>
+                    <a href="/admin/notifications" class="btn btn-outline-secondary btn-sm">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Back to Notices
+                    </a>
+                </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="admin-card">
+                            <div class="admin-card-header">
+                                <h5><i class="fa-solid fa-pen-nib text-primary me-2"></i>Announcement Details</h5>
+                            </div>
+                            <div class="admin-card-body">
+                                <form action="/admin/notifications/create" method="POST">
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Notification Title *</label>
+                                        <input type="text" name="title" class="form-control" required placeholder="e.g. Haryana Day Holiday & Diwali Festive Break">
+                                    </div>
+
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Notice Category *</label>
+                                            <select name="category" class="form-select" required>
+                                                <option value="general">General School Notice</option>
+                                                <option value="holiday">Holiday / Festive Break</option>
+                                                <option value="exam">Examination & Test Schedule</option>
+                                                <option value="fee_reminder">Fee Reminder</option>
+                                                <option value="attendance_alert">Attendance Notice</option>
+                                                <option value="emergency">Urgent Emergency Notice</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Target Audience *</label>
+                                            <select name="target_role" class="form-select" required>
+                                                <option value="all">Whole School (Everyone)</option>
+                                                <option value="student">Students & Parents Only</option>
+                                                <option value="parent">Parents Only</option>
+                                                <option value="teacher">Teachers & Staff Only</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Target Specific Class (Optional)</label>
+                                            <select name="class_id" class="form-select">
+                                                <option value="">All Classes (School Wide)</option>
+                                                <% classes.forEach(c => { %>
+                                                    <option value="<%= c.id %>"><%= c.class_name %></option>
+                                                <% }) %>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-6 d-flex align-items-center pt-4">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" name="is_pinned" id="pinSwitch" value="1">
+                                                <label class="form-check-label small fw-bold" for="pinSwitch">Pin to Top of Feed / Notice Board</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="form-label small fw-bold">Detailed Notice Content / Circular Text *</label>
+                                        <textarea name="message" rows="5" class="form-control" required placeholder="Write the complete announcement text here..."></textarea>
+                                    </div>
+
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a href="/admin/notifications" class="btn btn-light border">Cancel</a>
+                                        <button type="submit" class="btn btn-primary fw-bold px-4">
+                                            <i class="fa-solid fa-paper-plane me-1"></i> Broadcast Announcement
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

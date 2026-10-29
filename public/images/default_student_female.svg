@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="bgGradStudentGirl" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f43f5e"/>
+      <stop offset="100%" stop-color="#be123c"/>
+    </linearGradient>
+    <linearGradient id="skinGirl" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fed7aa"/>
+      <stop offset="100%" stop-color="#fcd34d"/>
+    </linearGradient>
+    <linearGradient id="uniformGirl" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a"/>
+      <stop offset="100%" stop-color="#172554"/>
+    </linearGradient>
+  </defs>
+  <!-- Background Circle -->
+  <circle cx="64" cy="64" r="64" fill="url(#bgGradStudentGirl)"/>
+  
+  <!-- Girl Two Ponytails (Pigtails with Red Ribbons) -->
+  <circle cx="36" cy="48" r="14" fill="#262626"/>
+  <circle cx="92" cy="48" r="14" fill="#262626"/>
+  <!-- Red Ribbons -->
+  <circle cx="38" cy="46" r="4.5" fill="#f43f5e"/>
+  <circle cx="90" cy="46" r="4.5" fill="#f43f5e"/>
+
+  <!-- School Pinafore / Shirt -->
+  <path d="M26 128 C26 98 42 86 64 86 C86 86 102 98 102 128 Z" fill="url(#uniformGirl)"/>
+  <!-- White Peter Pan Rounded Collar -->
+  <path d="M64 96 C56 94 48 88 52 86 C58 84 64 88 64 96 Z" fill="#ffffff"/>
+  <path d="M64 96 C72 94 80 88 76 86 C70 84 64 88 64 96 Z" fill="#ffffff"/>
+  <!-- Red Bowtie -->
+  <polygon points="59,94 69,94 66,97 62,97" fill="#e11d48"/>
+  <polygon points="62,94 66,94 64,96" fill="#be123c"/>
+
+  <!-- Neck -->
+  <rect x="57" y="72" width="14" height="16" rx="4" fill="url(#skinGirl)"/>
+  
+  <!-- Girl Head & Face -->
+  <ellipse cx="64" cy="54" rx="19" ry="22" fill="url(#skinGirl)"/>
+  
+  <!-- Front Bangs / Hair -->
+  <path d="M44 48 C42 32 50 24 64 24 C78 24 86 32 84 48 C78 36 72 32 64 32 C54 32 50 36 44 48 Z" fill="#262626"/>
+  <path d="M44 44 C48 36 56 32 64 32 C58 36 54 42 50 48 Z" fill="#171717"/>
+
+  <!-- Eyes & Cute Lashes -->
+  <circle cx="56" cy="54" r="2.5" fill="#0f172a"/>
+  <circle cx="72" cy="54" r="2.5" fill="#0f172a"/>
+  <circle cx="57" cy="53" r="0.8" fill="#ffffff"/>
+  <circle cx="73" cy="53" r="0.8" fill="#ffffff"/>
+  <path d="M53 51 L51 49" stroke="#0f172a" stroke-width="1.2" stroke-linecap="round"/>
+  <path d="M75 51 L77 49" stroke="#0f172a" stroke-width="1.2" stroke-linecap="round"/>
+
+  <!-- Eyebrows -->
+  <path d="M52 49 Q56 47 60 49" stroke="#262626" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+  <path d="M68 49 Q72 47 76 49" stroke="#262626" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+  
+  <!-- Sweet Smile -->
+  <path d="M58 65 Q64 71 70 65" stroke="#e11d48" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  <!-- Rosy Cheeks -->
+  <circle cx="48" cy="62" r="3.5" fill="#fda4af" opacity="0.6"/>
+  <circle cx="80" cy="62" r="3.5" fill="#fda4af" opacity="0.6"/>
+</svg>

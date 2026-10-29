@@ -1,0 +1,416 @@
+/* Admin Portal Styles - Star Academy Rohtak */
+:root {
+    --admin-sidebar-bg: #142b3c;
+    --admin-sidebar-hover: #1e3a52;
+    --admin-sidebar-active: #1a56db;
+    --admin-topbar-bg: #ffffff;
+    --admin-body-bg: #f4f6f9;
+    --admin-card-border: #e2e8f0;
+    --primary-color: #1a56db;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+}
+
+body.admin-body {
+    background-color: var(--admin-body-bg);
+    font-family: 'Rubik', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #1e293b;
+    margin: 0;
+    padding: 0;
+}
+
+/* Layout */
+.admin-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.admin-sidebar {
+    width: 260px;
+    background-color: var(--admin-sidebar-bg);
+    color: #cbd5e1;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.sidebar-brand {
+    padding: 18px 20px;
+    background-color: #0d1e2b;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.sidebar-brand img {
+    height: 38px;
+    width: auto;
+}
+.sidebar-brand-text {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.2;
+}
+.sidebar-brand-text small {
+    display: block;
+    font-size: 0.72rem;
+    color: #94a3b8;
+    font-weight: 400;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 15px 10px;
+    margin: 0;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+.sidebar-heading {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #64748b;
+    padding: 12px 14px 4px 14px;
+    font-weight: 700;
+}
+.sidebar-menu li a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    color: #cbd5e1;
+    text-decoration: none;
+    font-size: 0.92rem;
+    font-weight: 500;
+    border-radius: 8px;
+    margin-bottom: 2px;
+    transition: all 0.2s ease;
+}
+.sidebar-menu li a:hover {
+    background-color: var(--admin-sidebar-hover);
+    color: #ffffff;
+}
+.sidebar-menu li a.active {
+    background-color: var(--admin-sidebar-active);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(26, 86, 219, 0.35);
+}
+.sidebar-menu li a i {
+    width: 20px;
+    font-size: 1.05rem;
+    text-align: center;
+}
+
+/* Sidebar Dropdown & Submenu */
+.sidebar-dropdown-toggle {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+}
+.sidebar-dropdown-toggle .arrow-icon {
+    font-size: 0.72rem;
+    color: #64748b;
+    transition: transform 0.25s ease, color 0.2s ease;
+}
+.sidebar-dropdown-toggle[aria-expanded="true"] .arrow-icon {
+    transform: rotate(180deg);
+    color: #cbd5e1;
+}
+.sidebar-dropdown-toggle.active-parent {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-left: 3px solid var(--admin-sidebar-active);
+}
+.sidebar-submenu {
+    list-style: none;
+    padding: 3px 0 6px 14px;
+    margin: 0;
+    position: relative;
+}
+.sidebar-submenu::before {
+    content: '';
+    position: absolute;
+    left: 24px;
+    top: 6px;
+    bottom: 6px;
+    width: 2px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+}
+.sidebar-submenu li a {
+    padding: 8px 12px 8px 18px;
+    font-size: 0.86rem;
+    color: #94a3b8;
+    border-radius: 6px;
+    margin-bottom: 2px;
+    font-weight: 500;
+    gap: 10px;
+    box-shadow: none;
+}
+.sidebar-submenu li a i {
+    width: 16px;
+    font-size: 0.85rem;
+    opacity: 0.85;
+}
+.sidebar-submenu li a:hover {
+    color: #ffffff;
+    background-color: var(--admin-sidebar-hover);
+}
+.sidebar-submenu li a.active {
+    background-color: var(--admin-sidebar-active) !important;
+    color: #ffffff !important;
+    box-shadow: 0 3px 10px rgba(26, 86, 219, 0.4);
+    font-weight: 600;
+}
+
+/* Google-Style Auto-Suggestion Dropdown */
+.google-suggestions-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.15), 0 8px 10px -6px rgba(15, 23, 42, 0.1);
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 1070;
+    padding: 4px 0;
+}
+.google-suggestion-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    font-size: 0.88rem;
+    color: #334155;
+    cursor: pointer;
+    transition: background-color 0.12s ease, color 0.12s ease;
+}
+.google-suggestion-item i {
+    color: #94a3b8;
+    font-size: 0.8rem;
+    width: 16px;
+    text-align: center;
+}
+.google-suggestion-item:hover,
+.google-suggestion-item.active {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+}
+.google-suggestion-item:hover i,
+.google-suggestion-item.active i {
+    color: #2563eb;
+}
+.google-suggestion-header {
+    padding: 6px 14px 4px 14px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: 2px;
+}
+.google-suggestion-highlight {
+    font-weight: 700;
+    color: #1e40af;
+}
+
+/* Main Content Area */
+.admin-main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+/* Topbar */
+.admin-topbar {
+    background-color: var(--admin-topbar-bg);
+    border-bottom: 1px solid var(--admin-card-border);
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    position: sticky;
+    top: 0;
+    z-index: 990;
+}
+.topbar-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.topbar-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #e2e8f0;
+}
+
+/* Page Container */
+.admin-content {
+    padding: 24px;
+    flex-grow: 1;
+}
+
+/* Cards */
+.admin-card {
+    background: #ffffff;
+    border: 1px solid var(--admin-card-border);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    margin-bottom: 24px;
+}
+.admin-card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--admin-card-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.admin-card-header h5 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+.admin-card-body {
+    padding: 20px;
+}
+
+/* Stat Widgets */
+.stat-widget {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 22px;
+    border: 1px solid var(--admin-card-border);
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.stat-widget:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+.stat-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    flex-shrink: 0;
+}
+.stat-val {
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.1;
+    margin-bottom: 4px;
+}
+.stat-label {
+    font-size: 0.84rem;
+    color: #64748b;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Tables */
+.admin-table {
+    width: 100%;
+    margin-bottom: 0;
+}
+.admin-table th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e2e8f0;
+    padding: 12px 16px;
+}
+.admin-table td {
+    padding: 14px 16px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.9rem;
+}
+.admin-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Badges */
+.badge-status {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+.badge-present { background-color: #dcfce7; color: #15803d; }
+.badge-absent { background-color: #fee2e2; color: #b91c1c; }
+.badge-late { background-color: #fef3c7; color: #b45309; }
+.badge-paid { background-color: #dbeafe; color: #1d4ed8; }
+.badge-pending { background-color: #ffedd5; color: #c2410c; }
+
+/* Marks Matrix Spreadsheet Styles */
+.matrix-input {
+    width: 85px;
+    font-weight: 700;
+    font-size: 1rem;
+    text-align: center;
+    padding: 6px 8px;
+    border: 2px solid #cbd5e1;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+.matrix-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.2);
+    outline: none;
+    background-color: #eff6ff;
+}
+.grade-badge {
+    display: inline-block;
+    min-width: 40px;
+    text-align: center;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+/* Printable Slip Styles */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    .print-receipt-container, .print-receipt-container * {
+        visibility: visible;
+    }
+    .print-receipt-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 10px;
+    }
+    .no-print {
+        display: none !important;
+    }
+}

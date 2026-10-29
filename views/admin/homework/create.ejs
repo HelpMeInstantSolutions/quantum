@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+    <div class="admin-wrapper">
+        <%- include('../../partials/admin_sidebar') %>
+
+        <div class="admin-main">
+            <%- include('../../partials/admin_header') %>
+
+            <main class="admin-content">
+                <%- include('../../partials/alerts') %>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1">Assign Daily Homework</h4>
+                        <p class="text-muted small mb-0">Specify subject, instructions, due date and optional question worksheet attachment.</p>
+                    </div>
+                    <a href="/admin/homework" class="btn btn-outline-secondary btn-sm">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Back to Homework
+                    </a>
+                </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="admin-card">
+                            <div class="admin-card-header">
+                                <h5><i class="fa-solid fa-book text-primary me-2"></i>Homework Assignment Form</h5>
+                            </div>
+                            <div class="admin-card-body">
+                                <form action="/admin/homework/create" method="POST" enctype="multipart/form-data">
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-bold">Class *</label>
+                                            <select name="class_id" id="hwClassSelect" class="form-select" required>
+                                                <% classes.forEach(c => { %>
+                                                    <option value="<%= c.id %>"><%= c.class_name %></option>
+                                                <% }) %>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-bold">Section *</label>
+                                            <select name="section_id" id="hwSectionSelect" class="form-select" required>
+                                                <% const initialClassId = classes.length > 0 ? classes[0].id : null; %>
+                                                <% sections.filter(s => s.class_id === initialClassId).forEach(s => { %>
+                                                    <option value="<%= s.id %>">Section <%= s.section_name %></option>
+                                                <% }) %>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-bold">Subject *</label>
+                                            <select name="subject_id" id="hwSubjectSelect" class="form-select" required>
+                                                <% subjects.filter(sub => !sub.class_id || sub.class_id === initialClassId).forEach(sub => { %>
+                                                    <option value="<%= sub.id %>"><%= sub.subject_name %></option>
+                                                <% }) %>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Assigning Faculty</label>
+                                            <select name="teacher_id" class="form-select">
+                                                <option value="">Admin Office</option>
+                                                <% teachers.forEach(t => { %>
+                                                    <option value="<%= t.id %>"><%= t.name %></option>
+                                                <% }) %>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Submission Due Date *</label>
+                                            <input type="date" name="due_date" class="form-control" required value="<%= new Date(Date.now() + 86400000 * 2).toISOString().split('T')[0] %>">
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Homework Title / Chapter *</label>
+                                        <input type="text" name="title" class="form-control" required placeholder="e.g. NCERT Quadratic Equations Exercise 4.2">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Detailed Instructions / Questions *</label>
+                                        <textarea name="description" rows="5" class="form-control" required placeholder="Write question numbers, pages or special instructions for students..."></textarea>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="form-label small fw-bold">Optional Worksheet Attachment (PDF or Image)</label>
+                                        <input type="file" name="homework_file" class="form-control" accept=".pdf,.png,.jpg,.jpeg">
+                                    </div>
+
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a href="/admin/homework" class="btn btn-light border">Cancel</a>
+                                        <button type="submit" class="btn btn-primary fw-bold px-4">
+                                            <i class="fa-solid fa-check me-1"></i> Post Homework & Alert Students
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const allSections = <%- JSON.stringify(sections) %>;
+        const allSubjects = <%- JSON.stringify(subjects) %>;
+        const hwClass = document.getElementById('hwClassSelect');
+        const hwSection = document.getElementById('hwSectionSelect');
+        const hwSubject = document.getElementById('hwSubjectSelect');
+
+        function updateHwDropdowns(classId) {
+            // Update sections
+            hwSection.innerHTML = '';
+            const filteredSections = allSections.filter(s => String(s.class_id) === String(classId));
+            if (filteredSections.length === 0) {
+                const opt = document.createElement('option');
+                opt.value = '';
+                opt.textContent = 'No sections';
+                hwSection.appendChild(opt);
+            } else {
+                filteredSections.forEach((s, idx) => {
+                    const opt = document.createElement('option');
+                    opt.value = s.id;
+                    opt.textContent = `Section ${s.section_name}`;
+                    if (idx === 0) opt.selected = true;
+                    hwSection.appendChild(opt);
+                });
+            }
+
+            // Update subjects
+            hwSubject.innerHTML = '';
+            const filteredSubjects = allSubjects.filter(sub => !sub.class_id || String(sub.class_id) === String(classId));
+            if (filteredSubjects.length === 0) {
+                const opt = document.createElement('option');
+                opt.value = '';
+                opt.textContent = 'No subjects';
+                hwSubject.appendChild(opt);
+            } else {
+                filteredSubjects.forEach((sub, idx) => {
+                    const opt = document.createElement('option');
+                    opt.value = sub.id;
+                    opt.textContent = sub.subject_name;
+                    if (idx === 0) opt.selected = true;
+                    hwSubject.appendChild(opt);
+                });
+            }
+        }
+
+        if (hwClass && hwSection && hwSubject) {
+            hwClass.addEventListener('change', function() {
+                updateHwDropdowns(this.value);
+            });
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<%- include('../partials/header') %>
+
+<div class="py-5 bg-light border-bottom">
+    <div class="container text-center">
+        <span class="section-badge">Notice Board</span>
+        <h1 class="fw-bold mt-2 text-dark">Circulars & Announcements</h1>
+        <p class="text-muted mx-auto" style="max-width: 650px;">
+            Stay updated with school schedules, exam dates, holiday declarations, and academic circulars.
+        </p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row g-4">
+        <% if (notices && notices.length > 0) { %>
+            <% notices.forEach(n => { %>
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm p-4 border-start border-4 <%= n.category === 'holiday' ? 'border-danger' : (n.category === 'attendance_alert' ? 'border-warning' : 'border-primary') %>">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge <%= n.category === 'holiday' ? 'bg-danger' : 'bg-primary' %> text-uppercase">
+                                <%= n.category.replace('_', ' ') %>
+                            </span>
+                            <small class="text-muted"><i class="fa-regular fa-calendar-days me-1"></i> <%= new Date(n.created_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) %></small>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-2"><%= n.title %></h5>
+                        <p class="text-secondary small mb-0"><%= n.message %></p>
+                    </div>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <div class="col-12 text-center py-5">
+                <p class="text-muted">No notices available.</p>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

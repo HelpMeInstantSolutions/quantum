@@ -1,0 +1,285 @@
+<%- include('../partials/header') %>
+
+<!-- Notice Ticker -->
+<div class="notice-ticker-bar">
+    <div class="container d-flex align-items-center gap-3">
+        <span class="ticker-badge"><i class="fa-solid fa-bullhorn me-1"></i> LATEST ANNOUNCEMENT</span>
+        <marquee onmouseover="this.stop();" onmouseout="this.start();" class="text-dark fw-medium small mb-0">
+            <% if (notices && notices.length > 0) { %>
+                <% notices.forEach(n => { %>
+                    <span class="me-4"><i class="fa-solid fa-star text-warning me-1"></i> <strong><%= n.title %>:</strong> <%= n.message %></span>
+                <% }) %>
+            <% } else { %>
+                <span>Admissions are now open for Academic Session 2026-27 for Nursery to Class 12th (Science, Commerce, Arts). Apply today!</span>
+            <% } %>
+        </marquee>
+    </div>
+</div>
+
+<!-- Main Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <span class="hero-badge">
+                    <i class="fa-solid fa-fire text-warning"></i> ADMISSIONS OPEN 2026-27
+                </span>
+                <h1 class="hero-title">
+                    Empowering Young Minds for a Brilliant Future
+                </h1>
+                <p class="hero-subtitle">
+                    <%= school.tagline || 'Here it is not just study, but a positive experience of self-development.' %>
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="/admissions#apply-now" class="btn btn-warning text-dark fw-bold btn-lg px-4 py-3 shadow">
+                        <i class="fa-solid fa-paper-plane me-2"></i> Apply For Admission
+                    </a>
+                    <a href="/about" class="btn btn-outline-light btn-lg px-4 py-3">
+                        <i class="fa-solid fa-compass me-2"></i> Explore Campus
+                    </a>
+                </div>
+                <div class="d-flex align-items-center gap-4 mt-4 pt-2 text-white-50 small">
+                    <div><i class="fa-solid fa-check text-warning me-1"></i> CBSE & HBSE Curriculum</div>
+                    <div><i class="fa-solid fa-check text-warning me-1"></i> NEET / JEE Foundation</div>
+                    <div><i class="fa-solid fa-check text-warning me-1"></i> GPS Bus Transport</div>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block">
+                <div class="bg-white p-4 rounded-4 shadow-lg text-dark">
+                    <h4 class="fw-bold text-navy mb-2" style="color: #142b3c;"><i class="fa-solid fa-pen-to-square text-primary me-2"></i>Quick Admission Inquiry</h4>
+                    <p class="text-muted small mb-3">Speak to our academic counselors for Session 2026-27 registration.</p>
+                    <form action="/inquiry" method="POST">
+                        <div class="mb-2">
+                            <label class="form-label small fw-semibold">Parent / Guardian Name *</label>
+                            <input type="text" name="parent_name" class="form-control form-control-sm" required placeholder="e.g. Ramesh Sharma">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small fw-semibold">Student Name</label>
+                            <input type="text" name="student_name" class="form-control form-control-sm" placeholder="e.g. Aarav Sharma">
+                        </div>
+                        <div class="row g-2 mb-2">
+                            <div class="col-6">
+                                <label class="form-label small fw-semibold">Contact Mobile *</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-light fw-bold text-dark border-end-0">+91</span>
+                                    <input type="tel" name="phone" class="form-control" required placeholder="9812XXXXXX" maxlength="15">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-semibold">Class Applying For</label>
+                                <select name="seeking_class" class="form-select form-select-sm">
+                                    <option value="Class 6">Class 6th</option>
+                                    <option value="Class 7">Class 7th</option>
+                                    <option value="Class 8">Class 8th</option>
+                                    <option value="Class 9">Class 9th</option>
+                                    <option value="Class 10">Class 10th Board</option>
+                                    <option value="Class 11 Science">Class 11th Science</option>
+                                    <option value="Class 11 Commerce">Class 11th Commerce</option>
+                                    <option value="Class 12 Science">Class 12th Science</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Message / Query (Optional)</label>
+                            <textarea name="message" rows="2" class="form-control form-control-sm" placeholder="Any specific requirements..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2" style="background-color: #1a56db;">
+                            <i class="fa-solid fa-paper-plane me-1"></i> Submit Admission Inquiry
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Counter Bar -->
+<section class="py-4 bg-white border-bottom shadow-sm">
+    <div class="container">
+        <div class="row g-3 text-center">
+            <div class="col-6 col-md-3">
+                <div class="fw-bold fs-2 text-primary" style="color: #1a56db !important;">100%</div>
+                <div class="text-muted small fw-semibold">Board Pass Results</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="fw-bold fs-2 text-primary" style="color: #1a56db !important;">25+</div>
+                <div class="text-muted small fw-semibold">Experienced Faculty Mentors</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="fw-bold fs-2 text-primary" style="color: #1a56db !important;">1,200+</div>
+                <div class="text-muted small fw-semibold">Successful Alumni</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="fw-bold fs-2 text-primary" style="color: #1a56db !important;">10+</div>
+                <div class="text-muted small fw-semibold">Fleet of Safe GPS Buses</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="py-5" style="background-color: #f8fafc;">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <span class="section-badge">Why <%= school.school_name || 'Quantum Science Acadmey' %></span>
+            <h2 class="section-title">An Environment Designed for Scientific Excellence</h2>
+            <p class="section-subtitle">We balance board academic rigor with analytical skill development, personal mentorship, and character values.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <i class="fa-solid fa-chalkboard-user"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Subject Mentors</h5>
+                    <p class="text-muted small mb-0">Senior subject specialists with years of proven track record in CBSE and HBSE curriculum.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper" style="background-color: #fef3c7; color: #d97706;">
+                        <i class="fa-solid fa-flask-vial"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Modern Science Labs</h5>
+                    <p class="text-muted small mb-0">High-tech Physics, Chemistry, Biology, and Computer Labs for experiential, hands-on learning.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper" style="background-color: #ecfdf5; color: #059669;">
+                        <i class="fa-solid fa-atom"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Integrated Foundation</h5>
+                    <p class="text-muted small mb-0">NEET, JEE, and NTSE competitive coaching seamlessly integrated within school hours.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper" style="background-color: #fdf2f8; color: #db2777;">
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Smart Mobile App</h5>
+                    <p class="text-muted small mb-0">Live attendance alerts, digital homework, result marksheets, and fee notifications on parents' mobile app.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Academic Programs -->
+<section class="py-5 bg-white">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <span class="section-badge">Academic Streams</span>
+            <h2 class="section-title">Comprehensive Learning Pathways</h2>
+            <p class="section-subtitle">Tailored curriculum fostering intellectual curiosity from primary foundation to senior secondary mastery.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="program-card">
+                    <img src="/images/course_middle.jpg" alt="Middle School" class="program-img" onerror="this.src='/images/1789551671_6aaa643768381.png'">
+                    <div class="p-4">
+                        <span class="badge bg-primary-subtle text-primary mb-2">Classes 6th - 8th</span>
+                        <h5 class="fw-bold mb-2">Middle Wing Foundation</h5>
+                        <p class="text-muted small mb-3">Strengthening foundational concepts in Mathematics, Science, and Languages with interactive classroom methods.</p>
+                        <a href="/academics" class="btn btn-outline-primary btn-sm fw-semibold">Learn More <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="program-card">
+                    <img src="/images/course_high.jpg" alt="Secondary School" class="program-img" onerror="this.src='/images/1789551671_6aaa643768381.png'">
+                    <div class="p-4">
+                        <span class="badge bg-warning-subtle text-dark mb-2">Classes 9th - 10th</span>
+                        <h5 class="fw-bold mb-2">Secondary Board Prep</h5>
+                        <p class="text-muted small mb-3">Intensive CBSE/HBSE Board examination coaching, weekly chapter test series, and personalized doubt sessions.</p>
+                        <a href="/academics" class="btn btn-outline-primary btn-sm fw-semibold">Learn More <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="program-card">
+                    <img src="/images/course_science.jpg" alt="Senior Secondary Science" class="program-img" onerror="this.src='/images/1789551671_6aaa643768381.png'">
+                    <div class="p-4">
+                        <span class="badge bg-success-subtle text-success mb-2">Classes 11th - 12th</span>
+                        <h5 class="fw-bold mb-2">Senior Secondary Science</h5>
+                        <p class="text-muted small mb-3">Medical and Non-Medical streams with rigorous focus on Board scoring + NEET/JEE Main preparation.</p>
+                        <a href="/academics" class="btn btn-outline-primary btn-sm fw-semibold">Learn More <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Latest Notices & Announcements -->
+<section class="py-5" style="background-color: #f1f5f9;">
+    <div class="container py-3">
+        <div class="d-flex flex-wrap justify-content-between align-items-end mb-4">
+            <div>
+                <span class="section-badge">Notice Board</span>
+                <h2 class="section-title mb-0">Recent Circulars & Events</h2>
+            </div>
+            <a href="/notices" class="btn btn-outline-primary fw-bold mt-2 mt-md-0">
+                View All Notices <i class="fa-solid fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <div class="row g-3">
+            <% if (notices && notices.length > 0) { %>
+                <% notices.slice(0, 3).forEach(notice => { %>
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge <%= notice.category === 'holiday' ? 'bg-danger' : (notice.category === 'attendance_alert' ? 'bg-warning text-dark' : 'bg-primary') %> text-uppercase" style="font-size: 0.72rem;">
+                                    <%= notice.category.replace('_', ' ') %>
+                                </span>
+                                <small class="text-muted"><i class="fa-regular fa-clock me-1"></i> <%= new Date(notice.created_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) %></small>
+                            </div>
+                            <h6 class="fw-bold mb-2 text-dark"><%= notice.title %></h6>
+                            <p class="text-muted small mb-0"><%= notice.message %></p>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="col-12 text-center py-4 text-muted">
+                    <p>No notices published at the moment.</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</section>
+
+<!-- Director's Desk Message -->
+<section class="py-5 bg-white">
+    <div class="container py-4">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-5 text-center">
+                <div class="position-relative d-inline-block">
+                    <img src="<%= school.director_photo_url || '/images/director.jpg' %>" alt="Director <%= school.school_name || 'Quantum Science Acadmey' %>" class="img-fluid rounded-4 shadow-lg" style="max-height: 420px; object-fit: cover;" onerror="this.src='/images/1789551671_6aaa643768381.png'">
+                    <div class="bg-primary text-white p-3 rounded-3 position-absolute bottom-0 start-50 translate-middle-x mb-n3 shadow" style="width: 85%;">
+                        <h6 class="mb-0 fw-bold"><%= school.director_name || 'Dr. S. K. Hooda' %></h6>
+                        <small class="text-light"><%= school.director_title || 'Director & Head of Academics' %></small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7 pt-4 pt-lg-0">
+                <span class="section-badge">Leadership Desk</span>
+                <h2 class="section-title">Message from the Director</h2>
+                <div class="fst-italic text-secondary my-3 border-start border-4 border-warning ps-3">
+                    "<%= school.director_message || 'Education is not just about memorizing facts; it is about building character, nurturing curiosity, and empowering students to achieve their highest potential.' %>"
+                </div>
+                <p class="text-muted">
+                    At <%= school.school_name || 'Quantum Science Acadmey' %>, our goal is to cultivate an environment where every child feels valued, challenged, and inspired to excel. Through innovative teaching techniques, state-of-the-art laboratory infrastructure, and regular parent-teacher collaboration, we ensure that our students are well-prepared to compete at national levels.
+                </p>
+                <a href="/about" class="btn btn-outline-dark fw-semibold mt-2">
+                    Read Full Story <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<%- include('../partials/footer') %>

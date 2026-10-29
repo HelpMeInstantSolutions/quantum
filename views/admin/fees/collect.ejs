@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+    <div class="admin-wrapper">
+        <%- include('../../partials/admin_sidebar') %>
+
+        <div class="admin-main">
+            <%- include('../../partials/admin_header') %>
+
+            <main class="admin-content">
+                <%- include('../../partials/alerts') %>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1"><i class="fa-solid fa-cash-register text-success me-2"></i>Collect Student Fee</h4>
+                        <p class="text-muted small mb-0">Record cash/digital payment, clear pending dues, and issue a print-ready receipt slip.</p>
+                    </div>
+                    <a href="/admin/fees" class="btn btn-outline-secondary btn-sm">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Fee Overview
+                    </a>
+                </div>
+
+                <!-- Step 1: Select Student -->
+                <div class="admin-card mb-4">
+                    <div class="admin-card-body p-3">
+                        <form method="GET" action="/admin/fees/collect" class="row g-2 align-items-end">
+                            <div class="col-md-9">
+                                <label class="form-label small fw-bold text-muted">Select Student by Name or Admission No *</label>
+                                <select name="student_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    <option value="">-- Choose Student --</option>
+                                    <% studentsList.forEach(st => { %>
+                                        <option value="<%= st.id %>" <%= student_id == st.id ? 'selected' : '' %>>
+                                            <%= st.first_name %> <%= st.last_name %> (<%= st.admission_no %>) - <%= st.class_name %>-<%= st.section_name %> (Roll: <%= st.roll_no || '-' %>)
+                                        </option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <button type="submit" class="btn btn-primary btn-sm w-100 fw-bold">Load Fee Ledger</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <% if (student) { %>
+                    <form action="/admin/fees/collect" method="POST">
+                        <input type="hidden" name="student_id" value="<%= student.id %>">
+
+                        <div class="row g-4">
+                            <!-- Student Info & Dues List -->
+                            <div class="col-lg-7">
+                                <!-- Student Header -->
+                                <div class="admin-card p-3 mb-3 bg-light">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="fw-bold mb-1 text-dark"><%= student.first_name %> <%= student.last_name %></h5>
+                                            <div class="small text-muted">
+                                                Admission No: <strong class="text-primary"><%= student.admission_no %></strong> | Class: <strong><%= student.class_name %>-<%= student.section_name %></strong>
+                                            </div>
+                                            <div class="small text-muted">
+                                                Father: <%= student.father_name %> (<a href="tel:<%= student.father_phone %>"><%= student.father_phone %></a>)
+                                            </div>
+                                        </div>
+                                        <a href="/admin/students/<%= student.id %>" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="fa-solid fa-id-badge me-1"></i> Student 360
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- Unpaid Dues Table -->
+                                <div class="admin-card">
+                                    <div class="admin-card-header">
+                                        <h5>Pending / Overdue Fee Heads</h5>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="admin-table">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 40px;">Pay</th>
+                                                    <th>Fee Head / Month</th>
+                                                    <th>Total (₹)</th>
+                                                    <th>Paid</th>
+                                                    <th>Balance (₹)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (pendingDues && pendingDues.length > 0) { %>
+                                                    <% let totalOutstanding = 0; %>
+                                                    <% pendingDues.forEach(due => { %>
+                                                        <% totalOutstanding += Number(due.balance_amount); %>
+                                                        <tr>
+                                                            <td>
+                                                                <input type="checkbox" name="selected_dues" value="<%= due.id %>" class="form-check-input due-chk" data-amount="<%= due.balance_amount %>" checked onchange="calcTotal()">
+                                                            </td>
+                                                            <td>
+                                                                <strong><%= due.fee_title %></strong>
+                                                                <small class="text-muted d-block">Due: <%= new Date(due.due_date).toLocaleDateString('en-IN') %></small>
+                                                            </td>
+                                                            <td>₹<%= Number(due.net_amount).toLocaleString('en-IN') %></td>
+                                                            <td>₹<%= Number(due.paid_amount).toLocaleString('en-IN') %></td>
+                                                            <td><strong class="text-danger">₹<%= Number(due.balance_amount).toLocaleString('en-IN') %></strong></td>
+                                                        </tr>
+                                                    <% }) %>
+                                                    <tr class="table-light fw-bold">
+                                                        <td colspan="4" class="text-end">Total Outstanding Dues:</td>
+                                                        <td class="text-danger fs-6">₹<span id="outstandingDisplay"><%= Number(totalOutstanding).toLocaleString('en-IN') %></span></td>
+                                                    </tr>
+                                                <% } else { %>
+                                                    <tr>
+                                                        <td colspan="5" class="text-center text-success py-4">
+                                                            <i class="fa-solid fa-circle-check fs-4 mb-2 d-block"></i>
+                                                            No pending fees! All cleared for this student.
+                                                        </td>
+                                                    </tr>
+                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Payment Processing Box -->
+                            <div class="col-lg-5">
+                                <div class="admin-card">
+                                    <div class="admin-card-header bg-success-subtle text-success">
+                                        <h5 class="mb-0"><i class="fa-solid fa-credit-card me-2"></i>Payment Collection</h5>
+                                    </div>
+                                    <div class="admin-card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">Amount Being Paid (₹) *</label>
+                                            <input type="number" step="10" name="amount_paid" id="amountPaidInput" class="form-control form-control-lg fw-bold text-success" required placeholder="0">
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">Payment Mode *</label>
+                                            <select name="payment_mode" class="form-select form-select-sm" required>
+                                                <option value="Cash">Cash</option>
+                                                <option value="UPI / QR">UPI / QR Code</option>
+                                                <option value="Net Banking">Net Banking / NEFT</option>
+                                                <option value="Cheque">Cheque</option>
+                                                <option value="Card">Debit / Credit Card</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">Transaction Reference / Cheque No</label>
+                                            <input type="text" name="transaction_reference" class="form-control form-control-sm" placeholder="e.g. UPI-Ref-98234823 or Cheque No">
+                                        </div>
+
+                                        <div class="row g-2 mb-3">
+                                            <div class="col-6">
+                                                <label class="form-label small fw-bold">Discount / Concession (₹)</label>
+                                                <input type="number" name="discount_given" class="form-control form-control-sm" value="0">
+                                            </div>
+                                            <div class="col-6">
+                                                <label class="form-label small fw-bold">Late Fine Collected (₹)</label>
+                                                <input type="number" name="fine_included" class="form-control form-control-sm" value="0">
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label class="form-label small fw-bold">Remarks / Note</label>
+                                            <input type="text" name="remarks" class="form-control form-control-sm" placeholder="e.g. Paid in full for Q2">
+                                        </div>
+
+                                        <button type="submit" class="btn btn-success btn-lg w-100 fw-bold shadow">
+                                            <i class="fa-solid fa-receipt me-1"></i> Receive Payment & Generate Receipt
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                <% } else { %>
+                    <div class="admin-card p-5 text-center text-muted">
+                        <i class="fa-solid fa-user-magnifying-glass fs-1 text-secondary mb-3"></i>
+                        <h5>Please select a student from the dropdown above to view outstanding ledger and collect fees.</h5>
+                    </div>
+                <% } %>
+
+            </main>
+        </div>
+    </div>
+
+    <script>
+        function calcTotal() {
+            let sum = 0;
+            document.querySelectorAll('.due-chk:checked').forEach(c => {
+                sum += parseFloat(c.getAttribute('data-amount') || 0);
+            });
+            document.getElementById('amountPaidInput').value = sum;
+        }
+        // Auto fill amount on page load if student selected
+        window.addEventListener('DOMContentLoaded', calcTotal);
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

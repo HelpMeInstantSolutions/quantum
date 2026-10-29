@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+    <div class="admin-wrapper">
+        <%- include('../../partials/admin_sidebar') %>
+
+        <div class="admin-main">
+            <%- include('../../partials/admin_header') %>
+
+            <main class="admin-content">
+                <%- include('../../partials/alerts') %>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1">New Student Admission</h4>
+                        <p class="text-muted small mb-0">Fill in student personal details, guardian contact, and optional mobile app credentials.</p>
+                    </div>
+                    <a href="/admin/students" class="btn btn-outline-secondary btn-sm">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Back to List
+                    </a>
+                </div>
+
+                <form action="/admin/students/add" method="POST" enctype="multipart/form-data">
+                    <div class="row g-4">
+                        <!-- Personal Details -->
+                        <div class="col-lg-8">
+                            <div class="admin-card">
+                                <div class="admin-card-header">
+                                    <h5><i class="fa-solid fa-user text-primary me-2"></i>1. Student Information</h5>
+                                </div>
+                                <div class="admin-card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold">Admission No *</label>
+                                            <input type="text" name="admission_no" class="form-control" value="<%= autoAdmissionNo %>" required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold">Roll Number</label>
+                                            <input type="text" name="roll_no" class="form-control" placeholder="e.g. 106">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold text-primary">
+                                                <i class="fa-solid fa-fingerprint me-1"></i> Biometric Machine ID
+                                            </label>
+                                            <input type="text" name="biometric_id" class="form-control border-primary" placeholder="e.g. 1, 2, 101">
+                                            <small class="text-muted" style="font-size: 0.72rem;">User ID on Biometric Machine</small>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold">Student Photo</label>
+                                            <input type="file" name="photo" class="form-control" accept="image/*">
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">First Name *</label>
+                                            <input type="text" name="first_name" class="form-control" required placeholder="e.g. Rahul">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Last Name</label>
+                                            <input type="text" name="last_name" class="form-control" placeholder="e.g. Saini">
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-bold">Class *</label>
+                                            <select name="class_id" id="studentClassSelect" class="form-select" required>
+                                                <% classes.forEach(c => { %>
+                                                    <option value="<%= c.id %>"><%= c.class_name %></option>
+                                                <% }) %>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-bold">Section *</label>
+                                            <select name="section_id" id="studentSectionSelect" class="form-select" required>
+                                                <% const initialClassId = classes.length > 0 ? classes[0].id : null; %>
+                                                <% sections.filter(s => s.class_id === initialClassId).forEach(s => { %>
+                                                    <option value="<%= s.id %>">Section <%= s.section_name %></option>
+                                                <% }) %>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-bold">Gender</label>
+                                            <select name="gender" class="form-select">
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Date of Birth</label>
+                                            <input type="date" name="dob" class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Blood Group</label>
+                                            <select name="blood_group" class="form-select">
+                                                <option value="B+">B+</option>
+                                                <option value="O+">O+</option>
+                                                <option value="A+">A+</option>
+                                                <option value="AB+">AB+</option>
+                                                <option value="B-">B-</option>
+                                                <option value="O-">O-</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-12 mt-3 pt-3 border-top">
+                                            <h6 class="fw-bold text-primary mb-1">
+                                                <i class="fa-solid fa-id-card me-1"></i> Academic & Govt. Identifiers (MIS / UDISE+)
+                                            </h6>
+                                            <small class="text-muted d-block mb-3">Govt. school portal details for Haryana MIS Portal & National UDISE+ database</small>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">SRN (MIS Portal)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-address-card"></i></span>
+                                                <input type="text" name="srn_no" class="form-control" placeholder="e.g. 1901234567" maxlength="30">
+                                            </div>
+                                            <small class="text-muted" style="font-size: 0.75rem;">Student Registration Number (Haryana MIS Portal)</small>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">PEN Number (UDISE+)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-fingerprint"></i></span>
+                                                <input type="text" name="pen_no" class="form-control" placeholder="e.g. 21061234567" maxlength="30">
+                                            </div>
+                                            <small class="text-muted" style="font-size: 0.75rem;">Permanent Education Number (National UDISE+ Portal)</small>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Aadhaar Card Number</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-id-badge"></i></span>
+                                                <input type="text" name="aadhar_no" class="form-control" placeholder="12-digit Aadhaar Number" maxlength="20">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Family ID (PPP) / APAAR ID</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-users-rectangle"></i></span>
+                                                <input type="text" name="family_id" class="form-control" placeholder="Parivar Pehchan Patra (8-char) / APAAR" maxlength="30">
+                                            </div>
+                                            <small class="text-muted" style="font-size: 0.75rem;">Haryana Parivar Pehchan Patra (PPP)</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Guardian & Contact Details -->
+                            <div class="admin-card">
+                                <div class="admin-card-header">
+                                    <h5><i class="fa-solid fa-users text-primary me-2"></i>2. Guardian & Address Details</h5>
+                                </div>
+                                <div class="admin-card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Father's Name *</label>
+                                            <input type="text" name="father_name" class="form-control" required placeholder="Father / Guardian Name">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Father's Phone Number * (Used for SMS & Login)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light fw-bold text-dark border-end-0">+91</span>
+                                                <input type="tel" name="father_phone" class="form-control" required placeholder="9812345678" maxlength="15">
+                                            </div>
+                                            <small class="text-muted" style="font-size: 0.75rem;">+91 pehle se laga hua hai (Enter 10-digit mobile number)</small>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Father's Occupation</label>
+                                            <div class="position-relative">
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-briefcase"></i></span>
+                                                    <input type="text" name="father_occupation" id="father_occupation" class="form-control" placeholder="Type occupation (e.g. Business, Officer, Doctor...)" autocomplete="off">
+                                                </div>
+                                                <div id="occupation_suggestions" class="google-suggestions-dropdown d-none"></div>
+                                            </div>
+                                            <small class="text-muted" style="font-size: 0.75rem;">Type krte hi suggestions aayenge, click krke select karein ya new type karein</small>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Mother's Name</label>
+                                            <input type="text" name="mother_name" class="form-control" placeholder="Mother Name">
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label small fw-bold">Residential Address</label>
+                                            <textarea name="current_address" rows="2" class="form-control" placeholder="House no, Street, Sector / Village, Rohtak"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Logistics & App Credentials -->
+                        <div class="col-lg-4">
+                            <!-- Transport Allocation -->
+                            <div class="admin-card mb-4">
+                                <div class="admin-card-header">
+                                    <h5><i class="fa-solid fa-bus text-warning me-2"></i>School Transport</h5>
+                                </div>
+                                <div class="admin-card-body">
+                                    <label class="form-label small fw-bold">Assign Bus Route</label>
+                                    <select name="transport_route_id" class="form-select mb-2">
+                                        <option value="">No Transport (Self Commute)</option>
+                                        <% routes.forEach(r => { %>
+                                            <option value="<%= r.id %>"><%= r.route_name %> (<%= r.vehicle_number %>)</option>
+                                        <% }) %>
+                                    </select>
+                                    <small class="text-muted d-block">Monthly bus transport charges will be added to the fee ledger automatically if opted.</small>
+                                </div>
+                            </div>
+
+                            <!-- Mobile App User Account -->
+                            <div class="admin-card">
+                                <div class="admin-card-header">
+                                    <h5><i class="fa-solid fa-mobile-screen text-success me-2"></i>Android App Login</h5>
+                                </div>
+                                <div class="admin-card-body">
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" name="create_app_account" id="createAppSwitch" checked>
+                                        <label class="form-check-label small fw-bold" for="createAppSwitch">Create Student Mobile App Login</label>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-semibold text-muted">Initial App Password</label>
+                                        <input type="text" name="app_password" class="form-control form-control-sm" value="student123">
+                                        <small class="text-muted">Username will be based on admission number. Student/Parent can use this to login to Android App.</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg fw-bold shadow">
+                                    <i class="fa-solid fa-check me-1"></i> Register Student Admission
+                                </button>
+                                <a href="/admin/students" class="btn btn-light border">Cancel</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const allSections = <%- JSON.stringify(sections) %>;
+        const classSelect = document.getElementById('studentClassSelect');
+        const sectionSelect = document.getElementById('studentSectionSelect');
+
+        function updateSectionsForClass(classId) {
+            sectionSelect.innerHTML = '';
+            const filtered = allSections.filter(s => String(s.class_id) === String(classId));
+            if (filtered.length === 0) {
+                const opt = document.createElement('option');
+                opt.value = '';
+                opt.textContent = 'No sections available';
+                sectionSelect.appendChild(opt);
+                return;
+            }
+            filtered.forEach((s, idx) => {
+                const opt = document.createElement('option');
+                opt.value = s.id;
+                opt.textContent = `Section ${s.section_name}`;
+                if (idx === 0) opt.selected = true;
+                sectionSelect.appendChild(opt);
+            });
+        }
+
+        if (classSelect && sectionSelect) {
+            classSelect.addEventListener('change', function() {
+                updateSectionsForClass(this.value);
+            });
+        }
+
+        // Google-Style Auto-Suggestion for Father's Occupation
+        const occupationsList = <%- JSON.stringify(occupations || []) %>;
+        const occInput = document.getElementById('father_occupation');
+        const occSuggestions = document.getElementById('occupation_suggestions');
+        let selectedSuggestionIndex = -1;
+
+        function highlightMatch(text, query) {
+            if (!query) return text;
+            const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            return text.replace(regex, '<span class="google-suggestion-highlight">$1</span>');
+        }
+
+        function renderSuggestions(query) {
+            if (!occSuggestions) return;
+            const q = (query || '').trim().toLowerCase();
+            
+            let matches = [];
+            if (!q) {
+                matches = occupationsList.slice(0, 8);
+            } else {
+                matches = occupationsList.filter(item => item.toLowerCase().includes(q));
+            }
+
+            if (matches.length === 0) {
+                occSuggestions.innerHTML = `
+                    <div class="google-suggestion-item text-muted" style="cursor: default;">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                        <span>Keep typing: "<strong>${query}</strong>"</span>
+                    </div>
+                `;
+                occSuggestions.classList.remove('d-none');
+                selectedSuggestionIndex = -1;
+                return;
+            }
+
+            let html = `<div class="google-suggestion-header"><i class="fa-solid fa-magnifying-glass me-1"></i> Suggested Occupations</div>`;
+            matches.forEach((occ, idx) => {
+                const highlighted = highlightMatch(occ, q);
+                html += `
+                    <div class="google-suggestion-item" data-idx="${idx}" data-val="${occ.replace(/"/g, '&quot;')}">
+                        <i class="fa-solid fa-briefcase"></i>
+                        <span>${highlighted}</span>
+                    </div>
+                `;
+            });
+
+            occSuggestions.innerHTML = html;
+            occSuggestions.classList.remove('d-none');
+            selectedSuggestionIndex = -1;
+
+            occSuggestions.querySelectorAll('.google-suggestion-item[data-val]').forEach(item => {
+                item.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    const val = this.getAttribute('data-val');
+                    occInput.value = val;
+                    occSuggestions.classList.add('d-none');
+                });
+            });
+        }
+
+        if (occInput && occSuggestions) {
+            occInput.addEventListener('input', function() {
+                renderSuggestions(this.value);
+            });
+
+            occInput.addEventListener('focus', function() {
+                renderSuggestions(this.value);
+            });
+
+            occInput.addEventListener('keydown', function(e) {
+                const items = occSuggestions.querySelectorAll('.google-suggestion-item[data-val]');
+                if (!items.length || occSuggestions.classList.contains('d-none')) return;
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    selectedSuggestionIndex = (selectedSuggestionIndex + 1) % items.length;
+                    updateItemHighlight(items);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    selectedSuggestionIndex = (selectedSuggestionIndex - 1 + items.length) % items.length;
+                    updateItemHighlight(items);
+                } else if (e.key === 'Enter') {
+                    if (selectedSuggestionIndex >= 0 && items[selectedSuggestionIndex]) {
+                        e.preventDefault();
+                        occInput.value = items[selectedSuggestionIndex].getAttribute('data-val');
+                        occSuggestions.classList.add('d-none');
+                    }
+                } else if (e.key === 'Escape') {
+                    occSuggestions.classList.add('d-none');
+                }
+            });
+
+            function updateItemHighlight(items) {
+                items.forEach((it, idx) => {
+                    if (idx === selectedSuggestionIndex) {
+                        it.classList.add('active');
+                        it.scrollIntoView({ block: 'nearest' });
+                    } else {
+                        it.classList.remove('active');
+                    }
+                });
+            }
+
+            document.addEventListener('click', function(e) {
+                if (!occInput.contains(e.target) && !occSuggestions.contains(e.target)) {
+                    occSuggestions.classList.add('d-none');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

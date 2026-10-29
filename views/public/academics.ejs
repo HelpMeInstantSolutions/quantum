@@ -1,0 +1,41 @@
+<%- include('../partials/header') %>
+
+<div class="py-5 bg-light border-bottom">
+    <div class="container text-center">
+        <span class="section-badge">Curriculum & Methodology</span>
+        <h1 class="fw-bold mt-2 text-dark">Academic Programs & Classes</h1>
+        <p class="text-muted mx-auto" style="max-width: 650px;">
+            Comprehensive schooling from Primary classes to Senior Secondary with integrated board and competitive coaching.
+        </p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row g-4">
+        <% if (classes && classes.length > 0) { %>
+            <% classes.forEach(c => { %>
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm border-0 p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0 text-primary"><%= c.class_name %></h5>
+                            <span class="badge bg-light text-dark border">Level <%= c.numeric_level %></span>
+                        </div>
+                        <p class="text-muted small mb-3">
+                            Stream: <strong><%= c.stream || 'General' %></strong>. Comprehensive curriculum adhering strictly to CBSE and State Board standards with continuous evaluation.
+                        </p>
+                        <ul class="list-unstyled small text-secondary mb-4">
+                            <li><i class="fa-solid fa-check text-success me-2"></i>Daily classroom mentorship</li>
+                            <li><i class="fa-solid fa-check text-success me-2"></i>Weekly chapter assessments</li>
+                            <li><i class="fa-solid fa-check text-success me-2"></i>Digital parent reporting app</li>
+                        </ul>
+                        <a href="/admissions#apply-now" class="btn btn-outline-primary btn-sm mt-auto fw-semibold">
+                            Enroll in <%= c.class_name %>
+                        </a>
+                    </div>
+                </div>
+            <% }) %>
+        <% } %>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
