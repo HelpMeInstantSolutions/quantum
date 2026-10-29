@@ -98,7 +98,7 @@ router.get('/', async (req, res) => {
         const [sections] = await pool.query(`SELECT * FROM sections ORDER BY section_name ASC`);
 
         res.render('admin/students/index', {
-            title: 'Students Directory | Star Academy Rohtak',
+            title: 'Students Directory | Quantum Science Academy',
             students,
             classes,
             sections,
@@ -123,7 +123,7 @@ router.get('/add', async (req, res) => {
         const occupations = await getOccupationsList();
 
         res.render('admin/students/add', {
-            title: 'New Student Admission | Star Academy Rohtak',
+            title: 'New Student Admission | Quantum Science Academy',
             classes,
             sections,
             routes,
@@ -355,7 +355,7 @@ router.get('/:id/edit', async (req, res) => {
         );
 
         res.render('admin/students/edit', {
-            title: `Edit ${students[0].first_name} | Star Academy Rohtak`,
+            title: `Edit ${students[0].first_name} | Quantum Science Academy`,
             student: students[0],
             classes,
             sections,

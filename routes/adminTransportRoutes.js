@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
         const [stops] = await pool.query(`SELECT * FROM transport_stops ORDER BY route_id ASC, stop_order ASC`);
 
         res.render('admin/transport/index', {
-            title: 'Transport & Fleet Management | Star Academy Rohtak',
+            title: 'Transport & Fleet Management | Quantum Science Academy',
             routes,
             stops
         });
@@ -120,7 +120,7 @@ router.get('/students', async (req, res) => {
         );
 
         res.render('admin/transport/students', {
-            title: 'Bus Transport Students | Star Academy Rohtak',
+            title: 'Bus Transport Students | Quantum Science Academy',
             students,
             routes,
             unassignedStudents: allStudents

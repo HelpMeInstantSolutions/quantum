@@ -51,7 +51,7 @@ router.get('/', async (req, res) => {
         const totalPendingSum = defaulters.reduce((acc, curr) => acc + Number(curr.total_due_amount), 0);
 
         res.render('admin/fees/pending_fees', {
-            title: 'Outstanding & Pending Fees Analysis | Star Academy Rohtak',
+            title: 'Outstanding & Pending Fees Analysis | Quantum Science Academy',
             defaulters,
             classes,
             filters: { class_id, min_amount, search },

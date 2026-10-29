@@ -36,7 +36,7 @@ router.get('/', async (req, res) => {
         const [sections] = await pool.query(`SELECT * FROM sections ORDER BY section_name ASC`);
 
         res.render('admin/homework/index', {
-            title: 'Homework Management | Star Academy Rohtak',
+            title: 'Homework Management | Quantum Science Academy',
             homeworkList,
             classes,
             sections,
@@ -57,7 +57,7 @@ router.get('/create', async (req, res) => {
         const [teachers] = await pool.query(`SELECT t.id, u.name FROM teachers t JOIN users u ON t.user_id = u.id`);
 
         res.render('admin/homework/create', {
-            title: 'Assign Daily Homework | Star Academy Rohtak',
+            title: 'Assign Daily Homework | Quantum Science Academy',
             classes,
             sections,
             subjects,
@@ -147,7 +147,7 @@ router.get('/:id', async (req, res) => {
         );
 
         res.render('admin/homework/view', {
-            title: `Homework: ${hw.title} | Star Academy Rohtak`,
+            title: `Homework: ${hw.title} | Quantum Science Academy`,
             hw,
             submissions
         });

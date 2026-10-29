@@ -58,7 +58,7 @@ router.get('/', async (req, res) => {
         const [receipts] = await pool.query(query, params);
 
         res.render('admin/receipts/index', {
-            title: 'Fee Receipts Register | Star Academy Rohtak',
+            title: 'Fee Receipts Register | Quantum Science Academy',
             receipts,
             search,
             from_date,
@@ -110,7 +110,7 @@ router.get('/:id/print', async (req, res) => {
         const amountInWords = numberToWords(receipt.amount_paid);
 
         res.render('admin/receipts/print', {
-            title: `Fee Slip - ${receipt.receipt_no} | Star Academy Rohtak`,
+            title: `Fee Slip - ${receipt.receipt_no} | Quantum Science Academy`,
             receipt,
             items,
             current_balance: Number(current_balance).toLocaleString('en-IN'),

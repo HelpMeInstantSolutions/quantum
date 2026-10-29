@@ -30,7 +30,7 @@ router.get('/', async (req, res) => {
 
         const [notifications] = await pool.query(query, params);
         res.render('admin/notifications/index', {
-            title: 'School Notifications & Circulars | Star Academy Rohtak',
+            title: 'School Notifications & Circulars | Quantum Science Academy',
             notifications,
             category,
             target_role
@@ -46,7 +46,7 @@ router.get('/create', async (req, res) => {
     try {
         const [classes] = await pool.query(`SELECT * FROM classes ORDER BY numeric_level ASC`);
         res.render('admin/notifications/create', {
-            title: 'Publish New Notification | Star Academy Rohtak',
+            title: 'Publish New Notification | Quantum Science Academy',
             classes
         });
     } catch (err) {

@@ -29,7 +29,7 @@ router.get('/', async (req, res) => {
         );
 
         res.render('admin/fees/index', {
-            title: 'Fees Management & Overview | Star Academy Rohtak',
+            title: 'Fees Management & Overview | Quantum Science Academy',
             stats: {
                 totalCollected: Number(total_collected).toLocaleString('en-IN'),
                 totalPending: Number(total_pending).toLocaleString('en-IN'),
@@ -62,7 +62,7 @@ router.get('/structures', async (req, res) => {
         );
 
         res.render('admin/fees/structures', {
-            title: 'Fee Structures & Types | Star Academy Rohtak',
+            title: 'Fee Structures & Types | Quantum Science Academy',
             structures,
             classes,
             sections,
@@ -234,7 +234,7 @@ router.get('/collect', async (req, res) => {
         );
 
         res.render('admin/fees/collect', {
-            title: 'Collect Student Fees | Star Academy Rohtak',
+            title: 'Collect Student Fees | Quantum Science Academy',
             studentsList,
             student,
             student_id,

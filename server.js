@@ -23,7 +23,7 @@ app.use(cookieParser());
 
 // Session
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'star_academy_session_secret_2026',
+    secret: process.env.SESSION_SECRET || 'quantum_science_academy_session_secret_2026',
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -88,7 +88,7 @@ app.use((req, res, next) => {
     if (req.path.startsWith('/api')) {
         return res.status(404).json({ success: false, message: 'API Endpoint Not Found' });
     }
-    const schoolName = res.locals.school?.school_name || 'Quantum Science Acadmey';
+    const schoolName = res.locals.school?.school_name || 'Quantum Science Academy';
     res.status(404).render('public/404', {
         title: `404 - Page Not Found | ${schoolName}`
     });
@@ -112,7 +112,7 @@ app.listen(PORT, '0.0.0.0', async () => {
         console.warn('Notice on schema check:', e.message);
     }
     console.log(`=======================================================`);
-    console.log(`🚀 Star Academy Rohtak School Management System`);
+    console.log(`🚀 Quantum Science Academy School Management System`);
     console.log(`🌐 Public Website:     http://localhost:${PORT}`);
     console.log(`🔒 Admin Web Portal:   http://localhost:${PORT}/admin/login`);
     console.log(`📱 Mobile REST API:    http://localhost:${PORT}/api`);

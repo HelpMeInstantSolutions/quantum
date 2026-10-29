@@ -40,7 +40,7 @@ router.get('/', async (req, res) => {
         const [subjects] = await pool.query(`SELECT s.*, c.class_name FROM subjects s JOIN classes c ON s.class_id = c.id ORDER BY c.numeric_level ASC`);
 
         res.render('admin/teachers/index', {
-            title: 'Teachers & Academic Faculty | ' + (res.locals.school.school_name || 'Quantum Science Acadmey'),
+            title: 'Teachers & Academic Faculty | ' + (res.locals.school.school_name || 'Quantum Science Academy'),
             teachers,
             classes,
             sections,

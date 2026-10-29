@@ -237,7 +237,7 @@
 
                                                 <div class="col-md-6">
                                                     <label class="form-label-title">Institution Legal Name *</label>
-                                                    <input type="text" name="school_name" id="school_name" class="form-control fw-bold" value="<%= settings.school_name || 'Quantum Science Acadmey' %>" required>
+                                                    <input type="text" name="school_name" id="school_name" class="form-control fw-bold" value="<%= settings.school_name || 'Quantum Science Academy' %>" required>
                                                     <div class="form-text">Display name shown in top navigation, invoices, and certificates.</div>
                                                 </div>
 
@@ -279,7 +279,7 @@
                                                         <div class="d-flex align-items-center gap-3" id="liveBrandContainer">
                                                             <img src="<%= settings.logo_url || '/images/logo.png' %>" alt="Logo Preview" id="previewLogoImg" style="height: <%= settings.logo_height || 56 %>px; max-height: 120px; object-fit: contain; transition: height 0.15s ease;">
                                                             <div id="previewBrandText">
-                                                                <span class="fw-bold fs-5 text-dark d-block lh-1" id="previewName"><%= settings.school_name || 'Quantum Science Acadmey' %></span>
+                                                                <span class="fw-bold fs-5 text-dark d-block lh-1" id="previewName"><%= settings.school_name || 'Quantum Science Academy' %></span>
                                                                 <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.68rem; letter-spacing: 1px;" id="previewTagline"><%= settings.address ? settings.address.split(',')[0] : 'Haryana, India' %></small>
                                                             </div>
                                                         </div>
@@ -497,7 +497,7 @@
 
                                                 <div class="col-12">
                                                     <label class="form-label-title">Marquee Announcement Banner Text</label>
-                                                    <textarea name="marquee_notice" rows="2" class="form-control"><%= settings.marquee_notice || 'Admissions Open for Session 2026-27: Foundation, JEE & NEET Batches at Quantum Science Acadmey!' %></textarea>
+                                                    <textarea name="marquee_notice" rows="2" class="form-control"><%= settings.marquee_notice || 'Admissions Open for Session 2026-27: Foundation, JEE & NEET Batches at Quantum Science Academy!' %></textarea>
                                                     <div class="form-text">Scrolling alert ticker displayed across public pages for urgent announcements.</div>
                                                 </div>
                                             </div>
@@ -553,17 +553,17 @@
                                             <div class="row g-3">
                                                 <div class="col-12">
                                                     <label class="form-label-title">Homepage SEO Title</label>
-                                                    <input type="text" name="seo_meta_title" class="form-control" value="<%= settings.seo_meta_title || 'Quantum Science Acadmey | Premier Science & Board Institute' %>">
+                                                    <input type="text" name="seo_meta_title" class="form-control" value="<%= settings.seo_meta_title || 'Quantum Science Academy | Premier Science & Board Institute' %>">
                                                 </div>
 
                                                 <div class="col-12">
                                                     <label class="form-label-title">SEO Meta Description</label>
-                                                    <textarea name="seo_meta_description" rows="2" class="form-control"><%= settings.seo_meta_description || 'Quantum Science Acadmey provides top-tier education in Science, CBSE/HBSE Boards, and NEET/JEE preparation.' %></textarea>
+                                                    <textarea name="seo_meta_description" rows="2" class="form-control"><%= settings.seo_meta_description || 'Quantum Science Academy provides top-tier education in Science, CBSE/HBSE Boards, and NEET/JEE preparation.' %></textarea>
                                                 </div>
 
                                                 <div class="col-12">
                                                     <label class="form-label-title">SEO Meta Keywords</label>
-                                                    <input type="text" name="seo_meta_keywords" class="form-control" value="<%= settings.seo_meta_keywords || 'Quantum Science Acadmey, Science Academy Rohtak, CBSE school, NEET, JEE preparation' %>">
+                                                    <input type="text" name="seo_meta_keywords" class="form-control" value="<%= settings.seo_meta_keywords || 'Quantum Science Academy, Science Academy Bhiwani, CBSE school, NEET, JEE preparation' %>">
                                                 </div>
 
                                                 <div class="col-md-4">
@@ -627,7 +627,7 @@
         if (schoolNameInput) {
             schoolNameInput.addEventListener('input', function() {
                 if (previewName) {
-                    previewName.innerText = this.value || 'Quantum Science Acadmey';
+                    previewName.innerText = this.value || 'Quantum Science Academy';
                 }
             });
         }

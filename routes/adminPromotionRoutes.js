@@ -41,7 +41,7 @@ router.get('/', async (req, res) => {
         );
 
         res.render('admin/promotion/index', {
-            title: 'Class Promotion to Next Academic Session | Star Academy Rohtak',
+            title: 'Class Promotion to Next Academic Session | Quantum Science Academy',
             classes,
             from_class_id,
             to_class_id,

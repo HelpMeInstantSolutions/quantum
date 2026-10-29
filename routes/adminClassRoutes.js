@@ -64,7 +64,7 @@ router.get('/', async (req, res) => {
         );
 
         res.render('admin/classes/index', {
-            title: 'Classes, Sections, Subjects & Faculty Allocations | ' + (res.locals.school.school_name || 'Quantum Science Acadmey'),
+            title: 'Classes, Sections, Subjects & Faculty Allocations | ' + (res.locals.school.school_name || 'Quantum Science Academy'),
             classes,
             sections,
             subjects,

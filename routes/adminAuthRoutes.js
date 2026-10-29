@@ -9,7 +9,7 @@ router.get('/login', (req, res) => {
         return res.redirect('/admin/dashboard');
     }
     res.render('admin/login', {
-        title: 'Admin Portal Login | Star Academy Rohtak',
+        title: 'Admin Portal Login | Quantum Science Academy',
         error: req.session.login_error || null
     });
     delete req.session.login_error;
@@ -38,7 +38,7 @@ router.post('/login', async (req, res) => {
 
         // Check if role is admin
         if (user.role !== 'admin') {
-            req.session.login_error = `Access Denied: Web panel is strictly for School Administrators. ${user.role.toUpperCase()} accounts must log in using the Star Academy Android App.`;
+            req.session.login_error = `Access Denied: Web panel is strictly for School Administrators. ${user.role.toUpperCase()} accounts must log in using the Quantum Science Academy Android App.`;
             return res.redirect('/admin/login');
         }
 

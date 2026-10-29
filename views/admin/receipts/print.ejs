@@ -62,8 +62,8 @@
     <div class="receipt-card">
         <!-- School Header -->
         <div class="receipt-header">
-            <img src="<%= school.logo_url || '/images/logo.png' %>" alt="<%= school.school_name || 'Quantum Science Acadmey' %> Logo" class="receipt-logo" style="height: <%= school.logo_height ? Math.min(school.logo_height, 65) : 55 %>px; object-fit: contain;">
-            <h3 class="fw-bold mb-0" style="color: #142b3c;"><%= school.school_name || 'Quantum Science Acadmey' %></h3>
+            <img src="<%= school.logo_url || '/images/logo.png' %>" alt="<%= school.school_name || 'Quantum Science Academy' %> Logo" class="receipt-logo" style="height: <%= school.logo_height ? Math.min(school.logo_height, 65) : 55 %>px; object-fit: contain;">
+            <h3 class="fw-bold mb-0" style="color: #142b3c;"><%= school.school_name || 'Quantum Science Academy' %></h3>
             <div class="small text-muted"><%= school.address || 'Kaunt Road, Opposite Hanuman Mandir Bhiwani' %> | Tel: <%= school.phone || '+91-9466255941' %></div>
             <div class="small text-muted"><%= school.affiliation_no || (school.institution_type ? school.institution_type : 'Academy of Science') %> | Email: <%= school.email || 'info@quantumscience.in' %></div>
             <div class="badge bg-dark text-white text-uppercase px-3 py-1 mt-2 fw-semibold">

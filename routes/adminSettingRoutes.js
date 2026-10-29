@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
         });
 
         res.render('admin/settings/index', {
-            title: 'Site Configuration & Branding | ' + (settings.school_name || 'Quantum Science Acadmey'),
+            title: 'Site Configuration & Branding | ' + (settings.school_name || 'Quantum Science Academy'),
             settings
         });
     } catch (err) {

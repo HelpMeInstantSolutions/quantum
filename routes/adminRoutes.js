@@ -64,7 +64,7 @@ router.get('/dashboard', async (req, res) => {
         );
 
         res.render('admin/dashboard', {
-            title: 'Admin Dashboard | Star Academy Rohtak',
+            title: 'Admin Dashboard | Quantum Science Academy',
             stats: {
                 totalStudents: total_students,
                 totalTeachers: total_teachers,

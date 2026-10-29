@@ -34,7 +34,7 @@ router.get('/', async (req, res) => {
         const [classes] = await pool.query(`SELECT * FROM classes ORDER BY numeric_level ASC`);
 
         res.render('admin/results/index', {
-            title: 'Exams & Results Management | Star Academy Rohtak',
+            title: 'Exams & Results Management | Quantum Science Academy',
             exams,
             classes,
             filters: { class_id, exam_type }
@@ -50,7 +50,7 @@ router.get('/exams/create', async (req, res) => {
     try {
         const [classes] = await pool.query(`SELECT * FROM classes ORDER BY numeric_level ASC`);
         res.render('admin/results/create_exam', {
-            title: 'Create New Exam or Test | Star Academy Rohtak',
+            title: 'Create New Exam or Test | Quantum Science Academy',
             classes
         });
     } catch (err) {
@@ -190,7 +190,7 @@ router.get('/marks-matrix', async (req, res) => {
         }
 
         res.render('admin/results/marks_matrix', {
-            title: 'Effortless Bulk Marks Entry Matrix | Star Academy Rohtak',
+            title: 'Effortless Bulk Marks Entry Matrix | Quantum Science Academy',
             exams,
             selectedExam,
             exam_id,
@@ -311,7 +311,7 @@ router.get('/report-card/:studentId', async (req, res) => {
         const overallGrade = calculateGrade(totalObtained, totalMax);
 
         res.render('admin/results/report_card', {
-            title: `Report Card - ${student.first_name} ${student.last_name} | Star Academy Rohtak`,
+            title: `Report Card - ${student.first_name} ${student.last_name} | Quantum Science Academy`,
             student,
             marksList,
             totalMax,

@@ -1,4 +1,4 @@
-<% if (flash && flash.success) { %>
+<% if (typeof flash !== 'undefined' && flash && flash.success) { %>
     <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 mb-4 shadow-sm" role="alert">
         <i class="fa-solid fa-circle-check fs-5"></i>
         <div><strong>Success:</strong> <%= flash.success %></div>
@@ -6,7 +6,7 @@
     </div>
 <% } %>
 
-<% if (flash && flash.error) { %>
+<% if (typeof flash !== 'undefined' && flash && flash.error) { %>
     <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 mb-4 shadow-sm" role="alert">
         <i class="fa-solid fa-circle-exclamation fs-5"></i>
         <div><strong>Error:</strong> <%= flash.error %></div>

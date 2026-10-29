@@ -26,20 +26,20 @@ async function seedDatabase() {
         // 1. Settings
         console.log('🌱 Seeding Settings...');
         const defaultSettings = [
-            ['school_name', 'STAR ACADEMY ROHTAK'],
-            ['tagline', 'Here it is not just study, but a positive experience of self-development.'],
-            ['phone', '+91-9467389100'],
-            ['phone_alt', '+91-9812001234'],
-            ['email', 'info@staracademy.in'],
-            ['address', 'Star Academy Campus, Near Model Town, Rohtak, Haryana 124001'],
-            ['affiliation_no', 'CBSE / HBSE Affiliated No. 530892'],
+            ['school_name', 'QUANTUM SCIENCE ACADEMY'],
+            ['tagline', 'Inspiring Innovation, Igniting Scientific Minds & Excellence.'],
+            ['phone', '+91-9466255941'],
+            ['phone_alt', '+91-9466255941'],
+            ['email', 'info@quantumscience.in'],
+            ['address', 'Kaunt Road, Opposite Hanuman Mandir, Bhiwani, Haryana 127021'],
+            ['affiliation_no', 'CBSE / HBSE Affiliated'],
             ['current_session', '2026-2027'],
             ['logo_url', '/images/logo.png'],
-            ['receipt_prefix', 'STAR/2026/'],
-            ['about_short', 'Star Academy Rohtak is one of Haryana\'s premier educational institutions dedicated to providing holistic schooling, board preparation (HBSE & CBSE), and competitive entrance exam foundation coaching for classes Nursery to 12th.'],
-            ['about_full', 'Star Academy Rohtak was established with a singular objective: to transform traditional learning into an inspiring, empowering, and holistic growth experience. Located in Rohtak, Haryana, our institution has earned a stellar reputation for delivering top academic results in Board examinations as well as NEET/JEE competitive entrance tests.'],
+            ['receipt_prefix', 'QSA/2026/'],
+            ['about_short', 'Quantum Science Academy Bhiwani is one of Haryana\'s premier educational institutions dedicated to providing holistic schooling, board preparation (HBSE & CBSE), and competitive entrance exam foundation coaching for science aspirants.'],
+            ['about_full', 'Quantum Science Academy was established with a singular objective: to transform traditional learning into an inspiring, empowering, and holistic growth experience. Located in Bhiwani, Haryana, our institution has earned a stellar reputation for delivering top academic results in Board examinations as well as NEET/JEE competitive entrance tests.'],
             ['director_name', 'Dr. S. K. Hooda'],
-            ['director_message', 'Education is not just about memorizing facts; it is about building character, nurturing curiosity, and empowering students to achieve their highest potential. At Star Academy, we provide unmatched faculty support and modern facilities to prepare every student for academic and life success.'],
+            ['director_message', 'Education is not just about memorizing facts; it is about building character, nurturing curiosity, and empowering students to achieve their highest potential. At Quantum Science Academy, we provide unmatched faculty support and modern facilities to prepare every student for academic and life success.'],
             ['office_hours', 'Monday to Saturday: 8:00 AM - 4:00 PM']
         ];
 
@@ -219,16 +219,16 @@ async function seedDatabase() {
         if (routesEx.length === 0) {
             const [r1] = await connection.query(
                 `INSERT INTO transport_routes (route_name, vehicle_number, vehicle_model, driver_name, driver_phone, monthly_charge) 
-                 VALUES ('Route 1: City Bus Stand to Star Academy via Ashoka Chowk', 'HR-12-AB-4455', 'Tata Starbus 32 Seater', 'Suresh Kumar', '+91-9416012345', 1200.00)`
+                 VALUES ('Route 1: City Bus Stand to Quantum Science Academy', 'HR-12-AB-4455', 'Tata Starbus 32 Seater', 'Suresh Kumar', '+91-9416012345', 1200.00)`
             );
             route1Id = r1.insertId;
 
             await connection.query(
                 `INSERT INTO transport_stops (route_id, stop_name, pickup_time, drop_time, stop_fare, stop_order) VALUES 
-                 (?, 'Old Bus Stand Rohtak', '07:15 AM', '02:45 PM', 1200.00, 1),
-                 (?, 'Ashoka Chowk Circle', '07:25 AM', '02:35 PM', 1200.00, 2),
-                 (?, 'Model Town Market Gate', '07:35 AM', '02:25 PM', 1000.00, 3),
-                 (?, 'Star Academy Campus', '07:50 AM', '02:10 PM', 0.00, 4)`,
+                 (?, 'Old Bus Stand Bhiwani', '07:15 AM', '02:45 PM', 1200.00, 1),
+                 (?, 'Clock Tower Circle', '07:25 AM', '02:35 PM', 1200.00, 2),
+                 (?, 'Halu Bazar Gate', '07:35 AM', '02:25 PM', 1000.00, 3),
+                 (?, 'Quantum Science Academy Campus', '07:50 AM', '02:10 PM', 0.00, 4)`,
                 [route1Id, route1Id, route1Id, route1Id]
             );
         } else {
@@ -397,7 +397,7 @@ async function seedDatabase() {
         if (notifEx.length === 0) {
             await connection.query(
                 `INSERT INTO notifications (title, message, category, target_role, class_id, is_pinned) VALUES 
-                 ('Haryana Day & Diwali Festive Break Announcement', 'Star Academy Rohtak campus will observe festive holidays from 28th October to 2nd November 2026. Normal classes resume on Monday.', 'holiday', 'all', NULL, 1),
+                 ('Haryana Day & Diwali Festive Break Announcement', 'Quantum Science Academy campus will observe festive holidays from 28th October to 2nd November 2026. Normal classes resume on Monday.', 'holiday', 'all', NULL, 1),
                  ('Daily Attendance Alert: Rohan Malik is Absent Today', 'Dear Parent, your ward Rohan Malik (Class 10-A, Roll: 104) is marked ABSENT today. Please contact school desk if already notified.', 'attendance_alert', 'parent', ?, 0),
                  ('Mathematics Weekly Practice Sheet Chapter 4 Due Friday', 'Dear Class 10-A students, complete NCERT Quadratic Equations Exercise 4.2 & submit notebooks by Friday morning.', 'homework', 'student', ?, 0),
                  ('Tuition Fee Reminder for Term 2 (Session 2026-27)', 'Dear Parents, please clear pending academic dues by 10th of this month to avoid late fee charges.', 'fee_reminder', 'parent', NULL, 1)`,

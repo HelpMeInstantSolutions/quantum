@@ -4,118 +4,129 @@ const pool = require('../config/db');
 
 // Homepage (SEO Optimized)
 router.get('/', async (req, res) => {
+    let notices = [];
+    let classes = [];
+    let teachers = [];
+    let totalRoutes = 4;
+
     try {
         // Fetch pinned / recent notices
-        const [notices] = await pool.query(
+        const [noticeRows] = await pool.query(
             `SELECT * FROM notifications 
              WHERE target_role IN ('all', 'student', 'parent') 
              ORDER BY is_pinned DESC, created_at DESC LIMIT 6`
         );
+        notices = noticeRows || [];
 
         // Fetch classes
-        const [classes] = await pool.query(
+        const [classRows] = await pool.query(
             `SELECT c.*, COUNT(s.id) as student_count 
              FROM classes c 
              LEFT JOIN students s ON c.id = s.class_id AND s.status = 'active'
              GROUP BY c.id ORDER BY c.numeric_level ASC LIMIT 6`
         );
+        classes = classRows || [];
 
         // Fetch transport stats
-        const [routes] = await pool.query(`SELECT COUNT(*) as total_routes FROM transport_routes`);
+        const [routeRows] = await pool.query(`SELECT COUNT(*) as total_routes FROM transport_routes`);
+        totalRoutes = routeRows[0]?.total_routes || 4;
         
         // Fetch teachers
-        const [teachers] = await pool.query(
+        const [teacherRows] = await pool.query(
             `SELECT t.*, u.name, u.avatar_url 
              FROM teachers t 
              JOIN users u ON t.user_id = u.id 
              LIMIT 4`
         );
-
-        res.render('public/home', {
-            title: 'Star Academy Rohtak | Premier School & Coaching Institute',
-            metaDescription: 'Star Academy Rohtak is a premier educational institution in Haryana offering HBSE & CBSE board schooling with integrated NEET & JEE foundation for Classes Nursery to 12th.',
-            metaKeywords: 'Star Academy Rohtak, best school in Rohtak, CBSE school Rohtak, HBSE coaching, NEET foundation, JEE coaching Rohtak',
-            notices,
-            classes,
-            teachers,
-            totalRoutes: routes[0]?.total_routes || 4
-        });
+        teachers = teacherRows || [];
     } catch (err) {
-        console.error('Home page error:', err);
-        res.status(500).send('Internal Server Error');
+        console.warn('Home page DB fetch warning (using defaults):', err.message);
     }
+
+    res.render('public/home', {
+        title: 'Quantum Science Academy | Premier Science & Board Institute',
+        metaDescription: 'Quantum Science Academy Bhiwani is a premier educational institution in Haryana offering schooling with integrated NEET & JEE foundation for Classes Nursery to 12th.',
+        metaKeywords: 'Quantum Science Academy, best school in Bhiwani, CBSE school Bhiwani, HBSE coaching, NEET foundation, JEE coaching Bhiwani',
+        notices,
+        classes,
+        teachers,
+        totalRoutes
+    });
 });
 
 // About Page
 router.get('/about', (req, res) => {
     res.render('public/about', {
-        title: 'About Us | Star Academy Rohtak',
-        metaDescription: 'Learn about Star Academy Rohtak history, visionary leadership, mission, and academic excellence in Haryana.'
+        title: 'About Us | Quantum Science Academy',
+        metaDescription: 'Learn about Quantum Science Academy history, visionary leadership, mission, and academic excellence in Haryana.'
     });
 });
 
 // Academics Page
 router.get('/academics', async (req, res) => {
+    let classes = [];
     try {
-        const [classes] = await pool.query(`SELECT * FROM classes ORDER BY numeric_level ASC`);
-        res.render('public/academics', {
-            title: 'Academic Programs & Curriculum | Star Academy Rohtak',
-            metaDescription: 'Explore our academic programs from Primary to Senior Secondary Science, Commerce and Arts with Board exam excellence.',
-            classes
-        });
+        const [rows] = await pool.query(`SELECT * FROM classes ORDER BY numeric_level ASC`);
+        classes = rows || [];
     } catch (err) {
-        console.error(err);
-        res.redirect('/');
+        console.warn('Academics DB fetch warning:', err.message);
     }
+    res.render('public/academics', {
+        title: 'Academic Programs & Curriculum | Quantum Science Academy',
+        metaDescription: 'Explore our academic programs from Primary to Senior Secondary Science, Commerce and Arts with Board exam excellence.',
+        classes
+    });
 });
 
 // Admissions Page
 router.get('/admissions', async (req, res) => {
+    let classes = [];
     try {
-        const [classes] = await pool.query(`SELECT * FROM classes ORDER BY numeric_level ASC`);
-        res.render('public/admissions', {
-            title: 'Admissions 2026-27 | Star Academy Rohtak',
-            metaDescription: 'Admission open for session 2026-27 at Star Academy Rohtak. Register online or download admission form.',
-            classes
-        });
+        const [rows] = await pool.query(`SELECT * FROM classes ORDER BY numeric_level ASC`);
+        classes = rows || [];
     } catch (err) {
-        console.error(err);
-        res.redirect('/');
+        console.warn('Admissions DB fetch warning:', err.message);
     }
+    res.render('public/admissions', {
+        title: 'Admissions 2026-27 | Quantum Science Academy',
+        metaDescription: 'Admission open for session 2026-27 at Quantum Science Academy Bhiwani. Register online or download admission form.',
+        classes
+    });
 });
 
 // Notices & Circulars Page
 router.get('/notices', async (req, res) => {
+    let notices = [];
     try {
-        const [notices] = await pool.query(
+        const [rows] = await pool.query(
             `SELECT * FROM notifications 
              WHERE target_role IN ('all', 'student', 'parent') 
              ORDER BY is_pinned DESC, created_at DESC LIMIT 30`
         );
-        res.render('public/notices', {
-            title: 'Notices & Announcements | Star Academy Rohtak',
-            metaDescription: 'Latest school circulars, holiday notices, examination schedules and announcements from Star Academy Rohtak.',
-            notices
-        });
+        notices = rows || [];
     } catch (err) {
-        console.error(err);
-        res.redirect('/');
+        console.warn('Notices DB fetch warning:', err.message);
     }
+    res.render('public/notices', {
+        title: 'Notices & Announcements | Quantum Science Academy',
+        metaDescription: 'Latest school circulars, holiday notices, examination schedules and announcements from Quantum Science Academy.',
+        notices
+    });
 });
 
 // Gallery Page
 router.get('/gallery', (req, res) => {
     res.render('public/gallery', {
-        title: 'Campus & Activity Gallery | Star Academy Rohtak',
-        metaDescription: 'View campus photos, modern science laboratories, sports events and annual topper celebrations at Star Academy Rohtak.'
+        title: 'Campus & Activity Gallery | Quantum Science Academy',
+        metaDescription: 'View campus photos, modern science laboratories, sports events and annual topper celebrations at Quantum Science Academy.'
     });
 });
 
 // Contact Page
 router.get('/contact', (req, res) => {
     res.render('public/contact', {
-        title: 'Contact Star Academy Rohtak | Campus Location & Phone',
-        metaDescription: 'Get in touch with Star Academy Rohtak. Campus near Model Town, Rohtak, Haryana. Call +91-9467389100.'
+        title: 'Contact Quantum Science Academy | Campus Location & Phone',
+        metaDescription: 'Get in touch with Quantum Science Academy. Campus near Kaunt Road, Opposite Hanuman Mandir, Bhiwani, Haryana. Call +91-9466255941.'
     });
 });
 
