@@ -2,9 +2,12 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
+const path = require('path');
 const pool = require('../config/db');
 const { requireApiAuth, requireRole } = require('../middleware/authMiddleware');
 const { getAvatar } = require('../utils/avatarHelper');
+const upload = require('../middleware/uploadMiddleware');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'star_academy_jwt_super_key_mobile_2026';
 
@@ -1029,12 +1032,18 @@ router.get('/admin/directory', requireApiAuth, requireRole('admin'), async (req,
             type: 'students',
             results: students.map(s => ({
                 id: s.id,
+                first_name: s.first_name,
+                last_name: s.last_name || '',
                 name: `${s.first_name} ${s.last_name || ''}`.trim(),
-                roll_no: s.roll_no || 'N/A',
-                admission_no: s.admission_no || 'N/A',
+                roll_no: s.roll_no || '',
+                admission_no: s.admission_no || '',
                 biometric_id: s.biometric_id || null,
+                class_id: s.class_id,
+                class_name: s.class_name,
+                section_id: s.section_id,
+                section_name: s.section_name,
                 class_label: `${s.class_name} - ${s.section_name}`,
-                father_name: s.father_name || 'N/A',
+                father_name: s.father_name || '',
                 father_phone: s.father_phone || '',
                 mother_name: s.mother_name || '',
                 mother_phone: s.mother_phone || '',
@@ -1042,6 +1051,240 @@ router.get('/admin/directory', requireApiAuth, requireRole('admin'), async (req,
                 gender: s.gender || 'Male'
             }))
         });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Admin List Classes for Dropdowns & Filter
+router.get('/admin/classes', requireApiAuth, requireRole('admin'), async (req, res) => {
+    try {
+        const [classes] = await pool.query(`
+            SELECT c.id, c.class_name, c.numeric_level,
+                   (SELECT COUNT(*) FROM students s WHERE s.class_id = c.id AND s.status = 'active') as student_count
+            FROM classes c
+            ORDER BY c.numeric_level ASC, c.class_name ASC
+        `);
+        res.json({ success: true, classes });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Admin Create / Add Student from Mobile App
+router.post('/admin/student/create', requireApiAuth, requireRole('admin'), async (req, res) => {
+    try {
+        const {
+            first_name,
+            last_name,
+            class_id,
+            roll_no,
+            admission_no,
+            father_name,
+            father_phone,
+            gender,
+            biometric_id
+        } = req.body;
+
+        if (!first_name || !class_id) {
+            return res.status(400).json({ success: false, message: 'First name and Class are required.' });
+        }
+
+        // Get default section for class
+        const [secRows] = await pool.query(`SELECT id FROM sections WHERE class_id = ? ORDER BY id ASC LIMIT 1`, [class_id]);
+        const section_id = secRows.length > 0 ? secRows[0].id : null;
+
+        // Auto generate admission number if not provided
+        let admNo = (admission_no && String(admission_no).trim()) || `QSA-${Date.now().toString().slice(-5)}`;
+        const [admCheck] = await pool.query(`SELECT id FROM students WHERE admission_no = ?`, [admNo]);
+        if (admCheck.length > 0) {
+            admNo = `QSA-${Date.now().toString().slice(-6)}`;
+        }
+
+        const bioId = (biometric_id && String(biometric_id).trim()) || null;
+        if (bioId) {
+            const [bioCheck] = await pool.query(`SELECT id, first_name FROM students WHERE biometric_id = ? AND status = 'active'`, [bioId]);
+            if (bioCheck.length > 0) {
+                return res.status(400).json({ success: false, message: `Biometric ID #${bioId} is already assigned to ${bioCheck[0].first_name}` });
+            }
+        }
+
+        const [insertRes] = await pool.query(
+            `INSERT INTO students (admission_no, first_name, last_name, class_id, section_id, roll_no, father_name, father_phone, gender, biometric_id, status, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', NOW())`,
+            [
+                admNo,
+                first_name.trim(),
+                (last_name || '').trim(),
+                class_id,
+                section_id,
+                (roll_no || '').trim(),
+                (father_name || '').trim(),
+                (father_phone || '').trim(),
+                gender || 'Male',
+                bioId
+            ]
+        );
+
+        res.json({
+            success: true,
+            message: 'Student added successfully!',
+            student_id: insertRes.insertId,
+            admission_no: admNo
+        });
+    } catch (err) {
+        console.error('API create student error:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Admin Edit Student from Mobile App
+router.post('/admin/student/:id/edit', requireApiAuth, requireRole('admin'), async (req, res) => {
+    try {
+        const studentId = req.params.id;
+        const {
+            first_name,
+            last_name,
+            class_id,
+            roll_no,
+            father_name,
+            father_phone,
+            gender,
+            biometric_id,
+            status
+        } = req.body;
+
+        if (!first_name) {
+            return res.status(400).json({ success: false, message: 'First name is required.' });
+        }
+
+        const bioId = (biometric_id && String(biometric_id).trim()) || null;
+        if (bioId) {
+            const [bioCheck] = await pool.query(
+                `SELECT id, first_name FROM students WHERE biometric_id = ? AND id != ? AND status = 'active'`,
+                [bioId, studentId]
+            );
+            if (bioCheck.length > 0) {
+                return res.status(400).json({ success: false, message: `Biometric ID #${bioId} is already assigned to ${bioCheck[0].first_name}` });
+            }
+        }
+
+        await pool.query(
+            `UPDATE students SET
+                first_name = ?,
+                last_name = ?,
+                class_id = COALESCE(?, class_id),
+                roll_no = ?,
+                father_name = ?,
+                father_phone = ?,
+                gender = ?,
+                biometric_id = ?,
+                status = COALESCE(?, status),
+                updated_at = NOW()
+             WHERE id = ?`,
+            [
+                first_name.trim(),
+                (last_name || '').trim(),
+                class_id || null,
+                (roll_no || '').trim(),
+                (father_name || '').trim(),
+                (father_phone || '').trim(),
+                gender || 'Male',
+                bioId,
+                status || null,
+                studentId
+            ]
+        );
+
+        res.json({ success: true, message: 'Student updated successfully!' });
+    } catch (err) {
+        console.error('API edit student error:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Admin Get Student Documents
+router.get('/admin/student/:id/documents', requireApiAuth, requireRole('admin'), async (req, res) => {
+    try {
+        const studentId = req.params.id;
+        const [docs] = await pool.query(
+            `SELECT id, student_id, doc_type, doc_title, file_url, file_size, uploaded_at 
+             FROM student_documents 
+             WHERE student_id = ? 
+             ORDER BY uploaded_at DESC`,
+            [studentId]
+        );
+        res.json({ success: true, documents: docs });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Admin Upload Student Document (Supports multipart or base64 JSON)
+router.post('/admin/student/:id/documents', requireApiAuth, requireRole('admin'), upload.single('document_file'), async (req, res) => {
+    try {
+        const studentId = req.params.id;
+        let { doc_type, doc_title, base64_data, file_name } = req.body;
+        doc_type = doc_type || 'other';
+        doc_title = (doc_title && String(doc_title).trim()) || doc_type.toUpperCase();
+
+        let file_url = '';
+        let file_size = '0 KB';
+
+        if (req.file) {
+            file_url = `/uploads/documents/${req.file.filename}`;
+            file_size = `${(req.file.size / 1024).toFixed(1)} KB`;
+        } else if (base64_data) {
+            const ext = file_name ? path.extname(file_name) : '.jpg';
+            const uniqueFilename = `doc-${Date.now()}-${Math.round(Math.random() * 1e6)}${ext}`;
+            const targetDir = path.join(__dirname, '../public/uploads/documents');
+            if (!fs.existsSync(targetDir)) {
+                fs.mkdirSync(targetDir, { recursive: true });
+            }
+            const filePath = path.join(targetDir, uniqueFilename);
+            
+            // Clean base64 header if present
+            const cleanBase64 = base64_data.replace(/^data:([A-Za-z-+/]+);base64,/, '');
+            const buffer = Buffer.from(cleanBase64, 'base64');
+            fs.writeFileSync(filePath, buffer);
+
+            file_url = `/uploads/documents/${uniqueFilename}`;
+            file_size = `${(buffer.length / 1024).toFixed(1)} KB`;
+        } else {
+            return res.status(400).json({ success: false, message: 'No file or document data uploaded.' });
+        }
+
+        const [insertRes] = await pool.query(
+            `INSERT INTO student_documents (student_id, doc_type, doc_title, file_url, file_size, uploaded_at)
+             VALUES (?, ?, ?, ?, ?, NOW())`,
+            [studentId, doc_type, doc_title, file_url, file_size]
+        );
+
+        res.json({
+            success: true,
+            message: 'Document uploaded successfully!',
+            document: {
+                id: insertRes.insertId,
+                student_id: studentId,
+                doc_type,
+                doc_title,
+                file_url,
+                file_size,
+                uploaded_at: new Date().toISOString()
+            }
+        });
+    } catch (err) {
+        console.error('API upload document error:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Admin Delete Student Document
+router.post('/admin/student/:id/documents/:docId/delete', requireApiAuth, requireRole('admin'), async (req, res) => {
+    try {
+        const { id, docId } = req.params;
+        await pool.query(`DELETE FROM student_documents WHERE id = ? AND student_id = ?`, [docId, id]);
+        res.json({ success: true, message: 'Document deleted successfully.' });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
