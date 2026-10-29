@@ -23,22 +23,17 @@ logs/
 *.zip
 *.tar.gz
 *.rar
-/QuantumScienceAcademy-release.apk
+*.apk
+QuantumScienceAcademy-release.apk
+public/*.apk
 scratch/
 test_api.js
 AGENTS.md.txt
+logo.jfif
 
-# Android Build & Gradle files
-android/.gradle/
-android/build/
-android/app/build/
-android/local.properties
-android/.idea/
-android/*.iml
-android/app/*.iml
-android/.cxx/
-android/captures/
-.externalNativeBuild/
+# Mobile App & Standalone Services (Not needed for Hostinger Web Server)
+android/
+biometric_vps/
 
 # OS generated files
 .DS_Store
