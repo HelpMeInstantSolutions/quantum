@@ -1570,6 +1570,66 @@ router.get('/debug-push-status', async (req, res) => {
     }
 });
 
+// Instant 1-Click GET Test Push Notification for Browser Testing
+router.get('/send-test-push', async (req, res) => {
+    try {
+        const { sendFCMv1, getFirebaseCredentials, diagnoseFirebaseSetup } = require('../utils/pushNotificationService');
+        const creds = getFirebaseCredentials();
+        const setup = diagnoseFirebaseSetup();
+
+        // 1. Fetch registered tokens
+        const [tokens] = await pool.query(
+            `SELECT udt.*, u.name as user_name, s.first_name, s.last_name 
+             FROM user_device_tokens udt
+             LEFT JOIN users u ON udt.user_id = u.id
+             LEFT JOIN students s ON udt.student_id = s.id
+             ORDER BY udt.updated_at DESC LIMIT 10`
+        );
+
+        if (tokens.length === 0) {
+            return res.json({
+                success: false,
+                message: 'No registered device tokens found in database. Open the mobile app once to register token.',
+                firebase_setup: setup
+            });
+        }
+
+        const results = [];
+        const testTitle = req.query.title || 'Quantum Science Academy 🔔';
+        const testBody = req.query.message || `Test Notification from Web at ${new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' })}`;
+
+        for (const t of tokens) {
+            if (creds && t.device_token) {
+                const resFCM = await sendFCMv1({
+                    creds,
+                    token: t.device_token,
+                    title: testTitle,
+                    message: testBody,
+                    studentId: t.student_id
+                });
+                results.push({
+                    user: t.user_name || `${t.first_name || ''} ${t.last_name || ''}`.trim() || `User #${t.user_id}`,
+                    token_preview: `${t.device_token.substring(0, 15)}...${t.device_token.slice(-6)}`,
+                    provider: t.provider,
+                    dispatch_result: resFCM
+                });
+            }
+        }
+
+        res.json({
+            success: true,
+            message: `Dispatched test push notification to ${results.length} device(s)!`,
+            title: testTitle,
+            body: testBody,
+            results,
+            firebase_setup: setup
+        });
+    } catch (err) {
+        console.error('Send test push error:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 // Test Push Notification Dispatch (For verifying FCM setup)
 router.post('/test-push', requireApiAuth, async (req, res) => {
     try {
