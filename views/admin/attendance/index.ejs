@@ -57,7 +57,7 @@
                                     <label class="form-label small fw-bold text-muted">Select Class *</label>
                                     <select name="class_id" id="attendanceClassSelect" class="form-select form-select-sm" required>
                                         <% classes.forEach(c => { %>
-                                            <option value="<%= c.id %>" <%= class_id == c.id ? 'selected' : '' %>><%= c.class_name %></option>
+                                            <option value="<%= c.id %>" <%= class_id == c.id ? 'selected' : '' %>><%= c.class_name %> (<%= c.student_count || 0 %> Students)</option>
                                         <% }) %>
                                     </select>
                                 </div>
@@ -193,7 +193,8 @@
                     <% } else { %>
                         <div class="admin-card p-5 text-center text-muted">
                             <i class="fa-solid fa-user-group fs-1 text-secondary mb-3"></i>
-                            <h5>Please select a Class & Section to view students and record attendance.</h5>
+                            <h5>No enrolled students found in this Class & Section.</h5>
+                            <p class="small text-muted mb-0">Please select a class that has enrolled students from the dropdown above (e.g. classes showing active student count) and click <strong>Load Students</strong>.</p>
                         </div>
                     <% } %>
 
@@ -222,7 +223,7 @@
                                     <select name="class_id" class="form-select form-select-sm">
                                         <option value="">All Classes</option>
                                         <% classes.forEach(c => { %>
-                                            <option value="<%= c.id %>" <%= class_id == c.id ? 'selected' : '' %>><%= c.class_name %></option>
+                                            <option value="<%= c.id %>" <%= class_id == c.id ? 'selected' : '' %>><%= c.class_name %> (<%= c.student_count || 0 %>)</option>
                                         <% }) %>
                                     </select>
                                 </div>

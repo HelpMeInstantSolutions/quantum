@@ -8,11 +8,18 @@ router.use(requireAdminWeb);
 // Daily Attendance Page (Default: All Attendance Logs Descending with Pagination)
 router.get('/', async (req, res) => {
     try {
-        const [classes] = await pool.query(`SELECT * FROM classes ORDER BY numeric_level ASC`);
+        const [classes] = await pool.query(`
+            SELECT c.*, COUNT(s.id) as student_count 
+            FROM classes c 
+            LEFT JOIN students s ON s.class_id = c.id AND s.status = 'active' 
+            GROUP BY c.id 
+            ORDER BY c.numeric_level ASC
+        `);
         const [sections] = await pool.query(`SELECT * FROM sections ORDER BY section_name ASC`);
 
         const isMarkMode = req.query.mode === 'mark';
-        const class_id = req.query.class_id ? parseInt(req.query.class_id) : (isMarkMode && classes.length > 0 ? classes[0].id : null);
+        const defaultClass = classes.find(c => c.student_count > 0) || (classes.length > 0 ? classes[0] : null);
+        const class_id = req.query.class_id ? parseInt(req.query.class_id) : (isMarkMode && defaultClass ? defaultClass.id : null);
         const classSections = class_id ? sections.filter(s => s.class_id === class_id) : [];
 
         let section_id = req.query.section_id ? parseInt(req.query.section_id) : null;
@@ -143,22 +150,25 @@ router.post('/save', async (req, res) => {
 
         // Validate and filter submitted student IDs to guarantee Foreign Key integrity
         const submittedStudentIds = Object.keys(attendance)
-            .map(id => parseInt(id, 10))
-            .filter(id => !isNaN(id) && id > 0);
+            .map(id => String(id).trim())
+            .filter(id => id.length > 0 && !isNaN(parseInt(id, 10)));
 
         let validStudentIdSet = new Set();
         if (submittedStudentIds.length > 0) {
             const [existingStudents] = await conn.query(
                 `SELECT id FROM students WHERE id IN (?)`,
-                [submittedStudentIds]
+                [submittedStudentIds.map(id => parseInt(id, 10))]
             );
-            validStudentIdSet = new Set(existingStudents.map(s => s.id));
+            existingStudents.forEach(s => {
+                validStudentIdSet.add(String(s.id));
+                validStudentIdSet.add(Number(s.id));
+            });
         }
 
         let savedCount = 0;
         for (const [rawStudentId, status] of Object.entries(attendance)) {
             const studentId = parseInt(rawStudentId, 10);
-            if (!validStudentIdSet.has(studentId)) {
+            if (!validStudentIdSet.has(rawStudentId) && !validStudentIdSet.has(studentId)) {
                 console.warn(`[ATTENDANCE] Skipping invalid or deleted student ID: ${rawStudentId}`);
                 continue;
             }
@@ -179,8 +189,13 @@ router.post('/save', async (req, res) => {
         }
 
         await conn.commit();
-        req.session.flash_success = `Attendance saved successfully for ${savedCount} students! (${absentCount} Absent)`;
-        res.redirect(`/admin/attendance?class_id=${class_id}&section_id=${section_id}&date=${attendance_date}`);
+
+        if (savedCount === 0) {
+            req.session.flash_warning = 'No active students found in this class to mark attendance. Please select a Class and Section with enrolled students, click "Load Students", and then mark attendance.';
+        } else {
+            req.session.flash_success = `Attendance saved successfully for ${savedCount} students! (${absentCount} Absent)`;
+        }
+        res.redirect(`/admin/attendance?class_id=${class_id}&section_id=${section_id}&date=${attendance_date}&mode=mark`);
     } catch (err) {
         await conn.rollback();
         console.error('Save attendance error:', err);
