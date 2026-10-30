@@ -39,11 +39,15 @@ async function settingsMiddleware(req, res, next) {
     res.locals.adminUser = (req.session && req.session.user && req.session.user.role === 'admin') ? req.session.user : null;
     res.locals.flash = {
         success: (req.session && req.session.flash_success) || null,
-        error: (req.session && req.session.flash_error) || null
+        error: (req.session && req.session.flash_error) || null,
+        warning: (req.session && req.session.flash_warning) || null,
+        info: (req.session && req.session.flash_info) || null
     };
     if (req.session) {
         delete req.session.flash_success;
         delete req.session.flash_error;
+        delete req.session.flash_warning;
+        delete req.session.flash_info;
     }
 
     // 2. Fetch fresh settings from DB if cache expired

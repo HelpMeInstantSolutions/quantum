@@ -51,7 +51,7 @@
                     <!-- ========================================================= -->
                     <div class="admin-card mb-4">
                         <div class="admin-card-body p-3">
-                            <form method="GET" action="/admin/attendance" class="row g-2 align-items-end">
+                            <form method="GET" action="/admin/attendance" id="attendanceFilterForm" class="row g-2 align-items-end">
                                 <input type="hidden" name="mode" value="mark">
                                 <div class="col-md-3">
                                     <label class="form-label small fw-bold text-muted">Select Class *</label>
@@ -62,10 +62,15 @@
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label small fw-bold text-muted">Select Section *</label>
-                                    <select name="section_id" id="attendanceSectionSelect" class="form-select form-select-sm" required>
+                                    <label class="form-label small fw-bold text-muted">Select Section</label>
+                                    <select name="section_id" id="attendanceSectionSelect" class="form-select form-select-sm">
+                                        <option value="all" <%= (!section_id || section_id === 'all') ? 'selected' : '' %>>
+                                            All Sections (<%= selectedClass?.student_count || 0 %> Students)
+                                        </option>
                                         <% (classSections && classSections.length > 0 ? classSections : sections.filter(s => s.class_id == class_id)).forEach(s => { %>
-                                            <option value="<%= s.id %>" <%= section_id == s.id ? 'selected' : '' %>>Section <%= s.section_name %></option>
+                                            <option value="<%= s.id %>" <%= section_id == s.id ? 'selected' : '' %>>
+                                                Section <%= s.section_name %> (<%= s.student_count || 0 %> Students)
+                                            </option>
                                         <% }) %>
                                     </select>
                                 </div>
@@ -85,8 +90,8 @@
                     <% if (students && students.length > 0) { %>
                         <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 p-3 bg-white rounded-3 border">
                             <div class="d-flex align-items-center gap-2">
-                                <span class="fw-bold text-dark"><%= selectedClass?.class_name %> - Section <%= selectedSection?.section_name %></span>
-                                <span class="badge bg-secondary-subtle text-dark border"><%= students.length %> Enrolled</span>
+                                <span class="fw-bold text-dark"><%= selectedClass?.class_name %> - <%= selectedSection ? 'Section ' + selectedSection.section_name : 'All Sections' %></span>
+                                <span class="badge bg-primary text-white border-0"><%= students.length %> Enrolled</span>
                                 <span class="text-muted small">| Date: <strong><%= attendance_date || new Date().toISOString().split('T')[0] %></strong></span>
                             </div>
                             <div class="d-flex gap-2 mt-2 mt-sm-0">
@@ -95,7 +100,7 @@
                                 </button>
                                 <form action="/admin/attendance/send-absent-alert" method="POST" class="d-inline" onsubmit="return confirm('Dispatch instant absent notifications to all parents of absent students for this date?');">
                                     <input type="hidden" name="class_id" value="<%= class_id %>">
-                                    <input type="hidden" name="section_id" value="<%= section_id %>">
+                                    <input type="hidden" name="section_id" value="<%= section_id || 'all' %>">
                                     <input type="hidden" name="attendance_date" value="<%= attendance_date || new Date().toISOString().split('T')[0] %>">
                                     <button type="submit" class="btn btn-sm btn-warning text-dark fw-bold">
                                         <i class="fa-solid fa-bell me-1"></i> Dispatch Absent Alerts
@@ -106,7 +111,7 @@
 
                         <form action="/admin/attendance/save" method="POST">
                             <input type="hidden" name="class_id" value="<%= class_id %>">
-                            <input type="hidden" name="section_id" value="<%= section_id %>">
+                            <input type="hidden" name="section_id" value="<%= section_id || 'all' %>">
                             <input type="hidden" name="attendance_date" value="<%= attendance_date || new Date().toISOString().split('T')[0] %>">
 
                             <div class="admin-card">
@@ -135,8 +140,12 @@
                                                     <td><strong><%= st.roll_no || (idx + 1) %></strong></td>
                                                     <td>
                                                         <span class="fw-bold text-dark d-block"><%= st.first_name %> <%= st.last_name %></span>
+                                                        <input type="hidden" name="student_section[<%= st.id %>]" value="<%= st.section_id %>">
                                                         <div class="d-flex align-items-center gap-1 mt-1">
                                                             <small class="text-muted"><%= st.admission_no %></small>
+                                                            <% if (st.section_name) { %>
+                                                                <span class="badge bg-secondary-subtle text-dark border p-0 px-1 font-monospace" style="font-size: 0.7rem;">Sec: <%= st.section_name %></span>
+                                                            <% } %>
                                                             <% if (st.biometric_id) { %>
                                                                 <span class="badge bg-primary text-white border-0 p-0 px-1 font-monospace" style="font-size: 0.7rem;" title="Biometric Machine ID"><i class="fa-solid fa-fingerprint me-1"></i>Bio: <%= st.biometric_id %></span>
                                                             <% } else { %>
@@ -183,9 +192,13 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                <div class="admin-card-body border-top d-flex justify-content-end bg-light">
-                                    <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm">
-                                        <i class="fa-solid fa-save me-1"></i> Save Daily Attendance
+                                <div class="admin-card-body border-top d-flex justify-content-between align-items-center bg-light p-3">
+                                    <div class="text-muted small">
+                                        <i class="fa-solid fa-circle-info text-primary me-1"></i>
+                                        Saving will record daily attendance for all <%= students.length %> students.
+                                    </div>
+                                    <button type="submit" id="btnSaveAttendance" class="btn btn-primary px-4 fw-bold shadow-sm">
+                                        <i class="fa-solid fa-save me-1"></i> Save Daily Attendance (<%= students.length %> Students)
                                     </button>
                                 </div>
                             </div>
@@ -379,32 +392,41 @@
 
     <script>
         const allSections = <%- JSON.stringify(sections) %>;
+        const allClasses = <%- JSON.stringify(classes) %>;
         const classSelect = document.getElementById('attendanceClassSelect');
         const sectionSelect = document.getElementById('attendanceSectionSelect');
+        const filterForm = document.getElementById('attendanceFilterForm');
 
         function updateSectionsForClass(classId) {
             if (!sectionSelect) return;
             sectionSelect.innerHTML = '';
+
+            const currentCls = allClasses.find(c => String(c.id) === String(classId));
+            const totalCount = currentCls ? (currentCls.student_count || 0) : 0;
+
+            // Option 1: All Sections
+            const allOpt = document.createElement('option');
+            allOpt.value = 'all';
+            allOpt.textContent = `All Sections (${totalCount} Students)`;
+            allOpt.selected = true;
+            sectionSelect.appendChild(allOpt);
+
             const filtered = allSections.filter(s => String(s.class_id) === String(classId));
-            if (filtered.length === 0) {
-                const opt = document.createElement('option');
-                opt.value = '';
-                opt.textContent = 'No sections available';
-                sectionSelect.appendChild(opt);
-                return;
-            }
-            filtered.forEach((s, idx) => {
+            filtered.forEach(s => {
                 const opt = document.createElement('option');
                 opt.value = s.id;
-                opt.textContent = `Section ${s.section_name}`;
-                if (idx === 0) opt.selected = true;
+                opt.textContent = `Section ${s.section_name} (${s.student_count || 0} Students)`;
                 sectionSelect.appendChild(opt);
             });
         }
 
-        if (classSelect && sectionSelect) {
+        if (classSelect && sectionSelect && filterForm) {
             classSelect.addEventListener('change', function() {
                 updateSectionsForClass(this.value);
+                filterForm.submit(); // Auto reload students when class is selected
+            });
+            sectionSelect.addEventListener('change', function() {
+                filterForm.submit(); // Auto reload students when section is selected
             });
         }
 
@@ -412,6 +434,18 @@
             if (status === 'Present') {
                 document.querySelectorAll('input[type="radio"][value="Present"]').forEach(r => r.checked = true);
             }
+        }
+
+        // Show saving feedback and prevent double submission
+        const saveAttendanceForm = document.querySelector('form[action="/admin/attendance/save"]');
+        if (saveAttendanceForm) {
+            saveAttendanceForm.addEventListener('submit', function() {
+                const btn = document.getElementById('btnSaveAttendance');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Saving Attendance...';
+                }
+            });
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
