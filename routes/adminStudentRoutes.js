@@ -442,11 +442,42 @@ router.post('/:id/edit', upload.fields([{ name: 'photo', maxCount: 1 }, { name: 
 router.post('/:id/delete', async (req, res) => {
     try {
         const studentId = req.params.id;
-        await pool.query(`UPDATE students SET status = 'transferred' WHERE id = ?`, [studentId]);
-        req.session.flash_success = 'Student marked as Transferred/Inactive.';
+        const [studentRows] = await pool.query(
+            `SELECT id, first_name, last_name, admission_no, user_id FROM students WHERE id = ?`,
+            [studentId]
+        );
+
+        if (studentRows.length === 0) {
+            req.session.flash_error = 'Student record not found.';
+            return res.redirect('/admin/students');
+        }
+
+        const student = studentRows[0];
+        const studentName = `${student.first_name} ${student.last_name || ''}`.trim();
+
+        try {
+            // First attempt clean hard delete (removes documents & linked user)
+            await pool.query(`DELETE FROM student_documents WHERE student_id = ?`, [studentId]);
+            await pool.query(`DELETE FROM students WHERE id = ?`, [studentId]);
+            if (student.user_id) {
+                await pool.query(`DELETE FROM users WHERE id = ?`, [student.user_id]);
+            }
+        } catch (fkErr) {
+            // If historical foreign keys exist (e.g. attendance, fee transactions), soft delete safely
+            await pool.query(
+                `UPDATE students SET status = 'deleted', biometric_id = NULL, updated_at = NOW() WHERE id = ?`,
+                [studentId]
+            );
+            if (student.user_id) {
+                await pool.query(`UPDATE users SET status = 'inactive' WHERE id = ?`, [student.user_id]);
+            }
+        }
+
+        req.session.flash_success = `Student "${studentName}" (Admission: ${student.admission_no}) deleted successfully.`;
         res.redirect('/admin/students');
     } catch (err) {
-        console.error(err);
+        console.error('Delete student error:', err);
+        req.session.flash_error = 'Failed to delete student: ' + err.message;
         res.redirect('/admin/students');
     }
 });

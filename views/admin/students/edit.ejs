@@ -244,6 +244,14 @@
                     </div>
                 </form>
 
+                <div class="col-12 mt-2 mb-3 text-end">
+                    <form action="/admin/students/<%= student.id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete student <%= student.first_name %> <%= student.last_name || '' %> (Admission No: <%= student.admission_no %>)?');">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            <i class="fa-solid fa-trash me-1"></i> Delete Student Record
+                        </button>
+                    </form>
+                </div>
+
                 <!-- Section: Uploaded Documents & Certificates -->
                 <div class="row mt-4" id="documents">
                     <div class="col-12">

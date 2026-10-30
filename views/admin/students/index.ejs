@@ -147,6 +147,11 @@
                                                 <a href="/admin/fees/collect?student_id=<%= st.id %>" class="btn btn-sm btn-outline-success py-0 px-2" title="Collect Fee">
                                                     <i class="fa-solid fa-indian-rupee-sign"></i>
                                                 </a>
+                                                <form action="/admin/students/<%= st.id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Delete student <%= st.first_name %> <%= st.last_name || '' %> (Admission No: <%= st.admission_no %>)?');">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" title="Delete Student">
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </button>
+                                                </form>
                                             </td>
                                         </tr>
 

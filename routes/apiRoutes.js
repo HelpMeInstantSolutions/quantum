@@ -1203,6 +1203,50 @@ router.post('/admin/student/:id/edit', requireApiAuth, requireRole('admin'), asy
     }
 });
 
+// Admin Delete Student from Mobile App
+router.post('/admin/student/:id/delete', requireApiAuth, requireRole('admin'), async (req, res) => {
+    try {
+        const studentId = req.params.id;
+        const [studentRows] = await pool.query(
+            `SELECT id, first_name, last_name, admission_no, user_id FROM students WHERE id = ?`,
+            [studentId]
+        );
+
+        if (studentRows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Student record not found.' });
+        }
+
+        const student = studentRows[0];
+        const studentName = `${student.first_name} ${student.last_name || ''}`.trim();
+
+        try {
+            // First attempt clean hard delete (removes documents & linked user)
+            await pool.query(`DELETE FROM student_documents WHERE student_id = ?`, [studentId]);
+            await pool.query(`DELETE FROM students WHERE id = ?`, [studentId]);
+            if (student.user_id) {
+                await pool.query(`DELETE FROM users WHERE id = ?`, [student.user_id]);
+            }
+        } catch (fkErr) {
+            // If historical foreign keys exist (e.g. attendance, fee transactions), soft delete safely
+            await pool.query(
+                `UPDATE students SET status = 'deleted', biometric_id = NULL, updated_at = NOW() WHERE id = ?`,
+                [studentId]
+            );
+            if (student.user_id) {
+                await pool.query(`UPDATE users SET status = 'inactive' WHERE id = ?`, [student.user_id]);
+            }
+        }
+
+        res.json({
+            success: true,
+            message: `Student "${studentName}" (Admission: ${student.admission_no}) deleted successfully.`
+        });
+    } catch (err) {
+        console.error('API delete student error:', err);
+        res.status(500).json({ success: false, message: 'Failed to delete student: ' + err.message });
+    }
+});
+
 // Admin Get Student Documents
 router.get('/admin/student/:id/documents', requireApiAuth, requireRole('admin'), async (req, res) => {
     try {

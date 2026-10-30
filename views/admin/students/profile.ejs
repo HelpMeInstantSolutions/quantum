@@ -66,6 +66,11 @@
                                 <a href="/admin/students/<%= student.id %>/edit" class="btn btn-outline-secondary btn-sm">
                                     <i class="fa-solid fa-pen-to-square me-1"></i> Edit Profile
                                 </a>
+                                <form action="/admin/students/<%= student.id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete <%= student.first_name %> <%= student.last_name || '' %> (Admission: <%= student.admission_no %>)?');">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                                        <i class="fa-solid fa-trash me-1"></i> Delete
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
