@@ -140,6 +140,8 @@
                                                     <td><strong><%= st.roll_no || (idx + 1) %></strong></td>
                                                     <td>
                                                         <span class="fw-bold text-dark d-block"><%= st.first_name %> <%= st.last_name %></span>
+                                                        <input type="hidden" name="student_ids[]" value="<%= st.id %>">
+                                                        <input type="hidden" name="student_section_<%= st.id %>" value="<%= st.section_id %>">
                                                         <input type="hidden" name="student_section[<%= st.id %>]" value="<%= st.section_id %>">
                                                         <div class="d-flex align-items-center gap-1 mt-1">
                                                             <small class="text-muted"><%= st.admission_no %></small>
@@ -171,21 +173,21 @@
                                                     </td>
                                                     <td class="text-center">
                                                         <div class="btn-group btn-group-sm" role="group">
-                                                            <input type="radio" class="btn-check" name="attendance[<%= st.id %>]" id="pres_<%= st.id %>" value="Present" <%= currentStatus === 'Present' ? 'checked' : '' %>>
+                                                            <input type="radio" class="btn-check" name="status_<%= st.id %>" id="pres_<%= st.id %>" value="Present" <%= currentStatus === 'Present' ? 'checked' : '' %>>
                                                             <label class="btn btn-outline-success fw-semibold" for="pres_<%= st.id %>">Present</label>
 
-                                                            <input type="radio" class="btn-check" name="attendance[<%= st.id %>]" id="abs_<%= st.id %>" value="Absent" <%= currentStatus === 'Absent' ? 'checked' : '' %>>
+                                                            <input type="radio" class="btn-check" name="status_<%= st.id %>" id="abs_<%= st.id %>" value="Absent" <%= currentStatus === 'Absent' ? 'checked' : '' %>>
                                                             <label class="btn btn-outline-danger fw-semibold" for="abs_<%= st.id %>">Absent</label>
 
-                                                            <input type="radio" class="btn-check" name="attendance[<%= st.id %>]" id="late_<%= st.id %>" value="Late" <%= currentStatus === 'Late' ? 'checked' : '' %>>
+                                                            <input type="radio" class="btn-check" name="status_<%= st.id %>" id="late_<%= st.id %>" value="Late" <%= currentStatus === 'Late' ? 'checked' : '' %>>
                                                             <label class="btn btn-outline-warning text-dark fw-semibold" for="late_<%= st.id %>">Late</label>
 
-                                                            <input type="radio" class="btn-check" name="attendance[<%= st.id %>]" id="half_<%= st.id %>" value="Half Day" <%= currentStatus === 'Half Day' ? 'checked' : '' %>>
+                                                            <input type="radio" class="btn-check" name="status_<%= st.id %>" id="half_<%= st.id %>" value="Half Day" <%= currentStatus === 'Half Day' ? 'checked' : '' %>>
                                                             <label class="btn btn-outline-info text-dark fw-semibold" for="half_<%= st.id %>">Half Day</label>
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <input type="text" name="remarks[<%= st.id %>]" class="form-control form-control-sm" placeholder="e.g. Leave request" value="<%= st.remarks || '' %>">
+                                                        <input type="text" name="remark_<%= st.id %>" class="form-control form-control-sm" placeholder="e.g. Leave request" value="<%= st.remarks || '' %>">
                                                     </td>
                                                 </tr>
                                             <% }) %>

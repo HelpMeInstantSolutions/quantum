@@ -162,54 +162,70 @@ router.post('/save', async (req, res) => {
     try {
         await conn.beginTransaction();
 
-        const { class_id, section_id, attendance_date, attendance } = req.body;
-        // attendance object: { [student_id]: 'Present' | 'Absent' | 'Late' | 'Half Day' }
-        const remarksObj = req.body.remarks || {};
-        const studentSections = req.body.student_section || {};
+        const { class_id, section_id, attendance_date } = req.body;
 
-        if (!attendance || typeof attendance !== 'object' || Object.keys(attendance).length === 0) {
-            req.session.flash_warning = 'No student attendance records received to save.';
+        // 1. Gather all submitted student IDs from student_ids[] or attendance object
+        let rawStudentIds = [];
+        if (Array.isArray(req.body.student_ids)) {
+            rawStudentIds = req.body.student_ids;
+        } else if (req.body.student_ids) {
+            rawStudentIds = [req.body.student_ids];
+        } else if (req.body.attendance && typeof req.body.attendance === 'object') {
+            rawStudentIds = Object.keys(req.body.attendance);
+        }
+
+        const cleanStudentIds = rawStudentIds
+            .map(id => parseInt(id, 10))
+            .filter(id => !isNaN(id) && id > 0);
+
+        if (cleanStudentIds.length === 0) {
+            req.session.flash_warning = 'No active student records were selected to save attendance.';
             return res.redirect(`/admin/attendance?class_id=${class_id || ''}&section_id=${section_id || 'all'}&date=${attendance_date || ''}&mode=mark`);
         }
 
+        // 2. Fetch student records directly from DB to verify existence and get exact section_id
+        const [existingStudents] = await conn.query(
+            `SELECT id, class_id, section_id FROM students WHERE id IN (?)`,
+            [cleanStudentIds]
+        );
+
+        const studentMap = new Map();
+        existingStudents.forEach(s => {
+            studentMap.set(s.id, s);
+            studentMap.set(String(s.id), s);
+        });
+
+        let savedCount = 0;
         let absentCount = 0;
         let absentStudentIds = [];
 
-        // Validate and filter submitted student IDs to guarantee Foreign Key integrity
-        const submittedStudentIds = Object.keys(attendance)
-            .map(id => String(id).trim())
-            .filter(id => id.length > 0 && !isNaN(parseInt(id, 10)));
-
-        let validStudentMap = new Map();
-        if (submittedStudentIds.length > 0) {
-            const [existingStudents] = await conn.query(
-                `SELECT id, class_id, section_id FROM students WHERE id IN (?)`,
-                [submittedStudentIds.map(id => parseInt(id, 10))]
-            );
-            existingStudents.forEach(s => {
-                validStudentMap.set(s.id, s);
-                validStudentMap.set(String(s.id), s);
-            });
-        }
-
-        let savedCount = 0;
-        for (const [rawStudentId, status] of Object.entries(attendance)) {
-            const studentId = parseInt(rawStudentId, 10);
-            const studentRecord = validStudentMap.get(studentId) || validStudentMap.get(rawStudentId);
+        for (const studentId of cleanStudentIds) {
+            const studentRecord = studentMap.get(studentId);
             if (!studentRecord) {
-                console.warn(`[ATTENDANCE] Skipping invalid or deleted student ID: ${rawStudentId}`);
+                console.warn(`[ATTENDANCE] Skipping non-existent student ID: ${studentId}`);
                 continue;
             }
 
-            // Guarantee valid section_id from student or from form
-            let targetSectionId = studentRecord.section_id || studentSections[studentId] || (section_id !== 'all' ? parseInt(section_id, 10) : null);
+            // Extract status, remark, section
+            const status = req.body[`status_${studentId}`] || 
+                           (req.body.attendance && (req.body.attendance[studentId] || req.body.attendance[String(studentId)])) || 
+                           'Present';
+
+            const remark = req.body[`remark_${studentId}`] || 
+                           (req.body.remarks && (req.body.remarks[studentId] || req.body.remarks[String(studentId)])) || 
+                           '';
+
+            // Determine valid section_id: student's DB section -> form section -> selected section -> class fallback
+            let targetSectionId = studentRecord.section_id || 
+                                  req.body[`student_section_${studentId}`] || 
+                                  (section_id && section_id !== 'all' ? parseInt(section_id, 10) : null);
+
             if (!targetSectionId) {
                 const [fallbackSec] = await conn.query(`SELECT id FROM sections WHERE class_id = ? LIMIT 1`, [class_id || studentRecord.class_id]);
                 targetSectionId = fallbackSec.length > 0 ? fallbackSec[0].id : null;
             }
 
             const targetClassId = class_id || studentRecord.class_id;
-            const remark = remarksObj[rawStudentId] || remarksObj[studentId] || '';
 
             await conn.query(
                 `INSERT INTO attendance (student_id, class_id, section_id, attendance_date, status, remarks, marked_by_user_id) 
