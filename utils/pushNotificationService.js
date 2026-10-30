@@ -85,6 +85,17 @@ function getFirebaseCredentials() {
         };
     }
 
+    // 4. Bundled fallback credentials in config/firebase_credentials.js (for zero-config cloud deployments)
+    try {
+        const bundledCreds = require('../config/firebase_credentials');
+        if (bundledCreds && bundledCreds.client_email && bundledCreds.private_key) {
+            return {
+                ...bundledCreds,
+                source: 'bundled_config: config/firebase_credentials.js'
+            };
+        }
+    } catch (_) {}
+
     return null;
 }
 
