@@ -141,8 +141,29 @@ router.post('/save', async (req, res) => {
         let absentCount = 0;
         let absentStudentIds = [];
 
-        for (const [studentId, status] of Object.entries(attendance)) {
-            const remark = remarksObj[studentId] || '';
+        // Validate and filter submitted student IDs to guarantee Foreign Key integrity
+        const submittedStudentIds = Object.keys(attendance)
+            .map(id => parseInt(id, 10))
+            .filter(id => !isNaN(id) && id > 0);
+
+        let validStudentIdSet = new Set();
+        if (submittedStudentIds.length > 0) {
+            const [existingStudents] = await conn.query(
+                `SELECT id FROM students WHERE id IN (?)`,
+                [submittedStudentIds]
+            );
+            validStudentIdSet = new Set(existingStudents.map(s => s.id));
+        }
+
+        let savedCount = 0;
+        for (const [rawStudentId, status] of Object.entries(attendance)) {
+            const studentId = parseInt(rawStudentId, 10);
+            if (!validStudentIdSet.has(studentId)) {
+                console.warn(`[ATTENDANCE] Skipping invalid or deleted student ID: ${rawStudentId}`);
+                continue;
+            }
+
+            const remark = remarksObj[rawStudentId] || remarksObj[studentId] || '';
             await conn.query(
                 `INSERT INTO attendance (student_id, class_id, section_id, attendance_date, status, remarks, marked_by_user_id) 
                  VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -150,6 +171,7 @@ router.post('/save', async (req, res) => {
                 [studentId, class_id, section_id, attendance_date, status, remark, req.session.user.id]
             );
 
+            savedCount++;
             if (status === 'Absent') {
                 absentCount++;
                 absentStudentIds.push(studentId);
@@ -157,13 +179,13 @@ router.post('/save', async (req, res) => {
         }
 
         await conn.commit();
-        req.session.flash_success = `Attendance saved successfully for ${Object.keys(attendance).length} students! (${absentCount} Absent)`;
+        req.session.flash_success = `Attendance saved successfully for ${savedCount} students! (${absentCount} Absent)`;
         res.redirect(`/admin/attendance?class_id=${class_id}&section_id=${section_id}&date=${attendance_date}`);
     } catch (err) {
         await conn.rollback();
         console.error('Save attendance error:', err);
         req.session.flash_error = 'Failed to save attendance: ' + err.message;
-        res.redirect('/admin/attendance');
+        res.redirect(`/admin/attendance?class_id=${req.body.class_id || ''}&section_id=${req.body.section_id || ''}&date=${req.body.attendance_date || ''}`);
     } finally {
         conn.release();
     }

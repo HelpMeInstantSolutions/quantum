@@ -413,12 +413,31 @@ router.post('/attendance/mark', requireApiAuth, async (req, res) => {
 
         const date = attendance_date || new Date().toISOString().split('T')[0];
 
+        const submittedIds = attendance_list
+            .map(item => parseInt(item.student_id, 10))
+            .filter(id => !isNaN(id) && id > 0);
+
+        let validIdSet = new Set();
+        if (submittedIds.length > 0) {
+            const [validRows] = await pool.query(
+                `SELECT id FROM students WHERE id IN (?)`,
+                [submittedIds]
+            );
+            validIdSet = new Set(validRows.map(r => r.id));
+        }
+
         for (const item of attendance_list) {
+            const studentId = parseInt(item.student_id, 10);
+            if (!validIdSet.has(studentId)) {
+                console.warn(`[API ATTENDANCE] Skipping non-existent or deleted student ID: ${item.student_id}`);
+                continue;
+            }
+
             await pool.query(
                 `INSERT INTO attendance (student_id, class_id, section_id, attendance_date, status, remarks, marked_by_user_id) 
                  VALUES (?, ?, ?, ?, ?, ?, ?) 
                  ON DUPLICATE KEY UPDATE status = VALUES(status), remarks = VALUES(remarks), marked_by_user_id = VALUES(marked_by_user_id)`,
-                [item.student_id, class_id, section_id, date, item.status || 'Present', item.remarks || '', req.user.id]
+                [studentId, class_id, section_id, date, item.status || 'Present', item.remarks || '', req.user.id]
             );
 
             // If absent, dispatch instant alert notification
