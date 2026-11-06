@@ -1,11 +1,18 @@
 <header class="admin-topbar">
-    <div class="d-flex align-items-center gap-3">
-        <button class="btn btn-sm btn-light border d-lg-none" type="button" onclick="document.querySelector('.admin-sidebar').classList.toggle('d-none')">
+    <div class="d-flex align-items-center gap-2 gap-sm-3">
+        <!-- Desktop and Mobile Sidebar Toggle Button -->
+        <button class="btn btn-sm btn-light border sidebar-toggle-btn shadow-sm" type="button" id="sidebarToggleBtn" title="Toggle Sidebar Menu" aria-label="Toggle Sidebar">
             <i class="fa-solid fa-bars"></i>
         </button>
-        <div class="d-none d-md-flex align-items-center text-muted small">
-            <i class="fa-solid fa-graduation-cap me-2 text-primary"></i>
-            <span>Session: <strong class="text-dark"><%= school.current_session || '2026-2027' %></strong></span>
+
+        <div class="d-flex align-items-center gap-2">
+            <span class="fw-bold text-dark d-inline-block text-truncate" style="max-width: 220px;" title="<%= school.school_name || 'Quantum Science Academy' %>">
+                <i class="fa-solid fa-atom text-primary me-1"></i><%= school.school_name || 'Quantum Science Academy' %>
+            </span>
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle d-none d-md-inline-flex align-items-center gap-1" style="font-size: 0.72rem; padding: 4px 8px;">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>Session: <strong><%= school.current_session || '2026-2027' %></strong></span>
+            </span>
         </div>
     </div>
 
@@ -35,3 +42,93 @@
         </div>
     </div>
 </header>
+
+<script>
+    (function() {
+        function initAdminSidebar() {
+            const toggleBtn = document.getElementById('sidebarToggleBtn');
+            const closeBtn = document.getElementById('sidebarCloseBtn');
+            const backdrop = document.getElementById('sidebarBackdrop');
+
+            function updateToggleBtn(isOpen) {
+                if (toggleBtn) {
+                    toggleBtn.setAttribute('title', isOpen ? 'Hide Sidebar Menu' : 'Show Sidebar Menu');
+                    toggleBtn.classList.toggle('btn-primary', isOpen);
+                    toggleBtn.classList.toggle('text-white', isOpen);
+                    toggleBtn.classList.toggle('btn-light', !isOpen);
+                }
+            }
+
+            function setSidebar(open) {
+                if (open) {
+                    document.body.classList.add('sidebar-open');
+                    sessionStorage.setItem('admin_sidebar_open', 'true');
+                    updateToggleBtn(true);
+                } else {
+                    document.body.classList.remove('sidebar-open');
+                    sessionStorage.setItem('admin_sidebar_open', 'false');
+                    updateToggleBtn(false);
+                }
+            }
+
+            function toggleSidebar() {
+                const isOpen = document.body.classList.contains('sidebar-open');
+                setSidebar(!isOpen);
+            }
+
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    toggleSidebar();
+                });
+            }
+
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    setSidebar(false);
+                });
+            }
+
+            if (backdrop) {
+                backdrop.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    setSidebar(false);
+                });
+            }
+
+            // Close with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && document.body.classList.contains('sidebar-open')) {
+                    setSidebar(false);
+                }
+            });
+
+            // On mobile, clicking a navigation link closes the sidebar
+            document.querySelectorAll('.sidebar-menu a').forEach(function(link) {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth < 992) {
+                        setSidebar(false);
+                    }
+                });
+            });
+
+            // Default state: HIDDEN on opening admin panel
+            // Only restore to open if user explicitly toggled it open in this session
+            const stored = sessionStorage.getItem('admin_sidebar_open');
+            if (stored === 'true') {
+                document.body.classList.add('sidebar-open');
+                updateToggleBtn(true);
+            } else {
+                document.body.classList.remove('sidebar-open');
+                updateToggleBtn(false);
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initAdminSidebar);
+        } else {
+            initAdminSidebar();
+        }
+    })();
+</script>
