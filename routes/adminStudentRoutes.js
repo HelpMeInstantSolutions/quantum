@@ -56,45 +56,72 @@ async function getOccupationsList() {
 
 router.use(requireAdminWeb);
 
-// List Students with Search & Class Filter
+// List Students with Search & Class Filter & Pagination
 router.get('/', async (req, res) => {
     try {
         const { class_id, section_id, search, status } = req.query;
 
-        let query = `
-            SELECT s.*, c.class_name, sec.section_name, tr.route_name 
-            FROM students s 
-            JOIN classes c ON s.class_id = c.id 
-            JOIN sections sec ON s.section_id = sec.id 
-            LEFT JOIN transport_routes tr ON s.transport_route_id = tr.id 
-            WHERE 1=1 
-        `;
+        let whereClause = ' WHERE 1=1 ';
         const params = [];
 
         if (class_id) {
-            query += ` AND s.class_id = ? `;
+            whereClause += ` AND s.class_id = ? `;
             params.push(class_id);
         }
         if (section_id) {
-            query += ` AND s.section_id = ? `;
+            whereClause += ` AND s.section_id = ? `;
             params.push(section_id);
         }
         if (status) {
-            query += ` AND s.status = ? `;
+            whereClause += ` AND s.status = ? `;
             params.push(status);
         } else {
-            query += ` AND s.status = 'active' `;
+            whereClause += ` AND s.status = 'active' `;
         }
         if (search) {
-            query += ` AND (s.first_name LIKE ? OR s.last_name LIKE ? OR s.admission_no LIKE ? OR s.biometric_id LIKE ? OR s.father_phone LIKE ? OR s.srn_no LIKE ? OR s.pen_no LIKE ?) `;
+            whereClause += ` AND (s.first_name LIKE ? OR s.last_name LIKE ? OR s.admission_no LIKE ? OR s.biometric_id LIKE ? OR s.father_phone LIKE ? OR s.srn_no LIKE ? OR s.pen_no LIKE ?) `;
             const term = `%${search.trim()}%`;
             params.push(term, term, term, term, term, term, term);
         }
 
-        query += ` ORDER BY c.numeric_level ASC, sec.section_name ASC, s.roll_no ASC`;
+        // Pagination: page and limit (allowed: 25, 50, 100)
+        const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+        let limit = parseInt(req.query.limit, 10) || 25;
+        if (![25, 50, 100].includes(limit)) {
+            limit = 25;
+        }
+        const offset = (page - 1) * limit;
 
-        const [students] = await pool.query(query, params);
-        const [classes] = await pool.query(`SELECT * FROM classes ORDER BY numeric_level ASC`);
+        // Total count
+        const [[{ totalRecords }]] = await pool.query(
+            `SELECT COUNT(*) as totalRecords 
+             FROM students s 
+             ${whereClause}`,
+            params
+        );
+
+        const totalPages = Math.ceil(totalRecords / limit) || 1;
+
+        // Fetch students paginated
+        const query = `
+            SELECT s.*, c.class_name, sec.section_name, tr.route_name 
+            FROM students s 
+            LEFT JOIN classes c ON s.class_id = c.id 
+            LEFT JOIN sections sec ON s.section_id = sec.id 
+            LEFT JOIN transport_routes tr ON s.transport_route_id = tr.id 
+            ${whereClause} 
+            ORDER BY c.numeric_level ASC, sec.section_name ASC, s.roll_no ASC, s.first_name ASC 
+            LIMIT ? OFFSET ?
+        `;
+
+        const [students] = await pool.query(query, [...params, limit, offset]);
+        const [classes] = await pool.query(`
+            SELECT c.*, COUNT(s.id) as student_count 
+            FROM classes c 
+            LEFT JOIN students s ON s.class_id = c.id AND s.status = 'active' 
+            GROUP BY c.id 
+            ORDER BY c.numeric_level ASC
+        `);
         const [sections] = await pool.query(`SELECT * FROM sections ORDER BY section_name ASC`);
 
         res.render('admin/students/index', {
@@ -102,7 +129,12 @@ router.get('/', async (req, res) => {
             students,
             classes,
             sections,
-            filters: { class_id, section_id, search, status: status || 'active' }
+            filters: { class_id, section_id, search, status: status || 'active' },
+            page,
+            limit,
+            offset,
+            totalPages,
+            totalRecords
         });
     } catch (err) {
         console.error('Students list error:', err);
