@@ -43,7 +43,9 @@
                                         <% if (student.pen_no) { %>
                                             <span class="badge bg-secondary text-white border"><i class="fa-solid fa-fingerprint me-1"></i>PEN: <%= student.pen_no %></span>
                                         <% } %>
-                                        <span class="badge bg-light text-dark border"><i class="fa-solid fa-droplet text-danger me-1"></i><%= student.blood_group %></span>
+                                        <% if (student.blood_group && student.blood_group !== 'Unknown') { %>
+                                            <span class="badge bg-light text-dark border"><i class="fa-solid fa-droplet text-danger me-1"></i><%= student.blood_group %></span>
+                                        <% } %>
                                         <% if (student.route_name) { %>
                                             <span class="badge bg-info-subtle text-info border"><i class="fa-solid fa-bus me-1"></i>Bus: <%= student.vehicle_number %></span>
                                         <% } %>
@@ -123,7 +125,7 @@
                                             <tr><td class="text-muted small">Family ID (PPP)</td><td><%= student.family_id || 'N/A' %></td></tr>
                                             <tr><td class="text-muted small">Gender</td><td><%= student.gender %></td></tr>
                                             <tr><td class="text-muted small">Date of Birth</td><td><%= student.dob || 'N/A' %></td></tr>
-                                            <tr><td class="text-muted small">Blood Group</td><td><%= student.blood_group %></td></tr>
+                                            <tr><td class="text-muted small">Blood Group</td><td><%= (student.blood_group && student.blood_group !== 'Unknown') ? student.blood_group : '<span class="text-muted">Not Provided</span>' %></td></tr>
                                             <tr><td class="text-muted small">Class & Section</td><td><%= student.class_name %> (<%= student.section_name %>)</td></tr>
                                             <tr><td class="text-muted small">Admission Date</td><td><%= student.admission_date || 'N/A' %></td></tr>
                                         </table>

@@ -87,8 +87,14 @@
                                             <input type="date" name="dob" class="form-control" value="<%= student.dob ? student.dob.toISOString().split('T')[0] : '' %>">
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label small fw-bold">Blood Group</label>
-                                            <input type="text" name="blood_group" class="form-control" value="<%= student.blood_group %>">
+                                            <label class="form-label small fw-bold">Blood Group <span class="text-muted fw-normal">(Optional)</span></label>
+                                            <select name="blood_group" class="form-select">
+                                                <option value="" <%= (!student.blood_group || student.blood_group === 'Unknown') ? 'selected' : '' %>>-- Not Available / Unknown --</option>
+                                                <% ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'].forEach(bg => { %>
+                                                    <option value="<%= bg %>" <%= student.blood_group === bg ? 'selected' : '' %>><%= bg %></option>
+                                                <% }) %>
+                                                <option value="Unknown" <%= student.blood_group === 'Unknown' ? 'selected' : '' %>>Unknown / Not Tested</option>
+                                            </select>
                                         </div>
 
                                         <div class="col-12 mt-3 pt-3 border-top">

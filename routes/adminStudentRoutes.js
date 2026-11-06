@@ -212,7 +212,7 @@ router.post('/add', upload.single('photo'), async (req, res) => {
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURDATE(), 'active', ?, ?, ?, ?, ?)`,
             [
                 user_id, admission_no, roll_no || null, biometric_id ? biometric_id.trim() : null, first_name, last_name || '', gender || 'Male',
-                dob || null, blood_group || 'B+', class_id, section_id, father_name, cleanFatherPhone,
+                dob || null, (blood_group && blood_group.trim()) ? blood_group.trim() : null, class_id, section_id, father_name, cleanFatherPhone,
                 father_occupation || '', mother_name || '', cleanMotherPhone, current_address || '',
                 current_address || '', photo_url, transport_route_id ? transport_route_id : null,
                 srn_no ? srn_no.trim() : null, pen_no ? pen_no.trim() : null,
@@ -421,7 +421,7 @@ router.post('/:id/edit', upload.fields([{ name: 'photo', maxCount: 1 }, { name: 
 
         let photoSql = '';
         const params = [
-            roll_no || null, biometric_id ? biometric_id.trim() : null, first_name, last_name || '', gender, dob || null, blood_group,
+            roll_no || null, biometric_id ? biometric_id.trim() : null, first_name, last_name || '', gender, dob || null, (blood_group && blood_group.trim()) ? blood_group.trim() : null,
             class_id, section_id, father_name, cleanFatherPhone, father_occupation || '',
             mother_name || '', cleanMotherPhone, current_address || '',
             transport_route_id ? transport_route_id : null, status || 'active',
