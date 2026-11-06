@@ -30,12 +30,14 @@ router.get('/', async (req, res) => {
 
         let section_id_raw = req.query.section_id;
         let section_id = null;
-        if (section_id_raw === 'all' || !section_id_raw) {
+        if (section_id_raw === 'all') {
             section_id = 'all';
         } else if (section_id_raw && !isNaN(parseInt(section_id_raw, 10))) {
             section_id = parseInt(section_id_raw, 10);
-        } else {
+        } else if (isMarkMode) {
             section_id = 'all';
+        } else {
+            section_id = null;
         }
 
         const attendance_date = req.query.date || '';
@@ -102,7 +104,7 @@ router.get('/', async (req, res) => {
             whereClause += ' AND s.class_id = ? ';
             whereParams.push(class_id);
         }
-        if (section_id && !isMarkMode) {
+        if (section_id && section_id !== 'all' && !isMarkMode) {
             whereClause += ' AND s.section_id = ? ';
             whereParams.push(section_id);
         }
