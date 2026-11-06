@@ -209,7 +209,14 @@
                         <div class="admin-card p-5 text-center text-muted">
                             <i class="fa-solid fa-user-group fs-1 text-secondary mb-3"></i>
                             <h5>No enrolled students found in this Class & Section.</h5>
-                            <p class="small text-muted mb-0">Please select a class that has enrolled students from the dropdown above (e.g. classes showing active student count) and click <strong>Load Students</strong>.</p>
+                            <% if (selectedClass && selectedClass.student_count > 0) { %>
+                                <p class="small text-muted mb-3">Class <strong><%= selectedClass.class_name %></strong> has <%= selectedClass.student_count %> active students. Click below to load all sections:</p>
+                                <a href="/admin/attendance?class_id=<%= class_id %>&section_id=all&date=<%= attendance_date || '' %>&mode=mark" class="btn btn-primary btn-sm fw-bold px-3">
+                                    <i class="fa-solid fa-users me-1"></i> Load All Sections (<%= selectedClass.student_count %> Students)
+                                </a>
+                            <% } else { %>
+                                <p class="small text-muted mb-0">Please select a class that has enrolled students from the dropdown above (e.g. classes showing active student count) and click <strong>Load Students</strong>.</p>
+                            <% } %>
                         </div>
                     <% } %>
 

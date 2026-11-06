@@ -30,20 +30,12 @@ router.get('/', async (req, res) => {
 
         let section_id_raw = req.query.section_id;
         let section_id = null;
-        if (section_id_raw === 'all') {
+        if (section_id_raw === 'all' || !section_id_raw) {
             section_id = 'all';
         } else if (section_id_raw && !isNaN(parseInt(section_id_raw, 10))) {
             section_id = parseInt(section_id_raw, 10);
-        } else if (isMarkMode) {
-            // Auto-select the section that has active students, or first available, or 'all'
-            const populatedSec = classSections.find(s => s.student_count > 0);
-            if (populatedSec) {
-                section_id = populatedSec.id;
-            } else if (classSections.length > 0) {
-                section_id = classSections[0].id;
-            } else {
-                section_id = 'all';
-            }
+        } else {
+            section_id = 'all';
         }
 
         const attendance_date = req.query.date || '';
@@ -70,6 +62,31 @@ router.get('/', async (req, res) => {
             studentSql += ` ORDER BY sec.section_name ASC, s.roll_no ASC, s.first_name ASC`;
             const [rows] = await pool.query(studentSql, studentParams);
             students = rows;
+
+            // Auto-fallback: If a specific section was selected but has 0 students while the class has active students,
+            // fall back to 'all' sections so the admin can immediately view and mark all students.
+            if (students.length === 0 && section_id !== 'all') {
+                const [totalActive] = await pool.query(
+                    `SELECT COUNT(*) as count FROM students WHERE class_id = ? AND status = 'active'`,
+                    [class_id]
+                );
+                if (totalActive[0]?.count > 0) {
+                    section_id = 'all';
+                    const [fallbackRows] = await pool.query(
+                        `SELECT s.id, s.admission_no, s.roll_no, s.biometric_id, s.first_name, s.last_name, s.father_name, s.father_phone, s.section_id,
+                                sec.section_name,
+                                a.id as attendance_id, a.status as attendance_status, a.remarks,
+                                a.morning_in, a.morning_out, a.tuition_in, a.tuition_out, a.morning_status, a.tuition_status
+                         FROM students s
+                         LEFT JOIN sections sec ON s.section_id = sec.id
+                         LEFT JOIN attendance a ON s.id = a.student_id AND a.attendance_date = ?
+                         WHERE s.class_id = ? AND s.status = 'active'
+                         ORDER BY sec.section_name ASC, s.roll_no ASC, s.first_name ASC`,
+                        [markDate, class_id]
+                    );
+                    students = fallbackRows;
+                }
+            }
         }
 
         // 2. All Attendance Logs in Descending Order with Pagination
@@ -121,7 +138,7 @@ router.get('/', async (req, res) => {
              FROM attendance a 
              JOIN students s ON a.student_id = s.id 
              JOIN classes c ON s.class_id = c.id 
-             JOIN sections sec ON s.section_id = sec.id 
+             LEFT JOIN sections sec ON s.section_id = sec.id 
              ${whereClause} 
              ORDER BY a.attendance_date DESC, a.id DESC 
              LIMIT ? OFFSET ?`,

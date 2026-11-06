@@ -10,10 +10,12 @@ router.get('/', async (req, res) => {
     let totalRoutes = 4;
 
     try {
-        // Fetch pinned / recent notices
+        // Fetch pinned / recent notices (exclude private attendance alerts, fee reminders, and student-specific notices)
         const [noticeRows] = await pool.query(
             `SELECT * FROM notifications 
              WHERE target_role IN ('all', 'student', 'parent') 
+               AND category NOT IN ('attendance_alert', 'fee_reminder')
+               AND student_id IS NULL
              ORDER BY is_pinned DESC, created_at DESC LIMIT 6`
         );
         notices = noticeRows || [];
@@ -101,6 +103,8 @@ router.get('/notices', async (req, res) => {
         const [rows] = await pool.query(
             `SELECT * FROM notifications 
              WHERE target_role IN ('all', 'student', 'parent') 
+               AND category NOT IN ('attendance_alert', 'fee_reminder')
+               AND student_id IS NULL
              ORDER BY is_pinned DESC, created_at DESC LIMIT 30`
         );
         notices = rows || [];
